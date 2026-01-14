@@ -121,8 +121,8 @@ const IpLookup: React.FC = () => {
     <ToolLayout title={t("tools.ip_lookup.name")}>
       <div className="max-w-5xl mx-auto w-full space-y-6 pb-10">
         {/* 查询输入 */}
-        <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] p-6">
-          <label className="block text-sm font-bold text-[var(--text-main)] mb-3">
+        <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) p-6">
+          <label className="block text-sm font-bold text-(--text-main) mb-3">
             {t("tools.ip_lookup.ip_address")}
           </label>
           <div className="flex gap-3">
@@ -132,7 +132,7 @@ const IpLookup: React.FC = () => {
               onChange={(e) => setIpInput(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={t("tools.ip_lookup.ip_placeholder")}
-              className="flex-1 px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-4 py-2 bg-(--bg-main) border border-(--border-color) rounded-lg text-(--text-main) placeholder-(--text-muted) focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               onClick={() => handleQuery()}
@@ -145,7 +145,7 @@ const IpLookup: React.FC = () => {
             <button
               onClick={() => handleQuery("")}
               disabled={loading}
-              className="px-6 py-2 bg-[var(--bg-main)] hover:bg-[var(--border-color)] border border-[var(--border-color)] text-[var(--text-main)] rounded-lg font-medium transition-colors flex items-center gap-2"
+              className="px-6 py-2 bg-(--bg-main) hover:bg-(--border-color) border border-(--border-color) text-(--text-main) rounded-lg font-medium transition-colors flex items-center gap-2"
             >
               <Globe size={18} />
               {t("tools.ip_lookup.query_my_ip")}
@@ -173,42 +173,42 @@ const IpLookup: React.FC = () => {
         {queryResult && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* 基础信息 */}
-            <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] p-6 lg:col-span-3">
-              <h3 className="text-lg font-bold text-[var(--text-main)] mb-4 flex items-center gap-2">
+            <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) p-6 lg:col-span-3">
+              <h3 className="text-lg font-bold text-(--text-main) mb-4 flex items-center gap-2">
                 <Globe size={20} />
                 {t("common.status")}
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-[var(--bg-main)] p-4 rounded-lg">
-                  <p className="text-xs text-[var(--text-muted)]">IP</p>
-                  <p className="text-lg font-bold text-[var(--text-main)] truncate">
+                <div className="bg-(--bg-main) p-4 rounded-lg">
+                  <p className="text-xs text-(--text-muted)">IP</p>
+                  <p className="text-lg font-bold text-(--text-main) truncate">
                     {queryResult.ip}
                   </p>
                   <p className="text-xs text-blue-400 mt-1">
                     {queryResult.ip_type}
                   </p>
                 </div>
-                <div className="bg-[var(--bg-main)] p-4 rounded-lg">
-                  <p className="text-xs text-[var(--text-muted)]">
+                <div className="bg-(--bg-main) p-4 rounded-lg">
+                  <p className="text-xs text-(--text-muted)">
                     {t("tools.ip_lookup.country")}
                   </p>
-                  <p className="text-lg font-bold text-[var(--text-main)]">
+                  <p className="text-lg font-bold text-(--text-main)">
                     {getCountryFlag(queryResult.country)} {queryResult.country}
                   </p>
                 </div>
-                <div className="bg-[var(--bg-main)] p-4 rounded-lg">
-                  <p className="text-xs text-[var(--text-muted)]">
+                <div className="bg-(--bg-main) p-4 rounded-lg">
+                  <p className="text-xs text-(--text-muted)">
                     {t("tools.ip_lookup.isp")}
                   </p>
-                  <p className="text-lg font-bold text-[var(--text-main)] truncate">
+                  <p className="text-lg font-bold text-(--text-main) truncate">
                     {queryResult.isp || "-"}
                   </p>
                 </div>
-                <div className="bg-[var(--bg-main)] p-4 rounded-lg">
-                  <p className="text-xs text-[var(--text-muted)]">
+                <div className="bg-(--bg-main) p-4 rounded-lg">
+                  <p className="text-xs text-(--text-muted)">
                     {t("tools.ip_lookup.timezone")}
                   </p>
-                  <p className="text-lg font-bold text-[var(--text-main)] truncate">
+                  <p className="text-lg font-bold text-(--text-main) truncate">
                     {queryResult.timezone}
                   </p>
                 </div>
@@ -216,25 +216,25 @@ const IpLookup: React.FC = () => {
             </div>
 
             {/* 地理位置 */}
-            <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] p-6">
-              <h4 className="font-bold text-[var(--text-main)] mb-4 flex items-center gap-2">
+            <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) p-6">
+              <h4 className="font-bold text-(--text-main) mb-4 flex items-center gap-2">
                 <MapPin size={18} />
                 {t("tools.ip_lookup.location")}
               </h4>
               <div className="space-y-3">
                 <div>
-                  <p className="text-xs text-[var(--text-muted)]">
+                  <p className="text-xs text-(--text-muted)">
                     {t("tools.ip_lookup.province")}
                   </p>
-                  <p className="text-sm font-medium text-[var(--text-main)]">
+                  <p className="text-sm font-medium text-(--text-main)">
                     {queryResult.province || "-"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[var(--text-muted)]">
+                  <p className="text-xs text-(--text-muted)">
                     {t("tools.ip_lookup.city")}
                   </p>
-                  <p className="text-sm font-medium text-[var(--text-main)]">
+                  <p className="text-sm font-medium text-(--text-main)">
                     {queryResult.city || "-"}
                   </p>
                 </div>
@@ -242,24 +242,24 @@ const IpLookup: React.FC = () => {
             </div>
 
             {/* 坐标 */}
-            <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] p-6">
-              <h4 className="font-bold text-[var(--text-main)] mb-4">
+            <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) p-6">
+              <h4 className="font-bold text-(--text-main) mb-4">
                 {t("tools.ip_lookup.coordinates")}
               </h4>
               <div className="space-y-3">
                 <div>
-                  <p className="text-xs text-[var(--text-muted)]">
+                  <p className="text-xs text-(--text-muted)">
                     {t("tools.ip_lookup.latitude")}
                   </p>
-                  <p className="text-sm font-medium text-[var(--text-main)]">
+                  <p className="text-sm font-medium text-(--text-main)">
                     {queryResult.latitude}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[var(--text-muted)]">
+                  <p className="text-xs text-(--text-muted)">
                     {t("tools.ip_lookup.longitude")}
                   </p>
-                  <p className="text-sm font-medium text-[var(--text-main)]">
+                  <p className="text-sm font-medium text-(--text-main)">
                     {queryResult.longitude}
                   </p>
                 </div>
@@ -267,24 +267,24 @@ const IpLookup: React.FC = () => {
             </div>
 
             {/* 其他信息 */}
-            <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] p-6">
-              <h4 className="font-bold text-[var(--text-main)] mb-4">
+            <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) p-6">
+              <h4 className="font-bold text-(--text-main) mb-4">
                 {t("tools.ip_lookup.others")}
               </h4>
               <div className="space-y-3">
                 <div>
-                  <p className="text-xs text-[var(--text-muted)]">
+                  <p className="text-xs text-(--text-muted)">
                     {t("tools.ip_lookup.organization")}
                   </p>
-                  <p className="text-sm font-medium text-[var(--text-main)] truncate">
+                  <p className="text-sm font-medium text-(--text-main) truncate">
                     {queryResult.organization || "-"}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[var(--text-muted)]">
+                  <p className="text-xs text-(--text-muted)">
                     {t("tools.ip_lookup.asn")}
                   </p>
-                  <p className="text-sm font-medium text-[var(--text-main)]">
+                  <p className="text-sm font-medium text-(--text-main)">
                     {queryResult.asn || "-"}
                   </p>
                 </div>
@@ -295,27 +295,27 @@ const IpLookup: React.FC = () => {
 
         {/* 查询历史 */}
         {history.length > 0 && (
-          <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] p-6">
-            <h3 className="text-lg font-bold text-[var(--text-main)] mb-4">
+          <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) p-6">
+            <h3 className="text-lg font-bold text-(--text-main) mb-4">
               {t("tools.ip_lookup.query_history")}
             </h3>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {history.map((ip, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-3 bg-[var(--bg-main)] rounded-lg border border-[var(--border-color)] hover:border-blue-500 transition-colors"
+                  className="flex items-center justify-between p-3 bg-(--bg-main) rounded-lg border border-(--border-color) hover:border-blue-500 transition-colors"
                 >
                   <span
                     onClick={() => setIpInput(ip)}
-                    className="cursor-pointer text-sm text-[var(--text-main)] hover:text-blue-500 transition-colors"
+                    className="cursor-pointer text-sm text-(--text-main) hover:text-blue-500 transition-colors"
                   >
                     {ip}
                   </span>
                   <button
                     onClick={() => handleCopy(ip, "IP")}
-                    className="p-2 hover:bg-[var(--border-color)] rounded-lg transition-colors"
+                    className="p-2 hover:bg-(--border-color) rounded-lg transition-colors"
                   >
-                    <Copy size={16} className="text-[var(--text-muted)]" />
+                    <Copy size={16} className="text-(--text-muted)" />
                   </button>
                 </div>
               ))}

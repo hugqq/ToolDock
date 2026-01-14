@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { X, Download, Copy } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -38,17 +38,17 @@ export const DiagnosticModal: React.FC<Props> = ({ isOpen, onClose, json }) => {
       onClick={onClose}
     >
       <div
-        className="bg-[var(--card-bg)] rounded-2xl w-[800px] max-w-[95vw] max-h-[80vh] overflow-auto shadow-2xl border border-[var(--border-color)]"
+        className="bg-(--card-bg) rounded-2xl w-[800px] max-w-[95vw] max-h-[80vh] overflow-auto shadow-2xl border border-(--border-color)"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 pt-5 pb-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h3 className="text-lg font-bold text-[var(--text-main)]">
+            <h3 className="text-lg font-bold text-(--text-main)">
               {t("tools.hotkey_query.diagnostic.title")}
             </h3>
           </div>
           <button
-            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
             onClick={onClose}
           >
             <X size={18} />
@@ -58,27 +58,27 @@ export const DiagnosticModal: React.FC<Props> = ({ isOpen, onClose, json }) => {
         <div className="px-6 pb-6">
           <div className="mb-3 flex justify-end gap-2">
             <button
-              className="px-3 py-1 rounded-xl bg-[var(--bg-main)] text-sm text-[var(--text-muted)] hover:bg-[var(--border-color)]"
+              className="px-3 py-1 rounded-xl bg-(--bg-main) text-sm text-(--text-muted) hover:bg-(--border-color)"
               onClick={() => copyText(json)}
             >
               <Copy size={14} /> {t("tools.hotkey_query.diagnostic.copy")}
             </button>
             <button
-              className="px-3 py-1 rounded-xl bg-[var(--bg-main)] text-sm text-[var(--text-muted)] hover:bg-[var(--border-color)]"
+              className="px-3 py-1 rounded-xl bg-(--bg-main) text-sm text-(--text-muted) hover:bg-(--border-color)"
               onClick={() => download(json)}
             >
               <Download size={14} />{" "}
               {t("tools.hotkey_query.diagnostic.download")}
             </button>
           </div>
-          <pre className="bg-[var(--bg-main)] rounded p-4 text-xs whitespace-pre-wrap">
+          <pre className="bg-(--bg-main) rounded p-4 text-xs whitespace-pre-wrap">
             {json}
           </pre>
         </div>
 
-        <div className="px-6 py-4 bg-black/[0.02] dark:bg-white/[0.02] flex justify-end gap-3 border-t border-[var(--border-color)]">
+        <div className="px-6 py-4 bg-black/[0.02] dark:bg-white/[0.02] flex justify-end gap-3 border-t border-(--border-color)">
           <button
-            className="px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm font-medium hover:bg-[var(--border-color)]"
+            className="px-4 py-2 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm font-medium hover:bg-(--border-color)"
             onClick={onClose}
           >
             {t("common.close")}

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 通用弹窗组件
  * 支持确认、警告、错误等类型，适配黑白主题
  */
@@ -63,31 +63,31 @@ export const Modal: React.FC<ModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-[var(--card-bg)] rounded-2xl w-[420px] max-w-[90vw] shadow-2xl border border-[var(--border-color)] overflow-hidden animate-in slide-in-from-bottom-4 duration-300 ease-out"
+        className="bg-(--card-bg) rounded-2xl w-[420px] max-w-[90vw] shadow-2xl border border-(--border-color) overflow-hidden animate-in slide-in-from-bottom-4 duration-300 ease-out"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 pt-5 pb-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             {getIcon()}
-            <h3 className="text-lg font-bold text-[var(--text-main)]">
+            <h3 className="text-lg font-bold text-(--text-main)">
               {title}
             </h3>
           </div>
           <button
-            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-main) hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
             onClick={onClose}
           >
             <X size={18} />
           </button>
         </div>
         <div className="px-6 pb-6">
-          <p className="text-[15px] leading-relaxed text-[var(--text-muted)]">
+          <p className="text-[15px] leading-relaxed text-(--text-muted)">
             {message}
           </p>
         </div>
-        <div className="px-6 py-4 bg-black/[0.02] dark:bg-white/[0.02] flex justify-end gap-3 border-t border-[var(--border-color)]">
+        <div className="px-6 py-4 bg-black/[0.02] dark:bg-white/[0.02] flex justify-end gap-3 border-t border-(--border-color)">
           <button
-            className="px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm font-medium hover:bg-[var(--border-color)] transition-colors"
+            className="px-4 py-2 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm font-medium hover:bg-(--border-color) transition-colors"
             onClick={onClose}
           >
             {cancelText || t("common.cancel")}

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 通用扫描进度条组件
  * 用于显示长耗时任务的实时进度，包括百分比、文件计数和当前文件名
  */
@@ -72,13 +72,13 @@ export const ScanProgress: React.FC<ScanProgressProps> = ({
             <div>
               <Typography
                 variant="subtitle1"
-                className="font-bold text-[var(--text-main)]"
+                className="font-bold text-(--text-main)"
               >
                 {title}
               </Typography>
               <Typography
                 variant="caption"
-                className="text-[var(--text-muted)] transition-all duration-200"
+                className="text-(--text-muted) transition-all duration-200"
               >
                 {isIndeterminate
                   ? `已扫描 ${progress.scanned_files} 项...`
@@ -91,7 +91,7 @@ export const ScanProgress: React.FC<ScanProgressProps> = ({
           <div className="min-h-[2.5rem] pl-[52px] overflow-hidden">
             <Typography
               variant="body2"
-              className="text-[var(--text-main)] font-medium block break-all leading-relaxed transition-opacity duration-300 ease-in-out"
+              className="text-(--text-main) font-medium block break-all leading-relaxed transition-opacity duration-300 ease-in-out"
               title={
                 descriptionFormatter
                   ? descriptionFormatter(

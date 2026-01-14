@@ -425,22 +425,22 @@ const NodeCleaner: React.FC = () => {
         instructionsColor: "blue" as const,
         content: (
           <>
-            <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm mb-6">
+            <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm mb-6">
               <div className="flex flex-col gap-4">
-                <label className="text-sm font-bold text-[var(--text-main)]">
+                <label className="text-sm font-bold text-(--text-main)">
                   {t("tools.node_cleaner.col_path")}
                 </label>
                 <div className="flex gap-3">
                   <input
                     type="text"
                     placeholder={t("tools.node_cleaner.path_placeholder")}
-                    className="flex-1 !px-4 py-2.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    className="flex-1 !px-4 py-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     value={path}
                     onChange={(e) => setPath(e.target.value)}
                   />
                   <Button
                     variant="outlined"
-                    className="flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm font-medium hover:bg-[var(--border-color)] transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm font-medium hover:bg-(--border-color) transition-colors disabled:opacity-50"
                     onClick={handleBrowse}
                     disabled={scanning || processing}
                   >
@@ -479,7 +479,7 @@ const NodeCleaner: React.FC = () => {
                     variant="text"
                     size="small"
                     onClick={() => setShowLogs(false)}
-                    className="text-xs text-[var(--text-muted)] hover:text-primary transition-colors"
+                    className="text-xs text-(--text-muted) hover:text-primary transition-colors"
                   >
                     {t("tools.node_cleaner.logs_hide")}
                   </Button>
@@ -503,9 +503,9 @@ const NodeCleaner: React.FC = () => {
               </div>
             )}
 
-            <div className="flex flex-col gap-4 mt-6 pt-6 border-t border-[var(--border-color)]">
+            <div className="flex flex-col gap-4 mt-6 pt-6 border-t border-(--border-color)">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-bold text-[var(--text-main)]">
+                <label className="text-sm font-bold text-(--text-main)">
                   {t("tools.node_cleaner.tab_deps")}
                 </label>
                 <div className="flex gap-2">
@@ -570,7 +570,7 @@ const NodeCleaner: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 mt-6 pt-6 border-t border-[var(--border-color)]">
+            <div className="flex items-center gap-3 mt-6 pt-6 border-t border-(--border-color)">
               <Button
                 variant="outlined"
                 className="flex items-center gap-2 px-4 py-2 bg-primary/5 text-primary border border-primary/20 rounded-xl text-sm font-bold hover:bg-primary/10 transition-colors disabled:opacity-50"
@@ -582,10 +582,10 @@ const NodeCleaner: React.FC = () => {
                   {t(`tools.node_cleaner.${selectedManager}_install`)}
                 </span>
               </Button>
-              <div className="w-px h-6 bg-[var(--border-color)] mx-1" />
+              <div className="w-px h-6 bg-(--border-color) mx-1" />
               <Button
                 variant="outlined"
-                className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm font-medium hover:bg-[var(--border-color)] transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm font-medium hover:bg-(--border-color) transition-colors disabled:opacity-50"
                 onClick={() =>
                   setResults((prev) =>
                     prev.map((i) => ({ ...i, checked: true }))
@@ -598,7 +598,7 @@ const NodeCleaner: React.FC = () => {
               </Button>
               <Button
                 variant="outlined"
-                className="flex items-center gap-2 px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm font-medium hover:bg-[var(--border-color)] transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm font-medium hover:bg-(--border-color) transition-colors disabled:opacity-50"
                 onClick={() =>
                   setResults((prev) =>
                     prev.map((i) => ({ ...i, checked: false }))
@@ -626,27 +626,27 @@ const NodeCleaner: React.FC = () => {
 
             {results.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="bg-[var(--card-bg)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm flex items-center gap-4">
+                <div className="bg-(--card-bg) p-4 rounded-2xl border border-(--border-color) shadow-sm flex items-center gap-4">
                   <div className="w-12 h-12 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center shrink-0">
                     <Trash2 size={24} />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs text-[var(--text-muted)] font-medium">
+                    <span className="text-xs text-(--text-muted) font-medium">
                       {t("tools.node_cleaner.found_count", {
                         count: results.length,
                       })}
                     </span>
-                    <span className="text-lg font-bold text-[var(--text-main)]">
+                    <span className="text-lg font-bold text-(--text-main)">
                       {formatSize(totalSize)}
                     </span>
                   </div>
                 </div>
-                <div className="bg-[var(--card-bg)] p-4 rounded-2xl border border-emerald-500/20 shadow-sm flex items-center gap-4 border-l-4 border-l-emerald-500">
+                <div className="bg-(--card-bg) p-4 rounded-2xl border border-emerald-500/20 shadow-sm flex items-center gap-4 border-l-4 border-l-emerald-500">
                   <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
                     <Info size={24} />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xs text-[var(--text-muted)] font-medium">
+                    <span className="text-xs text-(--text-muted) font-medium">
                       {t("tools.node_cleaner.total_size", { size: "" })}
                     </span>
                     <span className="text-lg font-bold text-emerald-500">
@@ -657,16 +657,16 @@ const NodeCleaner: React.FC = () => {
               </div>
             )}
 
-            <div className="flex-1 min-h-0 bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] shadow-sm overflow-hidden flex flex-col">
+            <div className="flex-1 min-h-0 bg-(--card-bg) rounded-2xl border border-(--border-color) shadow-sm overflow-hidden flex flex-col">
               {results.length > 0 ? (
                 <div className="flex-1 overflow-auto">
                   <table className="w-full border-collapse text-left">
-                    <thead className="sticky top-0 bg-[var(--card-bg)] z-10 border-b border-[var(--border-color)]">
+                    <thead className="sticky top-0 bg-(--card-bg) z-10 border-b border-(--border-color)">
                       <tr>
                         <th className="px-4 py-3 w-12 text-center">
                           <input
                             type="checkbox"
-                            className="w-4 h-4 rounded border-[var(--border-color)] text-primary focus:ring-primary/20"
+                            className="w-4 h-4 rounded border-(--border-color) text-primary focus:ring-primary/20"
                             checked={
                               checkedCount === results.length &&
                               results.length > 0
@@ -681,32 +681,32 @@ const NodeCleaner: React.FC = () => {
                             }
                           />
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                        <th className="px-4 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider">
                           {t("tools.node_cleaner.col_path")}
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider text-right w-[120px]">
+                        <th className="px-4 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider text-right w-[120px]">
                           {t("tools.node_cleaner.col_size")}
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider text-center w-[120px]">
+                        <th className="px-4 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider text-center w-[120px]">
                           {t("tools.node_cleaner.col_status")}
                         </th>
-                        <th className="px-4 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider text-center w-[120px]">
+                        <th className="px-4 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider text-center w-[120px]">
                           操作
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[var(--border-color)]">
+                    <tbody className="divide-y divide-(--border-color)">
                       {results.map((item) => (
                         <tr
                           key={item.path}
-                          className={`hover:bg-[var(--bg-main)] transition-colors ${
+                          className={`hover:bg-(--bg-main) transition-colors ${
                             item.status === "success" ? "bg-emerald-500/5" : ""
                           }`}
                         >
                           <td className="px-4 py-3 text-center">
                             <input
                               type="checkbox"
-                              className="w-4 h-4 rounded border-[var(--border-color)] text-primary focus:ring-primary/20"
+                              className="w-4 h-4 rounded border-(--border-color) text-primary focus:ring-primary/20"
                               checked={item.checked}
                               disabled={item.status === "success" || processing}
                               onChange={() =>
@@ -729,8 +729,8 @@ const NodeCleaner: React.FC = () => {
                               <span
                                 className={`text-sm font-medium truncate max-w-[400px] ${
                                   item.status === "success"
-                                    ? "text-[var(--text-muted)] line-through"
-                                    : "text-[var(--text-main)]"
+                                    ? "text-(--text-muted) line-through"
+                                    : "text-(--text-main)"
                                 }`}
                                 title={item.path}
                               >
@@ -739,7 +739,7 @@ const NodeCleaner: React.FC = () => {
                             </div>
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <span className="text-sm font-mono font-bold text-[var(--text-main)]">
+                            <span className="text-sm font-mono font-bold text-(--text-main)">
                               {formatSize(item.size)}
                             </span>
                           </td>
@@ -769,7 +769,7 @@ const NodeCleaner: React.FC = () => {
                               </span>
                             )}
                             {item.status === "pending" && (
-                              <span className="text-xs text-[var(--text-muted)] font-medium whitespace-nowrap">
+                              <span className="text-xs text-(--text-muted) font-medium whitespace-nowrap">
                                 {t("common.ready")}
                               </span>
                             )}
@@ -779,7 +779,7 @@ const NodeCleaner: React.FC = () => {
                               <Button
                                 variant="text"
                                 size="small"
-                                className="p-1.5 text-[var(--text-muted)] hover:text-primary hover:bg-primary/10 rounded-lg transition-all disabled:opacity-30"
+                                className="p-1.5 text-(--text-muted) hover:text-primary hover:bg-primary/10 rounded-lg transition-all disabled:opacity-30"
                                 onClick={() => handlePkgInstall(item.path)}
                                 disabled={
                                   processing ||
@@ -793,7 +793,7 @@ const NodeCleaner: React.FC = () => {
                               <Button
                                 variant="text"
                                 size="small"
-                                className="p-1.5 text-[var(--text-muted)] hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-30"
+                                className="p-1.5 text-(--text-muted) hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-30"
                                 onClick={() => {
                                   setResults((prev) =>
                                     prev.map((i) =>
@@ -820,13 +820,13 @@ const NodeCleaner: React.FC = () => {
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-                  <div className="w-20 h-20 rounded-full bg-[var(--bg-main)] flex items-center justify-center mb-6">
+                  <div className="w-20 h-20 rounded-full bg-(--bg-main) flex items-center justify-center mb-6">
                     <BoxIcon size={40} className="text-primary/40" />
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--text-main)] mb-2">
+                  <h3 className="text-lg font-bold text-(--text-main) mb-2">
                     {t("common.ready")}
                   </h3>
-                  <p className="text-sm text-[var(--text-muted)] max-w-xs">
+                  <p className="text-sm text-(--text-muted) max-w-xs">
                     {scanning
                       ? t("tools.node_cleaner.status_scanning")
                       : t("tools.node_cleaner.status_ready")}
@@ -862,16 +862,16 @@ const NodeCleaner: React.FC = () => {
         instructionsColor: "green" as const,
         content: (
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm mb-6">
+            <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm mb-6">
               <div className="flex flex-col gap-4">
-                <label className="text-sm font-bold text-[var(--text-main)]">
+                <label className="text-sm font-bold text-(--text-main)">
                   {t("tools.node_cleaner.nvm.install")}
                 </label>
                 <div className="flex gap-3">
                   <input
                     type="text"
                     placeholder={t("tools.node_cleaner.nvm.placeholder")}
-                    className="flex-1 !px-4 py-2.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    className="flex-1 !px-4 py-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     value={newVersion}
                     onChange={(e) => setNewVersion(e.target.value)}
                   />
@@ -886,7 +886,7 @@ const NodeCleaner: React.FC = () => {
                   </Button>
                   <Button
                     variant="outlined"
-                    className="p-2.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-[var(--text-muted)] hover:text-primary hover:bg-primary/5 transition-all disabled:opacity-50"
+                    className="p-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-(--text-muted) hover:text-primary hover:bg-primary/5 transition-all disabled:opacity-50"
                     onClick={fetchNvmVersions}
                     disabled={nvmLoading}
                   >
@@ -899,28 +899,28 @@ const NodeCleaner: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex-1 min-h-0 bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] shadow-sm overflow-hidden flex flex-col">
+            <div className="flex-1 min-h-0 bg-(--card-bg) rounded-2xl border border-(--border-color) shadow-sm overflow-hidden flex flex-col">
               {nvmVersions.length > 0 ? (
                 <div className="flex-1 overflow-auto">
                   <table className="w-full border-collapse text-left">
-                    <thead className="sticky top-0 bg-[var(--card-bg)] z-10 border-b border-[var(--border-color)]">
+                    <thead className="sticky top-0 bg-(--card-bg) z-10 border-b border-(--border-color)">
                       <tr>
-                        <th className="px-6 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                        <th className="px-6 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider">
                           {t("tools.node_cleaner.nvm.list")}
                         </th>
-                        <th className="px-6 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider text-center w-[120px]">
+                        <th className="px-6 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider text-center w-[120px]">
                           {t("common.status")}
                         </th>
-                        <th className="px-6 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider text-center w-[200px]">
+                        <th className="px-6 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider text-center w-[200px]">
                           {t("tools.folder_size.col_actions")}
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[var(--border-color)]">
+                    <tbody className="divide-y divide-(--border-color)">
                       {nvmVersions.map((v) => (
                         <tr
                           key={v.version}
-                          className={`hover:bg-[var(--bg-main)] transition-colors ${
+                          className={`hover:bg-(--bg-main) transition-colors ${
                             v.is_current ? "bg-emerald-500/5" : ""
                           }`}
                         >
@@ -930,7 +930,7 @@ const NodeCleaner: React.FC = () => {
                                 className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                                   v.is_current
                                     ? "bg-emerald-500/10 text-emerald-500"
-                                    : "bg-[var(--bg-main)] text-[var(--text-muted)]"
+                                    : "bg-(--bg-main) text-(--text-muted)"
                                 }`}
                               >
                                 <Cpu size={16} />
@@ -939,7 +939,7 @@ const NodeCleaner: React.FC = () => {
                                 className={`text-sm font-medium ${
                                   v.is_current
                                     ? "text-emerald-600 font-bold"
-                                    : "text-[var(--text-main)]"
+                                    : "text-(--text-main)"
                                 }`}
                               >
                                 {v.version}
@@ -953,7 +953,7 @@ const NodeCleaner: React.FC = () => {
                                 {t("tools.node_cleaner.nvm.current")}
                               </span>
                             ) : (
-                              <span className="text-xs text-[var(--text-muted)]">
+                              <span className="text-xs text-(--text-muted)">
                                 -
                               </span>
                             )}
@@ -975,7 +975,7 @@ const NodeCleaner: React.FC = () => {
                               <Button
                                 variant="text"
                                 size="small"
-                                className="p-1.5 text-[var(--text-muted)] hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
+                                className="p-1.5 text-(--text-muted) hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
                                 onClick={() =>
                                   handleUninstallVersion(v.version)
                                 }
@@ -995,15 +995,15 @@ const NodeCleaner: React.FC = () => {
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-                  <div className="w-20 h-20 rounded-full bg-[var(--bg-main)] flex items-center justify-center mb-6">
+                  <div className="w-20 h-20 rounded-full bg-(--bg-main) flex items-center justify-center mb-6">
                     <Cpu size={40} className="text-primary/40" />
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--text-main)] mb-2">
+                  <h3 className="text-lg font-bold text-(--text-main) mb-2">
                     {nvmLoading
                       ? t("common.loading")
                       : t("tools.node_cleaner.nvm.not_found")}
                   </h3>
-                  <p className="text-sm text-[var(--text-muted)] max-w-xs">
+                  <p className="text-sm text-(--text-muted) max-w-xs">
                     {nvmLoading
                       ? t("tools.node_cleaner.status_scanning")
                       : t("tools.node_cleaner.nvm.error_nvm_not_found")}
@@ -1039,21 +1039,21 @@ const NodeCleaner: React.FC = () => {
         instructionsColor: "purple" as const,
         content: (
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm mb-6">
+            <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm mb-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-4">
-                  <label className="text-sm font-bold text-[var(--text-main)]">
+                  <label className="text-sm font-bold text-(--text-main)">
                     {t("tools.node_cleaner.vite.project_name")}
                   </label>
                   <input
                     type="text"
-                    className="!px-4 py-2.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    className="!px-4 py-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                     value={viteProjectName}
                     onChange={(e) => setViteProjectName(e.target.value)}
                   />
                 </div>
                 <div className="flex flex-col gap-4">
-                  <label className="text-sm font-bold text-[var(--text-main)]">
+                  <label className="text-sm font-bold text-(--text-main)">
                     {t("tools.node_cleaner.vite.target_dir")}
                   </label>
                   <div className="flex gap-3">
@@ -1062,13 +1062,13 @@ const NodeCleaner: React.FC = () => {
                       placeholder={t(
                         "tools.node_cleaner.vite.path_placeholder"
                       )}
-                      className="flex-1 !px-4 py-2.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                      className="flex-1 !px-4 py-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                       value={viteTargetDir}
                       onChange={(e) => setViteTargetDir(e.target.value)}
                     />
                     <Button
                       variant="outlined"
-                      className="flex items-center gap-2 px-4 py-2.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm font-medium hover:bg-[var(--border-color)] transition-colors"
+                      className="flex items-center gap-2 px-4 py-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm font-medium hover:bg-(--border-color) transition-colors"
                       onClick={async () => {
                         const selected = await openDialog({
                           directory: true,
@@ -1086,7 +1086,7 @@ const NodeCleaner: React.FC = () => {
               </div>
 
               <div className="mt-8">
-                <label className="text-sm font-bold text-[var(--text-main)] mb-4 block">
+                <label className="text-sm font-bold text-(--text-main) mb-4 block">
                   {t("tools.node_cleaner.vite.framework")}
                 </label>
                 <div className="flex flex-wrap gap-3">
@@ -1109,7 +1109,7 @@ const NodeCleaner: React.FC = () => {
               </div>
 
               <div className="mt-8">
-                <label className="text-sm font-bold text-[var(--text-main)] mb-4 block">
+                <label className="text-sm font-bold text-(--text-main) mb-4 block">
                   {t("tools.node_cleaner.vite.variant")}
                 </label>
                 <div className="flex flex-wrap gap-3">
@@ -1129,22 +1129,22 @@ const NodeCleaner: React.FC = () => {
               </div>
 
               <div className="mt-8">
-                <label className="text-sm font-bold text-[var(--text-main)] mb-2 block">
+                <label className="text-sm font-bold text-(--text-main) mb-2 block">
                   {t("tools.node_cleaner.vite.extra_args")}
                 </label>
                 <input
                   type="text"
                   placeholder="--help, --force, etc."
-                  className="w-full !px-4 py-2.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  className="w-full !px-4 py-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   value={viteExtraArgs}
                   onChange={(e) => setViteExtraArgs(e.target.value)}
                 />
-                <p className="mt-2 text-xs text-[var(--text-muted)]">
+                <p className="mt-2 text-xs text-(--text-muted)">
                   💡 {t("tools.node_cleaner.vite.extra_args_tip")}
                 </p>
               </div>
 
-              <div className="mt-8 pt-8 border-t border-[var(--border-color)] flex justify-end">
+              <div className="mt-8 pt-8 border-t border-(--border-color) flex justify-end">
                 <Button
                   variant="contained"
                   className="flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-xl text-sm font-bold hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 disabled:opacity-50"

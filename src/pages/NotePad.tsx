@@ -1,4 +1,4 @@
-﻿// src/pages/NotePad.tsx
+// src/pages/NotePad.tsx
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { ToolLayout } from "../components/layout/ToolLayout";

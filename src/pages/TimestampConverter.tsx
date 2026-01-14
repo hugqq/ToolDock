@@ -88,7 +88,7 @@ const TimestampConverter: React.FC = () => {
       <div className="max-w-4xl mx-auto w-full space-y-6 pb-10">
         {/* 控制按钮 - 放在最上面 */}
         <div>
-          <label className="block text-sm font-medium text-[var(--text-main)] mb-2">
+          <label className="block text-sm font-medium text-(--text-main) mb-2">
             {t("tools.timestamp_converter.convert")}
           </label>
           <div className="flex gap-2">
@@ -100,7 +100,7 @@ const TimestampConverter: React.FC = () => {
               className={`py-2 px-6 rounded-lg font-medium transition-colors ${
                 convertType === "to_datetime"
                   ? "bg-blue-500 text-white"
-                  : "bg-[var(--card-bg)] text-[var(--text-main)] border border-[var(--border-color)]"
+                  : "bg-(--card-bg) text-(--text-main) border border-(--border-color)"
               }`}
             >
               {t("tools.timestamp_converter.to_datetime")}
@@ -113,7 +113,7 @@ const TimestampConverter: React.FC = () => {
               className={`py-2 px-6 rounded-lg font-medium transition-colors ${
                 convertType === "to_timestamp"
                   ? "bg-blue-500 text-white"
-                  : "bg-[var(--card-bg)] text-[var(--text-main)] border border-[var(--border-color)]"
+                  : "bg-(--card-bg) text-(--text-main) border border-(--border-color)"
               }`}
             >
               {t("tools.timestamp_converter.to_timestamp")}
@@ -131,8 +131,8 @@ const TimestampConverter: React.FC = () => {
         {/* 转换器主体 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 左侧输入 */}
-          <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] p-6">
-            <label className="block text-sm font-bold text-[var(--text-main)] mb-3">
+          <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) p-6">
+            <label className="block text-sm font-bold text-(--text-main) mb-3">
               {convertType === "to_datetime"
                 ? t("tools.timestamp_converter.timestamp")
                 : t("tools.timestamp_converter.datetime")}
@@ -145,13 +145,13 @@ const TimestampConverter: React.FC = () => {
                   ? "1234567890 或 1234567890000"
                   : "2024-12-30 15:30:00"
               }
-              className="w-full h-32 p-4 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-[var(--text-main)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-32 p-4 bg-(--bg-main) border border-(--border-color) rounded-xl text-(--text-main) placeholder-(--text-muted) focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <div className="mt-4 flex gap-3">
               <select
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
-                className="flex-1 px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] focus:outline-none"
+                className="flex-1 px-4 py-2 bg-(--bg-main) border border-(--border-color) rounded-lg text-(--text-main) focus:outline-none"
               >
                 <option value="seconds">
                   {t("tools.timestamp_converter.seconds")}
@@ -166,7 +166,7 @@ const TimestampConverter: React.FC = () => {
               <select
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="flex-1 px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg text-[var(--text-main)] focus:outline-none"
+                className="flex-1 px-4 py-2 bg-(--bg-main) border border-(--border-color) rounded-lg text-(--text-main) focus:outline-none"
               >
                 <option value="Local">
                   {t("tools.timestamp_converter.local")}
@@ -179,8 +179,8 @@ const TimestampConverter: React.FC = () => {
           </div>
 
           {/* 右侧输出 */}
-          <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] p-6">
-            <label className="block text-sm font-bold text-[var(--text-main)] mb-3">
+          <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) p-6">
+            <label className="block text-sm font-bold text-(--text-main) mb-3">
               {convertType === "to_datetime"
                 ? t("tools.timestamp_converter.datetime")
                 : t("tools.timestamp_converter.timestamp")}
@@ -188,7 +188,7 @@ const TimestampConverter: React.FC = () => {
             <textarea
               value={outputValue}
               readOnly
-              className="w-full h-32 p-4 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-[var(--text-main)] placeholder-[var(--text-muted)] focus:outline-none"
+              className="w-full h-32 p-4 bg-(--bg-main) border border-(--border-color) rounded-xl text-(--text-main) placeholder-(--text-muted) focus:outline-none"
               placeholder={t("common.loading")}
             />
             <button
@@ -218,9 +218,9 @@ const TimestampConverter: React.FC = () => {
 
         {/* 历史记录 */}
         {history.length > 0 && (
-          <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] p-6">
+          <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[var(--text-main)]">
+              <h3 className="text-lg font-bold text-(--text-main)">
                 {t("tools.timestamp_converter.history")}
               </h3>
               <button
@@ -234,10 +234,10 @@ const TimestampConverter: React.FC = () => {
               {history.map((result, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-3 bg-[var(--bg-main)] rounded-lg border border-[var(--border-color)] hover:border-blue-500 transition-colors"
+                  className="flex items-center justify-between p-3 bg-(--bg-main) rounded-lg border border-(--border-color) hover:border-blue-500 transition-colors"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm text-[var(--text-muted)]">
+                    <div className="text-sm text-(--text-muted)">
                       {result.input}
                     </div>
                     <div className="text-sm text-blue-400 truncate">
@@ -246,9 +246,9 @@ const TimestampConverter: React.FC = () => {
                   </div>
                   <button
                     onClick={() => handleCopyFromHistory(result)}
-                    className="ml-4 p-2 hover:bg-[var(--border-color)] rounded-lg transition-colors"
+                    className="ml-4 p-2 hover:bg-(--border-color) rounded-lg transition-colors"
                   >
-                    <Copy size={16} className="text-[var(--text-muted)]" />
+                    <Copy size={16} className="text-(--text-muted)" />
                   </button>
                 </div>
               ))}

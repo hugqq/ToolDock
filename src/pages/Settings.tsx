@@ -388,10 +388,10 @@ const Settings: React.FC = () => {
     >
       <div className="max-w-3xl mx-auto w-full space-y-6 pb-10">
         {/* 通用设置 */}
-        <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-          <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+        <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+          <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
             <Settings2 size={18} className="text-gray-500" />
-            <h2 className="font-bold text-[var(--text-main)]">
+            <h2 className="font-bold text-(--text-main)">
               {t("tools.settings.general_settings")}
             </h2>
           </div>
@@ -402,7 +402,7 @@ const Settings: React.FC = () => {
                 <input
                   id="auto-start"
                   type="checkbox"
-                  className="w-4 h-4 text-blue-600 border-[var(--border-color)] rounded focus:ring-blue-500 bg-[var(--bg-main)]"
+                  className="w-4 h-4 text-blue-600 border-(--border-color) rounded focus:ring-blue-500 bg-(--bg-main)"
                   checked={autoStart}
                   onChange={toggleAutoStart}
                 />
@@ -410,11 +410,11 @@ const Settings: React.FC = () => {
               <div className="flex flex-col">
                 <label
                   htmlFor="auto-start"
-                  className="text-sm font-medium text-[var(--text-main)] cursor-pointer"
+                  className="text-sm font-medium text-(--text-main) cursor-pointer"
                 >
                   {t("tools.settings.auto_start")}
                 </label>
-                <p className="text-xs text-[var(--text-muted)] mt-1">
+                <p className="text-xs text-(--text-muted) mt-1">
                   {t("tools.settings.auto_start_desc")}
                 </p>
               </div>
@@ -422,7 +422,7 @@ const Settings: React.FC = () => {
 
             {/* 关闭行为 */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-[var(--text-main)]">
+              <label className="text-sm font-medium text-(--text-main)">
                 {t("tools.settings.close_behavior")}
               </label>
               <div className="flex flex-col gap-2">
@@ -430,11 +430,11 @@ const Settings: React.FC = () => {
                   <input
                     type="radio"
                     name="close-behavior"
-                    className="w-4 h-4 text-blue-600 border-[var(--border-color)] focus:ring-blue-500 bg-[var(--bg-main)]"
+                    className="w-4 h-4 text-blue-600 border-(--border-color) focus:ring-blue-500 bg-(--bg-main)"
                     checked={closeBehavior === "minimize"}
                     onChange={() => handleSetCloseBehavior("minimize")}
                   />
-                  <span className="text-sm text-[var(--text-main)]">
+                  <span className="text-sm text-(--text-main)">
                     {t("tools.settings.close_minimize")}
                   </span>
                 </label>
@@ -442,11 +442,11 @@ const Settings: React.FC = () => {
                   <input
                     type="radio"
                     name="close-behavior"
-                    className="w-4 h-4 text-blue-600 border-[var(--border-color)] focus:ring-blue-500 bg-[var(--bg-main)]"
+                    className="w-4 h-4 text-blue-600 border-(--border-color) focus:ring-blue-500 bg-(--bg-main)"
                     checked={closeBehavior === "exit"}
                     onChange={() => handleSetCloseBehavior("exit")}
                   />
-                  <span className="text-sm text-[var(--text-main)]">
+                  <span className="text-sm text-(--text-main)">
                     {t("tools.settings.close_exit")}
                   </span>
                 </label>
@@ -456,20 +456,20 @@ const Settings: React.FC = () => {
         </div>
 
         {/* 快捷键设置 */}
-        <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-          <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+        <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+          <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
             <Keyboard size={18} className="text-indigo-500" />
-            <h2 className="font-bold text-[var(--text-main)]">
+            <h2 className="font-bold text-(--text-main)">
               {t("tools.settings.shortcut_settings")}
             </h2>
           </div>
           <div className="p-6">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[var(--text-main)] mb-2">
+                <label className="block text-sm font-medium text-(--text-main) mb-2">
                   {t("tools.settings.global_shortcut")}
                 </label>
-                <p className="text-xs text-[var(--text-muted)] mb-4">
+                <p className="text-xs text-(--text-muted) mb-4">
                   {t("tools.settings.global_shortcut_desc")}
                 </p>
                 <div className="flex gap-3">
@@ -501,7 +501,7 @@ const Settings: React.FC = () => {
                     {t("tools.settings.shortcut_clear")}
                   </Button>
                 </div>
-                <p className="text-xs text-[var(--text-muted)] mt-2">
+                <p className="text-xs text-(--text-muted) mt-2">
                   {t("tools.settings.shortcut_example")}
                 </p>
               </div>
@@ -510,10 +510,10 @@ const Settings: React.FC = () => {
         </div>
 
         {/* 管理员模式 */}
-        <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-          <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+        <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+          <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
             <Shield size={18} className="text-orange-500" />
-            <h2 className="font-bold text-[var(--text-main)]">
+            <h2 className="font-bold text-(--text-main)">
               {t("tools.settings.admin_mode")}
             </h2>
           </div>
@@ -523,7 +523,7 @@ const Settings: React.FC = () => {
                 <input
                   id="run-as-admin"
                   type="checkbox"
-                  className="w-4 h-4 text-blue-600 border-[var(--border-color)] rounded focus:ring-blue-500 bg-[var(--bg-main)]"
+                  className="w-4 h-4 text-blue-600 border-(--border-color) rounded focus:ring-blue-500 bg-(--bg-main)"
                   checked={runAsAdmin}
                   onChange={(e) => setRunAsAdmin(e.target.checked)}
                 />
@@ -531,11 +531,11 @@ const Settings: React.FC = () => {
               <div className="flex flex-col">
                 <label
                   htmlFor="run-as-admin"
-                  className="text-sm font-medium text-[var(--text-main)] cursor-pointer"
+                  className="text-sm font-medium text-(--text-main) cursor-pointer"
                 >
                   {t("tools.settings.run_as_admin")}
                 </label>
-                <p className="text-xs text-[var(--text-muted)] mt-1">
+                <p className="text-xs text-(--text-muted) mt-1">
                   {t("tools.settings.run_as_admin_desc")}
                 </p>
               </div>
@@ -544,10 +544,10 @@ const Settings: React.FC = () => {
         </div>
 
         {/* 剪贴板设置 */}
-        <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-          <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+        <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+          <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
             <Clipboard size={18} className="text-blue-500" />
-            <h2 className="font-bold text-[var(--text-main)]">
+            <h2 className="font-bold text-(--text-main)">
               {t("tools.settings.clipboard_settings")}
             </h2>
           </div>
@@ -557,7 +557,7 @@ const Settings: React.FC = () => {
                 <input
                   id="clipboard-monitoring"
                   type="checkbox"
-                  className="w-4 h-4 text-blue-600 border-[var(--border-color)] rounded focus:ring-blue-500 bg-[var(--bg-main)]"
+                  className="w-4 h-4 text-blue-600 border-(--border-color) rounded focus:ring-blue-500 bg-(--bg-main)"
                   checked={clipboardEnabled}
                   onChange={(e) => setClipboardEnabled(e.target.checked)}
                 />
@@ -565,11 +565,11 @@ const Settings: React.FC = () => {
               <div className="flex flex-col">
                 <label
                   htmlFor="clipboard-monitoring"
-                  className="text-sm font-medium text-[var(--text-main)] cursor-pointer"
+                  className="text-sm font-medium text-(--text-main) cursor-pointer"
                 >
                   {t("tools.settings.clipboard_monitoring")}
                 </label>
-                <p className="text-xs text-[var(--text-muted)] mt-1">
+                <p className="text-xs text-(--text-muted) mt-1">
                   {t("tools.settings.clipboard_monitoring_desc")}
                 </p>
               </div>
@@ -577,7 +577,7 @@ const Settings: React.FC = () => {
 
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[var(--text-main)]">
+                <label className="text-sm font-medium text-(--text-main)">
                   {t("tools.clipboard_manager.prefix")}
                 </label>
                 <Input
@@ -588,7 +588,7 @@ const Settings: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[var(--text-main)]">
+                <label className="text-sm font-medium text-(--text-main)">
                   {t("tools.clipboard_manager.suffix")}
                 </label>
                 <Input
@@ -603,17 +603,17 @@ const Settings: React.FC = () => {
         </div>
 
         {/* AI 设置 */}
-        <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-          <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+        <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+          <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
             <Key size={18} className="text-purple-500" />
-            <h2 className="font-bold text-[var(--text-main)]">
+            <h2 className="font-bold text-(--text-main)">
               {t("tools.settings.ai_settings")}
             </h2>
           </div>
           <div className="p-6 space-y-8">
             {/* Active Provider Selection */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-[var(--text-main)]">
+              <label className="block text-sm font-medium text-(--text-main)">
                 {t("tools.settings.ai_active_provider")}
               </label>
               <div className="flex flex-wrap gap-4">
@@ -625,7 +625,7 @@ const Settings: React.FC = () => {
                     <input
                       type="radio"
                       name="active-provider"
-                      className="w-4 h-4 text-blue-600 border-[var(--border-color)] focus:ring-blue-500 bg-[var(--bg-main)]"
+                      className="w-4 h-4 text-blue-600 border-(--border-color) focus:ring-blue-500 bg-(--bg-main)"
                       checked={safeAi.activeProvider === p}
                       onChange={() => setAiActiveProvider(p as any)}
                     />
@@ -633,7 +633,7 @@ const Settings: React.FC = () => {
                       className={`text-sm transition-colors ${
                         safeAi.activeProvider === p
                           ? "text-blue-500 font-bold"
-                          : "text-[var(--text-muted)] group-hover:text-[var(--text-main)]"
+                          : "text-(--text-muted) group-hover:text-(--text-main)"
                       }`}
                     >
                       {p === "deepseek"
@@ -651,9 +651,9 @@ const Settings: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* DeepSeek Settings */}
-              <div className="space-y-4 p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-main)]/20">
+              <div className="space-y-4 p-4 rounded-xl border border-(--border-color) bg-(--bg-main)/20">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-(--text-main) flex items-center gap-2">
                     <div
                       className={`w-2 h-2 rounded-full ${
                         safeAi.activeProvider === "deepseek"
@@ -713,9 +713,9 @@ const Settings: React.FC = () => {
               </div>
 
               {/* Doubao Settings */}
-              <div className="space-y-4 p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-main)]/20">
+              <div className="space-y-4 p-4 rounded-xl border border-(--border-color) bg-(--bg-main)/20">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-(--text-main) flex items-center gap-2">
                     <div
                       className={`w-2 h-2 rounded-full ${
                         safeAi.activeProvider === "doubao"
@@ -779,9 +779,9 @@ const Settings: React.FC = () => {
               </div>
 
               {/* OpenAI Settings */}
-              <div className="space-y-4 p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-main)]/20">
+              <div className="space-y-4 p-4 rounded-xl border border-(--border-color) bg-(--bg-main)/20">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-(--text-main) flex items-center gap-2">
                     <div
                       className={`w-2 h-2 rounded-full ${
                         safeAi.activeProvider === "openai"
@@ -851,9 +851,9 @@ const Settings: React.FC = () => {
               </div>
 
               {/* SiliconFlow Settings */}
-              <div className="space-y-4 p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-main)]/20">
+              <div className="space-y-4 p-4 rounded-xl border border-(--border-color) bg-(--bg-main)/20">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-(--text-main) flex items-center gap-2">
                     <div
                       className={`w-2 h-2 rounded-full ${
                         safeAi.activeProvider === "siliconflow"
@@ -938,10 +938,10 @@ const Settings: React.FC = () => {
         </div>
 
         {/* OCR 设置 */}
-        <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-          <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+        <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+          <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
             <Camera size={18} className="text-blue-500" />
-            <h2 className="font-bold text-[var(--text-main)]">
+            <h2 className="font-bold text-(--text-main)">
               {t("tools.ocr.settings")}
             </h2>
           </div>
@@ -949,7 +949,7 @@ const Settings: React.FC = () => {
             {/* Tencent OCR */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-[var(--text-main)]">
+                <h3 className="text-sm font-bold text-(--text-main)">
                   {t("tools.ocr.engine_tencent").split("(")[0].trim()}
                 </h3>
                 <Button
@@ -965,7 +965,7 @@ const Settings: React.FC = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[var(--text-main)]">
+                  <label className="text-sm font-medium text-(--text-main)">
                     {t("tools.ocr.tencent_secret_id")}
                   </label>
                   <Input
@@ -979,7 +979,7 @@ const Settings: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[var(--text-main)]">
+                  <label className="text-sm font-medium text-(--text-main)">
                     {t("tools.ocr.tencent_secret_key")}
                   </label>
                   <Input
@@ -994,7 +994,7 @@ const Settings: React.FC = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-[var(--text-main)]">
+                <label className="text-sm font-medium text-(--text-main)">
                   {t("tools.ocr.tencent_region")}
                 </label>
                 <Input
@@ -1005,7 +1005,7 @@ const Settings: React.FC = () => {
                     setOcrSetting("tencentRegion", e.target.value)
                   }
                 />
-                <p className="text-xs text-[var(--text-muted)]">
+                <p className="text-xs text-(--text-muted)">
                   例如: ap-shanghai, ap-guangzhou, ap-beijing
                 </p>
               </div>
@@ -1014,7 +1014,7 @@ const Settings: React.FC = () => {
             {/* Baidu OCR */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-[var(--text-main)]">
+                <h3 className="text-sm font-bold text-(--text-main)">
                   {t("tools.ocr.engine_baidu").split("(")[0].trim()}
                 </h3>
                 <Button
@@ -1032,7 +1032,7 @@ const Settings: React.FC = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[var(--text-main)]">
+                  <label className="text-sm font-medium text-(--text-main)">
                     {t("tools.ocr.baidu_api_key")}
                   </label>
                   <Input
@@ -1046,7 +1046,7 @@ const Settings: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-[var(--text-main)]">
+                  <label className="text-sm font-medium text-(--text-main)">
                     {t("tools.ocr.baidu_secret_key")}
                   </label>
                   <Input
@@ -1065,10 +1065,10 @@ const Settings: React.FC = () => {
         </div>
 
         {/* 翻译设置 */}
-        <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-          <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+        <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+          <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
             <Key size={18} className="text-blue-500" />
-            <h2 className="font-bold text-[var(--text-main)]">
+            <h2 className="font-bold text-(--text-main)">
               {t("tools.settings.translator_keys")}
             </h2>
           </div>
@@ -1076,7 +1076,7 @@ const Settings: React.FC = () => {
             {/* Google */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-[var(--text-main)]">
+                <label className="block text-sm font-medium text-(--text-main)">
                   Google Cloud Translation API Key
                 </label>
                 <Button
@@ -1099,7 +1099,7 @@ const Settings: React.FC = () => {
                 value={translator.googleKey}
                 onChange={(e) => setTranslatorKey("google", e.target.value)}
               />
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-muted)">
                 {t("tools.translator.google_key_desc")}
               </p>
             </div>
@@ -1107,7 +1107,7 @@ const Settings: React.FC = () => {
             {/* Youdao */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-[var(--text-main)]">
+                <label className="block text-sm font-medium text-(--text-main)">
                   Youdao Translate (AppKey:Secret)
                 </label>
                 <Button
@@ -1126,7 +1126,7 @@ const Settings: React.FC = () => {
                 value={translator.youdaoKey}
                 onChange={(e) => setTranslatorKey("youdao", e.target.value)}
               />
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-muted)">
                 {t("tools.translator.youdao_key_desc")}
               </p>
             </div>
@@ -1134,7 +1134,7 @@ const Settings: React.FC = () => {
             {/* Baidu */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-[var(--text-main)]">
+                <label className="block text-sm font-medium text-(--text-main)">
                   Baidu Translate (AppID:Secret)
                 </label>
                 <Button
@@ -1155,7 +1155,7 @@ const Settings: React.FC = () => {
                 value={translator.baiduKey}
                 onChange={(e) => setTranslatorKey("baidu", e.target.value)}
               />
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-muted)">
                 {t("tools.translator.baidu_key_desc")}
               </p>
             </div>
@@ -1163,7 +1163,7 @@ const Settings: React.FC = () => {
             {/* Tencent */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-[var(--text-main)]">
+                <label className="block text-sm font-medium text-(--text-main)">
                   Tencent Translate (SecretId:SecretKey)
                 </label>
                 <Button
@@ -1191,7 +1191,7 @@ const Settings: React.FC = () => {
                   setTranslatorKey("tencent", e.target.value.trim())
                 }
               />
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-muted)">
                 {t("tools.translator.tencent_key_desc")}
               </p>
               <div className="space-y-1">
@@ -1212,7 +1212,7 @@ const Settings: React.FC = () => {
             {/* Volcengine */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-[var(--text-main)]">
+                <label className="block text-sm font-medium text-(--text-main)">
                   Volcengine Translate (AccessKey:SecretKey)
                 </label>
                 <Button
@@ -1235,7 +1235,7 @@ const Settings: React.FC = () => {
                   setTranslatorKey("volcengine", e.target.value.trim())
                 }
               />
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-muted)">
                 {t("tools.translator.volcengine_key_desc")}
               </p>
             </div>
@@ -1243,7 +1243,7 @@ const Settings: React.FC = () => {
             {/* DeepL */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-[var(--text-main)]">
+                <label className="block text-sm font-medium text-(--text-main)">
                   DeepL API Key
                 </label>
                 <Button
@@ -1264,7 +1264,7 @@ const Settings: React.FC = () => {
                 value={translator.deeplKey}
                 onChange={(e) => setTranslatorKey("deepl", e.target.value)}
               />
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-muted)">
                 {t("tools.translator.deepl_key_desc")}
               </p>
             </div>
@@ -1272,7 +1272,7 @@ const Settings: React.FC = () => {
             {/* DeepLX */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="block text-sm font-medium text-[var(--text-main)]">
+                <label className="block text-sm font-medium text-(--text-main)">
                   DeepLX API Key
                 </label>
                 <Button
@@ -1291,7 +1291,7 @@ const Settings: React.FC = () => {
                 value={translator.deeplxKey}
                 onChange={(e) => setTranslatorKey("deeplx", e.target.value)}
               />
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-muted)">
                 {t("tools.translator.deeplx_key_desc")}
               </p>
             </div>
@@ -1301,15 +1301,15 @@ const Settings: React.FC = () => {
         {/* 导出导入 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 导出 */}
-          <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-            <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+          <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
               <Download size={18} className="text-green-500" />
-              <h2 className="font-bold text-[var(--text-main)]">
+              <h2 className="font-bold text-(--text-main)">
                 {t("tools.settings.export_config")}
               </h2>
             </div>
             <div className="p-6 space-y-4">
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-muted)">
                 {t("tools.settings.export_desc")}
               </p>
               <div className="space-y-3">
@@ -1317,13 +1317,13 @@ const Settings: React.FC = () => {
                   <input
                     id="encrypt-export"
                     type="checkbox"
-                    className="w-4 h-4 text-blue-600 border-[var(--border-color)] rounded focus:ring-blue-500 bg-[var(--bg-main)]"
+                    className="w-4 h-4 text-blue-600 border-(--border-color) rounded focus:ring-blue-500 bg-(--bg-main)"
                     checked={encryptExport}
                     onChange={(e) => setEncryptExport(e.target.checked)}
                   />
                   <label
                     htmlFor="encrypt-export"
-                    className="text-sm text-[var(--text-main)] cursor-pointer"
+                    className="text-sm text-(--text-main) cursor-pointer"
                   >
                     {t("tools.settings.encrypt_config")}
                   </label>
@@ -1352,15 +1352,15 @@ const Settings: React.FC = () => {
           </div>
 
           {/* 导入 */}
-          <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-            <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+          <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
               <Upload size={18} className="text-purple-500" />
-              <h2 className="font-bold text-[var(--text-main)]">
+              <h2 className="font-bold text-(--text-main)">
                 {t("tools.settings.import_config")}
               </h2>
             </div>
             <div className="p-6 space-y-4">
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-muted)">
                 {t("tools.settings.import_desc")}
               </p>
               <div className="space-y-3">

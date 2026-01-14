@@ -159,7 +159,7 @@ export default function UnitConverter() {
     <ToolLayout title={t("tools.unit_converter.name")}>
       <div className="flex-1 flex flex-col gap-6 p-6 overflow-auto custom-scrollbar">
         {/* 分类选择卡片 */}
-        <div className="bg-[var(--card-bg)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
+        <div className="bg-(--card-bg) p-4 rounded-2xl border border-(--border-color) shadow-sm">
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((cat) => (
               <Button
@@ -192,9 +192,9 @@ export default function UnitConverter() {
         {/* 转换主区域 */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 items-center">
           {/* 输入端 */}
-          <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm space-y-6">
+          <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
+              <label className="text-xs font-bold text-(--text-muted) uppercase tracking-wider">
                 {t("tools.unit_converter.from_unit")}
               </label>
               <Select
@@ -204,14 +204,14 @@ export default function UnitConverter() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
+              <label className="text-xs font-bold text-(--text-muted) uppercase tracking-wider">
                 {t("tools.unit_converter.input_value")}
               </label>
               <input
                 type={category === "base" ? "text" : "number"}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-[var(--text-main)] font-medium transition-all"
+                className="w-full px-4 py-3 bg-(--bg-main) border border-(--border-color) rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 text-(--text-main) font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
@@ -240,9 +240,9 @@ export default function UnitConverter() {
           </div>
 
           {/* 输出端 */}
-          <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm space-y-6">
+          <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
+              <label className="text-xs font-bold text-(--text-muted) uppercase tracking-wider">
                 {t("tools.unit_converter.to_unit")}
               </label>
               <Select
@@ -252,7 +252,7 @@ export default function UnitConverter() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider">
+              <label className="text-xs font-bold text-(--text-muted) uppercase tracking-wider">
                 {t("tools.unit_converter.output_value")}
               </label>
               <div className="relative group">
@@ -260,13 +260,13 @@ export default function UnitConverter() {
                   type="text"
                   value={result}
                   readOnly
-                  className="w-full px-4 py-3 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-[var(--text-main)] font-mono font-bold text-lg"
+                  className="w-full px-4 py-3 bg-(--bg-main) border border-(--border-color) rounded-xl text-(--text-main) font-mono font-bold text-lg"
                 />
                 <Button
                   variant="text"
                   size="small"
                   onClick={handleCopy}
-                  className="!absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[var(--text-muted)] hover:text-primary hover:bg-primary/10 rounded-lg transition-all opacity-0 group-hover:opacity-100 h-auto min-w-0"
+                  className="!absolute right-2 top-1/2 -translate-y-1/2 p-2 text-(--text-muted) hover:text-primary hover:bg-primary/10 rounded-lg transition-all opacity-0 group-hover:opacity-100 h-auto min-w-0"
                   title={t("common.copy")}
                 >
                   <Copy className="w-5 h-5" />
@@ -278,11 +278,11 @@ export default function UnitConverter() {
 
         {/* 底部状态栏 (仅汇率) */}
         {category === "currency" && (
-          <div className="bg-[var(--card-bg)] px-6 py-4 rounded-2xl border border-[var(--border-color)] shadow-sm flex items-center justify-between">
-            <div className="flex items-center gap-3 text-sm text-[var(--text-muted)]">
+          <div className="bg-(--card-bg) px-6 py-4 rounded-2xl border border-(--border-color) shadow-sm flex items-center justify-between">
+            <div className="flex items-center gap-3 text-sm text-(--text-muted)">
               <div
                 className={`p-2 rounded-lg ${
-                  loading ? "bg-primary/10 text-primary" : "bg-[var(--bg-main)]"
+                  loading ? "bg-primary/10 text-primary" : "bg-(--bg-main)"
                 }`}
               >
                 <RefreshCw
@@ -291,7 +291,7 @@ export default function UnitConverter() {
               </div>
               <span>
                 {t("tools.unit_converter.last_update")}:{" "}
-                <span className="font-mono font-medium text-[var(--text-main)]">
+                <span className="font-mono font-medium text-(--text-main)">
                   {lastUpdate || "---"}
                 </span>
               </span>

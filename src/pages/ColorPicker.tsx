@@ -246,7 +246,7 @@ const ColorButton = memo<{
   <Button
     variant="text"
     onClick={() => onClick(hex)}
-    className={`p-0 rounded-lg border border-[var(--border-color)] shadow-sm hover:scale-110 transition-transform ${
+    className={`p-0 rounded-lg border border-(--border-color) shadow-sm hover:scale-110 transition-transform ${
       size === "sm" ? "w-6 h-6" : "aspect-square h-auto"
     }`}
     style={{ backgroundColor: hex }}
@@ -262,7 +262,7 @@ const PaletteSection = memo<{
   t: any;
 }>(({ palette, onColorSelect, t }) => (
   <div className="flex flex-col gap-2">
-    <span className="text-xs text-[var(--text-muted)] font-medium">
+    <span className="text-xs text-(--text-muted) font-medium">
       {t(`tools.color_picker.palette_types.${palette.name}`)}
     </span>
     <div className="flex flex-wrap gap-2">
@@ -286,10 +286,10 @@ const TraditionalColorItem = memo<{
     className="flex flex-col items-center gap-1 group h-auto p-0"
   >
     <div
-      className="w-full aspect-square rounded-lg border border-[var(--border-color)] shadow-sm group-hover:scale-105 transition-transform"
+      className="w-full aspect-square rounded-lg border border-(--border-color) shadow-sm group-hover:scale-105 transition-transform"
       style={{ backgroundColor: color.hex }}
     />
-    <span className="text-[9px] text-[var(--text-muted)] truncate w-full text-center">
+    <span className="text-[9px] text-(--text-muted) truncate w-full text-center">
       {t(`tools.color_picker.chinese_colors.${color.name}`)}
     </span>
   </Button>
@@ -413,9 +413,9 @@ const ColorPicker: React.FC = () => {
       <div className="flex flex-col gap-6 h-full overflow-auto custom-scrollbar pr-2">
         {/* 主选择区 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm flex flex-col items-center gap-6">
+          <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm flex flex-col items-center gap-6">
             <div
-              className="w-full aspect-video rounded-xl shadow-inner border border-[var(--border-color)] flex items-center justify-center relative overflow-hidden"
+              className="w-full aspect-video rounded-xl shadow-inner border border-(--border-color) flex items-center justify-center relative overflow-hidden"
               style={{ backgroundColor: color }}
             >
               <span
@@ -434,7 +434,7 @@ const ColorPicker: React.FC = () => {
                   onChange={handleColorChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
-                <div className="w-full h-full rounded-xl border border-[var(--border-color)] bg-[var(--bg-main)] flex items-center justify-center gap-2 pointer-events-none">
+                <div className="w-full h-full rounded-xl border border-(--border-color) bg-(--bg-main) flex items-center justify-center gap-2 pointer-events-none">
                   <Palette size={18} className="text-primary" />
                   <span className="text-sm font-medium">
                     {t("tools.color_picker.palette")}
@@ -452,7 +452,7 @@ const ColorPicker: React.FC = () => {
             </div>
 
             <div className="w-full flex justify-end">
-              <label className="flex items-center gap-2 text-sm text-[var(--text-muted)] cursor-pointer select-none hover:text-primary transition-colors">
+              <label className="flex items-center gap-2 text-sm text-(--text-muted) cursor-pointer select-none hover:text-primary transition-colors">
                 <input
                   type="checkbox"
                   checked={hideOnPick}
@@ -463,7 +463,7 @@ const ColorPicker: React.FC = () => {
                       String(e.target.checked)
                     );
                   }}
-                  className="w-4 h-4 rounded border-[var(--border-color)] text-primary focus:ring-primary bg-transparent"
+                  className="w-4 h-4 rounded border-(--border-color) text-primary focus:ring-primary bg-transparent"
                 />
                 {t("tools.color_picker.hide_on_pick")}
               </label>
@@ -471,8 +471,8 @@ const ColorPicker: React.FC = () => {
           </div>
 
           {/* 格式转换区 */}
-          <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm flex flex-col gap-4">
-            <h3 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm flex flex-col gap-4">
+            <h3 className="text-sm font-bold text-(--text-muted) uppercase tracking-wider flex items-center gap-2">
               <RefreshCw size={14} />
               {t("tools.color_picker.format")}
             </h3>
@@ -493,9 +493,9 @@ const ColorPicker: React.FC = () => {
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="flex items-center gap-3 p-3 bg-[var(--bg-main)] rounded-xl border border-[var(--border-color)] group"
+                  className="flex items-center gap-3 p-3 bg-(--bg-main) rounded-xl border border-(--border-color) group"
                 >
-                  <span className="w-12 text-xs font-bold text-[var(--text-muted)]">
+                  <span className="w-12 text-xs font-bold text-(--text-muted)">
                     {item.label}
                   </span>
                   <span className="flex-1 font-mono text-sm truncate">
@@ -518,16 +518,16 @@ const ColorPicker: React.FC = () => {
         {/* 对比度与历史记录 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* 对比度检查 */}
-          <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm flex flex-col gap-4">
-            <h3 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm flex flex-col gap-4">
+            <h3 className="text-sm font-bold text-(--text-muted) uppercase tracking-wider flex items-center gap-2">
               <CheckCircle2 size={14} />
               {t("tools.color_picker.contrast")}
             </h3>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl border border-[var(--border-color)] flex flex-col gap-2">
+              <div className="p-4 rounded-xl border border-(--border-color) flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[var(--text-muted)]">
+                  <span className="text-xs text-(--text-muted)">
                     {t("tools.color_picker.on_white")}
                   </span>
                   <span className="text-sm font-bold">
@@ -551,16 +551,16 @@ const ColorPicker: React.FC = () => {
                     : t("tools.color_picker.contrast_fail")}
                 </div>
                 <div
-                  className="h-8 rounded-lg flex items-center justify-center text-sm font-medium border border-[var(--border-color)]"
+                  className="h-8 rounded-lg flex items-center justify-center text-sm font-medium border border-(--border-color)"
                   style={{ backgroundColor: "#fff", color: color }}
                 >
                   {t("tools.color_picker.sample_text")}
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl border border-[var(--border-color)] flex flex-col gap-2">
+              <div className="p-4 rounded-xl border border-(--border-color) flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[var(--text-muted)]">
+                  <span className="text-xs text-(--text-muted)">
                     {t("tools.color_picker.on_black")}
                   </span>
                   <span className="text-sm font-bold">
@@ -584,7 +584,7 @@ const ColorPicker: React.FC = () => {
                     : t("tools.color_picker.contrast_fail")}
                 </div>
                 <div
-                  className="h-8 rounded-lg flex items-center justify-center text-sm font-medium border border-[var(--border-color)]"
+                  className="h-8 rounded-lg flex items-center justify-center text-sm font-medium border border-(--border-color)"
                   style={{ backgroundColor: "#000", color: color }}
                 >
                   {t("tools.color_picker.sample_text")}
@@ -594,9 +594,9 @@ const ColorPicker: React.FC = () => {
           </div>
 
           {/* 历史记录 */}
-          <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm flex flex-col gap-4">
+          <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm flex flex-col gap-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
+              <h3 className="text-sm font-bold text-(--text-muted) uppercase tracking-wider flex items-center gap-2">
                 <History size={14} />
                 {t("tools.color_picker.history")}
               </h3>
@@ -607,7 +607,7 @@ const ColorPicker: React.FC = () => {
                   setHistory([]);
                   localStorage.removeItem("color_picker_history");
                 }}
-                className="p-1.5 h-auto text-[var(--text-muted)] hover:text-red-500"
+                className="p-1.5 h-auto text-(--text-muted) hover:text-red-500"
               >
                 <Trash2 size={14} />
               </Button>
@@ -623,7 +623,7 @@ const ColorPicker: React.FC = () => {
                 />
               ))}
               {history.length === 0 && (
-                <div className="col-span-6 h-20 flex items-center justify-center text-xs text-[var(--text-muted)] border-2 border-dashed border-[var(--border-color)] rounded-xl">
+                <div className="col-span-6 h-20 flex items-center justify-center text-xs text-(--text-muted) border-2 border-dashed border-(--border-color) rounded-xl">
                   {t("tools.color_picker.no_history")}
                 </div>
               )}
@@ -634,8 +634,8 @@ const ColorPicker: React.FC = () => {
         {/* 常用配色与中国传统色 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* 常用配色 */}
-          <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm flex flex-col gap-4">
-            <h3 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm flex flex-col gap-4">
+            <h3 className="text-sm font-bold text-(--text-muted) uppercase tracking-wider flex items-center gap-2">
               <Palette size={14} />
               {t("tools.color_picker.common_palettes")}
             </h3>
@@ -652,8 +652,8 @@ const ColorPicker: React.FC = () => {
           </div>
 
           {/* 中国传统色 */}
-          <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm flex flex-col gap-4">
-            <h3 className="text-sm font-bold text-[var(--text-muted)] uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm flex flex-col gap-4">
+            <h3 className="text-sm font-bold text-(--text-muted) uppercase tracking-wider flex items-center gap-2">
               <Palette size={14} />
               {t("tools.color_picker.traditional_chinese_colors")}
             </h3>

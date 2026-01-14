@@ -207,11 +207,11 @@ const VariableNaming: React.FC = () => {
         />
 
         {/* 参数配置区域 */}
-        <div className="bg-[var(--card-bg)] p-6 rounded-2xl border border-[var(--border-color)] shadow-sm space-y-4">
+        <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 模型选择 */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[var(--text-muted)] flex items-center gap-2">
+              <label className="text-sm font-medium text-(--text-muted) flex items-center gap-2">
                 <Cpu size={16} />
                 {t("tools.variable_naming.model_label")}
               </label>
@@ -224,7 +224,7 @@ const VariableNaming: React.FC = () => {
 
             {/* 语言选择 */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-[var(--text-muted)] flex items-center gap-2">
+              <label className="text-sm font-medium text-(--text-muted) flex items-center gap-2">
                 <Code size={16} />
                 {t("tools.variable_naming.language_label")}
               </label>
@@ -249,7 +249,7 @@ const VariableNaming: React.FC = () => {
                 {language === "custom" && (
                   <input
                     type="text"
-                    className="flex-1 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                    className="flex-1 bg-(--bg-main) border border-(--border-color) rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                     value={customLanguage}
                     onChange={(e) => setCustomLanguage(e.target.value)}
                     placeholder={t(
@@ -265,12 +265,12 @@ const VariableNaming: React.FC = () => {
           <div className="flex gap-3 pt-2">
             <div className="relative flex-1">
               <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-muted)"
                 size={20}
               />
               <input
                 type="text"
-                className="w-full bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl pl-12 pr-4 py-2 text-base focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                className="w-full bg-(--bg-main) border border-(--border-color) rounded-xl pl-12 pr-4 py-2 text-base focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                 placeholder={t("tools.variable_naming.input_placeholder")}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -307,11 +307,11 @@ const VariableNaming: React.FC = () => {
             {results.map((category) => (
               <div
                 key={category.category}
-                className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm flex flex-col"
+                className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm flex flex-col"
               >
-                <div className="px-6 py-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-3">
+                <div className="px-6 py-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-3">
                   {getCategoryIcon(category.category)}
-                  <h2 className="font-bold text-[var(--text-main)]">
+                  <h2 className="font-bold text-(--text-main)">
                     {getCategoryTitle(category.category)}
                   </h2>
                 </div>
@@ -320,14 +320,14 @@ const VariableNaming: React.FC = () => {
                     {category.items.map((item, idx) => (
                       <div
                         key={idx}
-                        className="group flex items-center justify-between p-3 rounded-xl bg-[var(--bg-main)]/50 border border-transparent hover:border-blue-500/30 hover:bg-blue-500/5 transition-all cursor-pointer"
+                        className="group flex items-center justify-between p-3 rounded-xl bg-(--bg-main)/50 border border-transparent hover:border-blue-500/30 hover:bg-blue-500/5 transition-all cursor-pointer"
                         onClick={() => handleCopy(item.value)}
                       >
                         <div className="flex flex-col min-w-0">
-                          <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-0.5">
+                          <span className="text-[10px] text-(--text-muted) uppercase tracking-wider mb-0.5">
                             {item.label}
                           </span>
-                          <span className="text-[var(--text-main)] font-mono font-medium truncate">
+                          <span className="text-(--text-main) font-mono font-medium truncate">
                             {item.value}
                           </span>
                         </div>
@@ -337,7 +337,7 @@ const VariableNaming: React.FC = () => {
                           className={`p-2 rounded-lg transition-all h-auto ${
                             copiedValue === item.value
                               ? "bg-green-500/10 text-green-500"
-                              : "text-[var(--text-muted)] opacity-0 group-hover:opacity-100 hover:bg-blue-500/10 hover:text-blue-500"
+                              : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:bg-blue-500/10 hover:text-blue-500"
                           }`}
                         >
                           {copiedValue === item.value ? (
@@ -357,7 +357,7 @@ const VariableNaming: React.FC = () => {
 
         {/* 初始状态提示 */}
         {!loading && results.length === 0 && !error && (
-          <div className="flex flex-col items-center justify-center py-20 text-[var(--text-muted)] opacity-50">
+          <div className="flex flex-col items-center justify-center py-20 text-(--text-muted) opacity-50">
             <Code size={64} className="mb-4" />
             <p className="text-lg">{t("tools.variable_naming.description")}</p>
           </div>

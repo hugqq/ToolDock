@@ -343,7 +343,7 @@ const CronGenerator: React.FC = () => {
             className={`flex items-center gap-3 p-4 rounded-xl border transition-all cursor-pointer ${
               state.type === "any"
                 ? "bg-blue-500/5 border-blue-500/50 ring-1 ring-blue-500/20"
-                : "bg-[var(--bg-main)]/50 border-[var(--border-color)] hover:border-blue-500/30"
+                : "bg-(--bg-main)/50 border-(--border-color) hover:border-blue-500/30"
             }`}
           >
             <input
@@ -353,10 +353,10 @@ const CronGenerator: React.FC = () => {
               className="w-4 h-4 text-blue-500"
             />
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-[var(--text-main)]">
+              <span className="text-sm font-medium text-(--text-main)">
                 {t("tools.cron_generator.any")}
               </span>
-              <span className="text-xs text-[var(--text-muted)]">
+              <span className="text-xs text-(--text-muted)">
                 允许该字段匹配任何值
               </span>
             </div>
@@ -367,7 +367,7 @@ const CronGenerator: React.FC = () => {
             className={`flex flex-col gap-3 p-4 rounded-xl border transition-all ${
               state.type === "range"
                 ? "bg-blue-500/5 border-blue-500/50 ring-1 ring-blue-500/20"
-                : "bg-[var(--bg-main)]/50 border-[var(--border-color)]"
+                : "bg-(--bg-main)/50 border-(--border-color)"
             }`}
           >
             <label className="flex items-center gap-3 cursor-pointer">
@@ -377,7 +377,7 @@ const CronGenerator: React.FC = () => {
                 onChange={() => updateField(field, { type: "range" })}
                 className="w-4 h-4 text-blue-500"
               />
-              <span className="text-sm font-medium text-[var(--text-main)]">
+              <span className="text-sm font-medium text-(--text-main)">
                 {t("tools.cron_generator.from")}
               </span>
             </label>
@@ -393,9 +393,9 @@ const CronGenerator: React.FC = () => {
                     type: "range",
                   })
                 }
-                className="w-24 px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-24 px-3 py-1.5 bg-(--bg-main) border border-(--border-color) rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
               />
-              <span className="text-sm text-[var(--text-muted)]">
+              <span className="text-sm text-(--text-muted)">
                 {t("tools.cron_generator.to")}
               </span>
               <input
@@ -409,7 +409,7 @@ const CronGenerator: React.FC = () => {
                     type: "range",
                   })
                 }
-                className="w-24 px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-24 px-3 py-1.5 bg-(--bg-main) border border-(--border-color) rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
           </div>
@@ -419,7 +419,7 @@ const CronGenerator: React.FC = () => {
             className={`flex flex-col gap-3 p-4 rounded-xl border transition-all ${
               state.type === "step"
                 ? "bg-blue-500/5 border-blue-500/50 ring-1 ring-blue-500/20"
-                : "bg-[var(--bg-main)]/50 border-[var(--border-color)]"
+                : "bg-(--bg-main)/50 border-(--border-color)"
             }`}
           >
             <label className="flex items-center gap-3 cursor-pointer">
@@ -429,7 +429,7 @@ const CronGenerator: React.FC = () => {
                 onChange={() => updateField(field, { type: "step" })}
                 className="w-4 h-4 text-blue-500"
               />
-              <span className="text-sm font-medium text-[var(--text-main)]">
+              <span className="text-sm font-medium text-(--text-main)">
                 {t("tools.cron_generator.from")}
               </span>
             </label>
@@ -445,9 +445,9 @@ const CronGenerator: React.FC = () => {
                     type: "step",
                   })
                 }
-                className="w-24 px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-24 px-3 py-1.5 bg-(--bg-main) border border-(--border-color) rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
               />
-              <span className="text-sm text-[var(--text-muted)]">
+              <span className="text-sm text-(--text-muted)">
                 {t("tools.cron_generator.every")}
               </span>
               <input
@@ -461,9 +461,9 @@ const CronGenerator: React.FC = () => {
                     type: "step",
                   })
                 }
-                className="w-24 px-3 py-1.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="w-24 px-3 py-1.5 bg-(--bg-main) border border-(--border-color) rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
               />
-              <span className="text-sm text-[var(--text-muted)]">
+              <span className="text-sm text-(--text-muted)">
                 {t(`tools.cron_generator.${field}`)}
               </span>
             </div>
@@ -474,7 +474,7 @@ const CronGenerator: React.FC = () => {
             className={`flex flex-col gap-3 p-4 rounded-xl border transition-all ${
               state.type === "specific"
                 ? "bg-blue-500/5 border-blue-500/50 ring-1 ring-blue-500/20"
-                : "bg-[var(--bg-main)]/50 border-[var(--border-color)]"
+                : "bg-(--bg-main)/50 border-(--border-color)"
             }`}
           >
             <label className="flex items-center gap-3 cursor-pointer">
@@ -484,7 +484,7 @@ const CronGenerator: React.FC = () => {
                 onChange={() => updateField(field, { type: "specific" })}
                 className="w-4 h-4 text-blue-500"
               />
-              <span className="text-sm font-medium text-[var(--text-main)]">
+              <span className="text-sm font-medium text-(--text-main)">
                 {t("tools.cron_generator.specific")}
               </span>
             </label>
@@ -528,11 +528,11 @@ const CronGenerator: React.FC = () => {
     <ToolLayout title={t("tools.cron_generator.name")}>
       <div className="max-w-6xl mx-auto w-full p-6 space-y-6 pb-10">
         {/* AI Generation Card */}
-        <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] shadow-sm">
-          <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center justify-between">
+        <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) shadow-sm">
+          <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles size={18} className="text-purple-500" />
-              <h2 className="font-bold text-[var(--text-main)]">
+              <h2 className="font-bold text-(--text-main)">
                 {t("tools.cron_generator.ai_generate")}
               </h2>
             </div>
@@ -555,7 +555,7 @@ const CronGenerator: React.FC = () => {
                   onChange={(e) => setAiInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAiGenerate()}
                   placeholder={t("tools.cron_generator.ai_placeholder")}
-                  className="w-full bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl pl-4 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  className="w-full bg-(--bg-main) border border-(--border-color) rounded-xl pl-4 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                 />
               </div>
               <Button
@@ -577,8 +577,8 @@ const CronGenerator: React.FC = () => {
         {/* Main Editor & Preview */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Editor Card */}
-          <div className="lg:col-span-2 flex flex-col bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-            <div className="flex bg-[var(--bg-main)]/30 border-b border-[var(--border-color)] overflow-x-auto no-scrollbar">
+          <div className="lg:col-span-2 flex flex-col bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+            <div className="flex bg-(--bg-main)/30 border-b border-(--border-color) overflow-x-auto no-scrollbar">
               {tabs.map((tab) => (
                 <Button
                   key={tab}
@@ -587,7 +587,7 @@ const CronGenerator: React.FC = () => {
                   className={`px-6 py-4 h-auto rounded-none text-sm font-medium transition-all whitespace-nowrap relative ${
                     activeTab === tab
                       ? "text-blue-500"
-                      : "text-[var(--text-muted)] hover:text-[var(--text-main)]"
+                      : "text-(--text-muted) hover:text-(--text-main)"
                   }`}
                 >
                   {t(`tools.cron_generator.${tab}`)}
@@ -605,15 +605,15 @@ const CronGenerator: React.FC = () => {
           {/* Result & Preview Card */}
           <div className="space-y-6">
             {/* Expression Card */}
-            <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-              <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+            <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+              <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
                 <Settings2 size={18} className="text-blue-500" />
-                <h2 className="font-bold text-[var(--text-main)]">
+                <h2 className="font-bold text-(--text-main)">
                   {t("tools.cron_generator.expression")}
                 </h2>
               </div>
               <div className="p-6 space-y-4">
-                <div className="p-4 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl font-mono text-lg text-center text-blue-500 break-all">
+                <div className="p-4 bg-(--bg-main) border border-(--border-color) rounded-xl font-mono text-lg text-center text-blue-500 break-all">
                   {expression}
                 </div>
                 <div className="flex gap-2">
@@ -637,10 +637,10 @@ const CronGenerator: React.FC = () => {
             </div>
 
             {/* Next Runs Card */}
-            <div className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm">
-              <div className="p-4 border-b border-[var(--border-color)] bg-[var(--bg-main)]/30 flex items-center gap-2">
+            <div className="bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+              <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex items-center gap-2">
                 <Calendar size={18} className="text-green-500" />
-                <h2 className="font-bold text-[var(--text-main)]">
+                <h2 className="font-bold text-(--text-main)">
                   {t("tools.cron_generator.next_runs")}
                 </h2>
               </div>
@@ -650,17 +650,17 @@ const CronGenerator: React.FC = () => {
                     {nextRuns.map((run, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--bg-main)] transition-colors group"
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-(--bg-main) transition-colors group"
                       >
                         <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-green-500/10 text-green-500 rounded text-[10px] font-bold">
                           {index + 1}
                         </span>
-                        <span className="text-sm font-mono text-[var(--text-main)]">
+                        <span className="text-sm font-mono text-(--text-main)">
                           {run}
                         </span>
                         <ChevronRight
                           size={14}
-                          className="ml-auto text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="ml-auto text-(--text-muted) opacity-0 group-hover:opacity-100 transition-opacity"
                         />
                       </div>
                     ))}
@@ -683,7 +683,7 @@ const CronGenerator: React.FC = () => {
                 {t("tools.cron_generator.preview")}
               </h4>
               <div className="space-y-3">
-                <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+                <p className="text-xs text-(--text-muted) leading-relaxed">
                   Cron 表达式由 6 或 7 个字段组成：
                   <br />
                   <span className="font-mono text-blue-500/80">
@@ -691,19 +691,19 @@ const CronGenerator: React.FC = () => {
                   </span>
                 </p>
                 <div className="space-y-2">
-                  <div className="p-2 bg-[var(--bg-main)]/50 rounded-lg border border-[var(--border-color)]">
+                  <div className="p-2 bg-(--bg-main)/50 rounded-lg border border-(--border-color)">
                     <code className="text-[10px] text-blue-500">
                       0 0 12 * * ?
                     </code>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-1">
+                    <p className="text-[10px] text-(--text-muted) mt-1">
                       每天中午 12 点
                     </p>
                   </div>
-                  <div className="p-2 bg-[var(--bg-main)]/50 rounded-lg border border-[var(--border-color)]">
+                  <div className="p-2 bg-(--bg-main)/50 rounded-lg border border-(--border-color)">
                     <code className="text-[10px] text-blue-500">
                       0 15 10 ? * MON-FRI
                     </code>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-1">
+                    <p className="text-[10px] text-(--text-muted) mt-1">
                       周一至周五上午 10:15
                     </p>
                   </div>

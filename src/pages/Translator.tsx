@@ -166,13 +166,13 @@ const Translator: React.FC = () => {
     <ToolLayout title={t("tools.translator.name")}>
       <div className="flex flex-col gap-6 h-full max-w-5xl mx-auto w-full">
         {/* 引擎与语言选择栏 */}
-        <div className="flex flex-col gap-3 bg-[var(--card-bg)] p-3 rounded-xl border border-[var(--border-color)] shadow-sm">
-          <div className="flex items-center justify-between gap-4 px-2 border-b border-[var(--border-color)] pb-2">
+        <div className="flex flex-col gap-3 bg-(--card-bg) p-3 rounded-xl border border-(--border-color) shadow-sm">
+          <div className="flex items-center justify-between gap-4 px-2 border-b border-(--border-color) pb-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider">
+              <span className="text-xs font-medium text-(--text-muted) uppercase tracking-wider">
                 {t("tools.translator.engine")}:
               </span>
-              <div className="flex bg-[var(--bg-main)] p-1 rounded-lg gap-1 flex-wrap">
+              <div className="flex bg-(--bg-main) p-1 rounded-lg gap-1 flex-wrap">
                 {[
                   "google",
                   "youdao",
@@ -194,8 +194,8 @@ const Translator: React.FC = () => {
                         engine === e
                           ? "shadow-sm"
                           : available
-                          ? "text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--card-bg)]"
-                          : "text-[var(--text-muted)] opacity-40 cursor-not-allowed"
+                          ? "text-(--text-muted) hover:text-(--text-main) hover:bg-(--card-bg)"
+                          : "text-(--text-muted) opacity-40 cursor-not-allowed"
                       }`}
                       title={
                         !available
@@ -227,7 +227,7 @@ const Translator: React.FC = () => {
                 <Select value={source} onChange={setSource} options={LANGS} />
               </div>
               {source === "auto" && detectedLang && (
-                <span className="text-[var(--text-muted)] text-xs whitespace-nowrap px-2 py-1 bg-[var(--bg-main)] rounded-md border border-[var(--border-color)]">
+                <span className="text-(--text-muted) text-xs whitespace-nowrap px-2 py-1 bg-(--bg-main) rounded-md border border-(--border-color)">
                   {t(`languages.${detectedLang}`)}
                 </span>
               )}
@@ -238,10 +238,10 @@ const Translator: React.FC = () => {
               size="small"
               onClick={handleSwap}
               disabled={source === "auto"}
-              className={`p-2 rounded-full hover:bg-[var(--bg-main)] transition-colors h-auto flex-none ${
+              className={`p-2 rounded-full hover:bg-(--bg-main) transition-colors h-auto flex-none ${
                 source === "auto"
                   ? "opacity-30 cursor-not-allowed"
-                  : "text-[var(--text-muted)] hover:text-[var(--text-main)]"
+                  : "text-(--text-muted) hover:text-(--text-main)"
               }`}
             >
               <ArrowRightLeft size={18} />
@@ -262,57 +262,57 @@ const Translator: React.FC = () => {
         {/* 翻译区域 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-0">
           {/* 输入框 */}
-          <div className="flex flex-col bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm focus-within:border-blue-500/50 transition-colors">
+          <div className="flex flex-col bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm focus-within:border-blue-500/50 transition-colors">
             <textarea
               className="flex-1 p-4 bg-transparent border-none focus:ring-0 resize-none text-lg leading-relaxed outline-none"
               placeholder={t("tools.translator.placeholder_input")}
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />
-            <div className="p-3 flex items-center justify-between border-t border-[var(--border-color)] bg-[var(--bg-main)]/30">
+            <div className="p-3 flex items-center justify-between border-t border-(--border-color) bg-(--bg-main)/30">
               <div className="flex items-center gap-1">
                 <Button
                   variant="text"
                   size="small"
                   onClick={handleClear}
-                  className="p-2 rounded-lg hover:bg-[var(--bg-main)] text-[var(--text-muted)] hover:text-red-500 transition-colors h-auto"
+                  className="p-2 rounded-lg hover:bg-(--bg-main) text-(--text-muted) hover:text-red-500 transition-colors h-auto"
                   title={t("common.clear")}
                 >
                   <Trash2 size={18} />
                 </Button>
               </div>
-              <div className="text-xs text-[var(--text-muted)]">
+              <div className="text-xs text-(--text-muted)">
                 {input.length} / 5000
               </div>
             </div>
           </div>
 
           {/* 输出框 */}
-          <div className="flex flex-col bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] overflow-hidden shadow-sm bg-blue-50/5 dark:bg-blue-900/5">
+          <div className="flex flex-col bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm bg-blue-50/5 dark:bg-blue-900/5">
             <textarea
               className="flex-1 p-4 bg-transparent border-none focus:ring-0 resize-none text-lg leading-relaxed outline-none"
               readOnly
               placeholder={loading ? t("common.loading") : ""}
               value={output}
             />
-            <div className="p-3 flex items-center justify-between border-t border-[var(--border-color)] bg-[var(--bg-main)]/30">
+            <div className="p-3 flex items-center justify-between border-t border-(--border-color) bg-(--bg-main)/30">
               <div className="flex items-center gap-2">
                 <Button
                   variant="text"
                   size="small"
                   onClick={handleCopy}
                   disabled={!output}
-                  className={`p-2 rounded-lg hover:bg-[var(--bg-main)] transition-colors h-auto ${
+                  className={`p-2 rounded-lg hover:bg-(--bg-main) transition-colors h-auto ${
                     copied
                       ? "text-green-500"
-                      : "text-[var(--text-muted)] hover:text-[var(--text-main)]"
+                      : "text-(--text-muted) hover:text-(--text-main)"
                   }`}
                   title={t("common.copy")}
                 >
                   {copied ? <Check size={18} /> : <Copy size={18} />}
                 </Button>
                 {responseTime !== null && (
-                  <span className="text-xs text-[var(--text-muted)] flex items-center gap-1 px-2 py-1 bg-[var(--bg-main)] rounded-md">
+                  <span className="text-xs text-(--text-muted) flex items-center gap-1 px-2 py-1 bg-(--bg-main) rounded-md">
                     <svg
                       className="w-3 h-3"
                       fill="none"

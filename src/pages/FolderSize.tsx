@@ -299,9 +299,9 @@ const FolderSize: React.FC = () => {
           ]}
         />
 
-        <div className="bg-[var(--card-bg)] p-4 sm:p-6 rounded-2xl border border-[var(--border-color)] shadow-sm">
+        <div className="bg-(--card-bg) p-4 sm:p-6 rounded-2xl border border-(--border-color) shadow-sm">
           <div className="flex flex-col gap-4">
-            <label className="text-sm font-bold text-[var(--text-main)]">
+            <label className="text-sm font-bold text-(--text-main)">
               {t("tools.folder_size.col_path")}
             </label>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -309,7 +309,7 @@ const FolderSize: React.FC = () => {
                 <input
                   type="text"
                   placeholder={t("tools.folder_size.path_placeholder")}
-                  className="w-full !pl-4 !pr-10 py-2.5 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  className="w-full !pl-4 !pr-10 py-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   value={path}
                   onChange={(e) => setPath(e.target.value)}
                 />
@@ -409,42 +409,42 @@ const FolderSize: React.FC = () => {
 
         {results.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-[var(--card-bg)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm flex items-center gap-4">
+            <div className="bg-(--card-bg) p-4 rounded-2xl border border-(--border-color) shadow-sm flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0">
                 <HardDrive size={24} />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-[var(--text-muted)] font-medium">
+                <span className="text-xs text-(--text-muted) font-medium">
                   {t("tools.folder_size.total_size")}
                 </span>
-                <span className="text-lg font-bold text-[var(--text-main)]">
+                <span className="text-lg font-bold text-(--text-main)">
                   {formatSize(totalSize)}
                 </span>
               </div>
             </div>
-            <div className="bg-[var(--card-bg)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm flex items-center gap-4">
+            <div className="bg-(--card-bg) p-4 rounded-2xl border border-(--border-color) shadow-sm flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
                 <Files size={24} />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-[var(--text-muted)] font-medium">
+                <span className="text-xs text-(--text-muted) font-medium">
                   {t("tools.folder_size.item_count")}
                 </span>
-                <span className="text-lg font-bold text-[var(--text-main)]">
+                <span className="text-lg font-bold text-(--text-main)">
                   {results.length}
                 </span>
               </div>
             </div>
-            <div className="bg-[var(--card-bg)] p-4 rounded-2xl border border-[var(--border-color)] shadow-sm flex items-center gap-4">
+            <div className="bg-(--card-bg) p-4 rounded-2xl border border-(--border-color) shadow-sm flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
                 <FolderOpen size={24} />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-xs text-[var(--text-muted)] font-medium">
+                <span className="text-xs text-(--text-muted) font-medium">
                   {t("tools.folder_size.largest_item")}
                 </span>
                 <span
-                  className="text-lg font-bold text-[var(--text-main)] truncate"
+                  className="text-lg font-bold text-(--text-main) truncate"
                   title={largestItem?.name}
                 >
                   {largestItem?.name || "-"}
@@ -454,14 +454,14 @@ const FolderSize: React.FC = () => {
           </div>
         )}
 
-        <div className="flex-1 min-h-0 bg-[var(--card-bg)] rounded-2xl border border-[var(--border-color)] shadow-sm overflow-hidden flex flex-col">
+        <div className="flex-1 min-h-0 bg-(--card-bg) rounded-2xl border border-(--border-color) shadow-sm overflow-hidden flex flex-col">
           {results.length > 0 ? (
-            <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-[var(--border-color)]">
+            <div className="flex-1 overflow-auto scrollbar-thin scrollbar-thumb-(--border-color)">
               <table className="w-full border-collapse text-left min-w-[600px]">
-                <thead className="sticky top-0 bg-[var(--card-bg)] z-10 border-b border-[var(--border-color)]">
+                <thead className="sticky top-0 bg-(--card-bg) z-10 border-b border-(--border-color)">
                   <tr>
                     <th
-                      className="px-4 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider cursor-pointer hover:text-primary transition-colors"
+                      className="px-4 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider cursor-pointer hover:text-primary transition-colors"
                       onClick={() => handleSort("name")}
                     >
                       <div className="flex items-center gap-1">
@@ -475,7 +475,7 @@ const FolderSize: React.FC = () => {
                       </div>
                     </th>
                     <th
-                      className="px-4 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-right"
+                      className="px-4 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider cursor-pointer hover:text-primary transition-colors text-right"
                       onClick={() => handleSort("size")}
                     >
                       <div className="flex items-center gap-1 justify-end">
@@ -488,19 +488,19 @@ const FolderSize: React.FC = () => {
                           ))}
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider text-right w-[200px]">
+                    <th className="px-4 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider text-right w-[200px]">
                       {t("common.progress")}
                     </th>
-                    <th className="px-4 py-3 text-xs font-bold text-[var(--text-muted)] uppercase tracking-wider text-center w-[100px]">
+                    <th className="px-4 py-3 text-xs font-bold text-(--text-muted) uppercase tracking-wider text-center w-[100px]">
                       {t("tools.folder_size.col_actions")}
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--border-color)]">
+                <tbody className="divide-y divide-(--border-color)">
                   {sortedResults.map((item) => (
                     <tr
                       key={item.path}
-                      className="hover:bg-[var(--bg-main)] transition-colors group cursor-default"
+                      className="hover:bg-(--bg-main) transition-colors group cursor-default"
                       onDoubleClick={() => handleItemDoubleClick(item)}
                       onContextMenu={(e) => handleContextMenu(e, item)}
                     >
@@ -518,7 +518,7 @@ const FolderSize: React.FC = () => {
                             />
                           )}
                           <span
-                            className="text-sm font-medium text-[var(--text-main)] truncate max-w-[300px]"
+                            className="text-sm font-medium text-(--text-main) truncate max-w-[300px]"
                             title={item.path}
                           >
                             {item.name}
@@ -526,13 +526,13 @@ const FolderSize: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className="text-sm font-mono font-bold text-[var(--text-main)]">
+                        <span className="text-sm font-mono font-bold text-(--text-main)">
                           {formatSize(item.size)}
                         </span>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="flex-1 h-1.5 bg-[var(--bg-main)] rounded-full overflow-hidden">
+                          <div className="flex-1 h-1.5 bg-(--bg-main) rounded-full overflow-hidden">
                             <div
                               className="h-full bg-primary transition-all duration-500"
                               style={{
@@ -547,7 +547,7 @@ const FolderSize: React.FC = () => {
                               }}
                             />
                           </div>
-                          <span className="text-[10px] font-medium text-[var(--text-muted)] w-10 text-right">
+                          <span className="text-[10px] font-medium text-(--text-muted) w-10 text-right">
                             {totalSize > 0
                               ? Math.min(
                                   (item.size / totalSize) * 100,
@@ -564,7 +564,7 @@ const FolderSize: React.FC = () => {
                             variant="text"
                             size="small"
                             onClick={() => openFolder(item.path)}
-                            className="p-1.5 text-[var(--text-muted)] hover:text-primary hover:bg-primary/10 rounded-lg transition-all h-auto"
+                            className="p-1.5 text-(--text-muted) hover:text-primary hover:bg-primary/10 rounded-lg transition-all h-auto"
                             title={t("tools.folder_size.open_in_explorer")}
                           >
                             <ExternalLink size={14} />
@@ -573,7 +573,7 @@ const FolderSize: React.FC = () => {
                             variant="text"
                             size="small"
                             onClick={() => copyPath(item.path)}
-                            className="p-1.5 text-[var(--text-muted)] hover:text-primary hover:bg-primary/10 rounded-lg transition-all h-auto"
+                            className="p-1.5 text-(--text-muted) hover:text-primary hover:bg-primary/10 rounded-lg transition-all h-auto"
                             title={t("tools.folder_size.copy_path")}
                           >
                             <Copy size={14} />
@@ -587,13 +587,13 @@ const FolderSize: React.FC = () => {
             </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-              <div className="w-20 h-20 rounded-full bg-[var(--bg-main)] flex items-center justify-center mb-6">
+              <div className="w-20 h-20 rounded-full bg-(--bg-main) flex items-center justify-center mb-6">
                 <BarChart3 size={40} className="text-primary/40" />
               </div>
-              <h3 className="text-lg font-bold text-[var(--text-main)] mb-2">
+              <h3 className="text-lg font-bold text-(--text-main) mb-2">
                 {t("common.ready")}
               </h3>
-              <p className="text-sm text-[var(--text-muted)] max-w-xs">
+              <p className="text-sm text-(--text-muted) max-w-xs">
                 {scanning
                   ? t("tools.folder_size.scanning")
                   : t("tools.folder_size.ready_desc")}
@@ -604,7 +604,7 @@ const FolderSize: React.FC = () => {
 
         {contextMenu && (
           <div
-            className="fixed bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl shadow-xl p-1.5 z-[1000] min-w-[180px] animate-in fade-in zoom-in duration-150"
+            className="fixed bg-(--card-bg) border border-(--border-color) rounded-xl shadow-xl p-1.5 z-[1000] min-w-[180px] animate-in fade-in zoom-in duration-150"
             style={{
               top: contextMenu.y,
               left: contextMenu.x,
@@ -612,7 +612,7 @@ const FolderSize: React.FC = () => {
           >
             <Button
               variant="text"
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-[var(--text-main)] hover:bg-primary/10 hover:text-primary rounded-lg transition-colors justify-start h-auto"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-(--text-main) hover:bg-primary/10 hover:text-primary rounded-lg transition-colors justify-start h-auto"
               onClick={() =>
                 contextMenu.item && openFolder(contextMenu.item.path)
               }
@@ -622,7 +622,7 @@ const FolderSize: React.FC = () => {
             </Button>
             <Button
               variant="text"
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-[var(--text-main)] hover:bg-primary/10 hover:text-primary rounded-lg transition-colors justify-start h-auto"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-(--text-main) hover:bg-primary/10 hover:text-primary rounded-lg transition-colors justify-start h-auto"
               onClick={() =>
                 contextMenu.item && revealFolder(contextMenu.item.path)
               }
@@ -632,7 +632,7 @@ const FolderSize: React.FC = () => {
             </Button>
             <Button
               variant="text"
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-[var(--text-main)] hover:bg-primary/10 hover:text-primary rounded-lg transition-colors justify-start h-auto"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-(--text-main) hover:bg-primary/10 hover:text-primary rounded-lg transition-colors justify-start h-auto"
               onClick={() =>
                 contextMenu.item && copyPath(contextMenu.item.path)
               }
@@ -640,7 +640,7 @@ const FolderSize: React.FC = () => {
               <Copy size={16} />
               <span>{t("tools.folder_size.copy_path")}</span>
             </Button>
-            <div className="h-px bg-[var(--border-color)] my-1.5 mx-1" />
+            <div className="h-px bg-(--border-color) my-1.5 mx-1" />
             <Button
               variant="text"
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50 rounded-lg transition-colors justify-start h-auto"

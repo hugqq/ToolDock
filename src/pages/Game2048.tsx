@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import {
   Box,

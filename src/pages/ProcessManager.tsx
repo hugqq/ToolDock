@@ -308,17 +308,17 @@ const ProcessManager: React.FC = () => {
         )}
 
         {/* 控制栏 */}
-        <div className="flex flex-wrap items-center gap-4 bg-[var(--card-bg)] p-4 rounded-2xl border border-[var(--border-color)]">
+        <div className="flex flex-wrap items-center gap-4 bg-(--card-bg) p-4 rounded-2xl border border-(--border-color)">
           <div className="flex items-center gap-2 flex-1 min-w-[280px]">
             <div className="relative flex-1">
               <Search
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-muted)"
               />
               <input
                 type="text"
                 placeholder={t("tools.process_manager.search_placeholder")}
-                className="w-full pl-10 pr-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
               />
@@ -328,7 +328,7 @@ const ProcessManager: React.FC = () => {
               size="small"
               onClick={handleManualSelect}
               title={t("tools.process_manager.select_file_tooltip")}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all h-auto whitespace-nowrap border-[var(--border-color)] hover:border-primary hover:text-primary"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all h-auto whitespace-nowrap border-(--border-color) hover:border-primary hover:text-primary"
             >
               <FileSearch size={18} />
               <span className="text-xs font-medium hidden sm:inline">
@@ -338,7 +338,7 @@ const ProcessManager: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-1 bg-[var(--bg-main)] p-1 rounded-xl border border-[var(--border-color)]">
+            <div className="flex items-center gap-1 bg-(--bg-main) p-1 rounded-xl border border-(--border-color)">
               {PROTOCOL_FILTERS.map((p) => (
                 <Button
                   key={p}
@@ -348,7 +348,7 @@ const ProcessManager: React.FC = () => {
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all h-auto whitespace-nowrap ${
                     protocolFilter === p
                       ? "shadow-sm"
-                      : "text-[var(--text-muted)] hover:bg-[var(--border-color)]"
+                      : "text-(--text-muted) hover:bg-(--border-color)"
                   }`}
                 >
                   {p === "ALL" ? t("common.all") : p}
@@ -356,7 +356,7 @@ const ProcessManager: React.FC = () => {
               ))}
             </div>
 
-            <div className="flex items-center gap-1 bg-[var(--bg-main)] p-1 rounded-xl border border-[var(--border-color)]">
+            <div className="flex items-center gap-1 bg-(--bg-main) p-1 rounded-xl border border-(--border-color)">
               {REFRESH_INTERVALS.map((item) => (
                 <Button
                   key={item.value}
@@ -368,7 +368,7 @@ const ProcessManager: React.FC = () => {
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all h-auto whitespace-nowrap ${
                     refreshInterval === item.value
                       ? "shadow-sm"
-                      : "text-[var(--text-muted)] hover:bg-[var(--border-color)]"
+                      : "text-(--text-muted) hover:bg-(--border-color)"
                   }`}
                 >
                   {t(item.labelKey)}
@@ -389,7 +389,7 @@ const ProcessManager: React.FC = () => {
         </div>
 
         {/* 统计信息 */}
-        <div className="flex items-center justify-between px-2 text-sm text-[var(--text-muted)]">
+        <div className="flex items-center justify-between px-2 text-sm text-(--text-muted)">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
               <Activity size={14} />
@@ -419,9 +419,9 @@ const ProcessManager: React.FC = () => {
         </div>
 
         {/* 表格区域 */}
-        <div className="flex-1 overflow-auto bg-[var(--card-bg)] border border-[var(--border-color)] rounded-2xl">
+        <div className="flex-1 overflow-auto bg-(--card-bg) border border-(--border-color) rounded-2xl">
           <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-[var(--card-bg)] border-b border-[var(--border-color)] z-10">
+            <thead className="sticky top-0 bg-(--card-bg) border-b border-(--border-color) z-10">
               <tr>
                 <th className="px-4 py-3 text-left">
                   <input
@@ -483,7 +483,7 @@ const ProcessManager: React.FC = () => {
                   return (
                     <tr
                       key={rowId}
-                      className={`border-b border-[var(--border-color)] hover:bg-[var(--bg-main)] transition-colors ${
+                      className={`border-b border-(--border-color) hover:bg-(--bg-main) transition-colors ${
                         isSelected ? "bg-primary/5" : ""
                       }`}
                       onContextMenu={(e) => {
@@ -592,7 +592,7 @@ const ProcessManager: React.FC = () => {
       {/* 右键菜单 */}
       {contextMenu.visible && (
         <div
-          className="fixed z-50 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl shadow-2xl py-1 min-w-[160px] animate-in fade-in zoom-in duration-100"
+          className="fixed z-50 bg-(--card-bg) border border-(--border-color) rounded-xl shadow-2xl py-1 min-w-[160px] animate-in fade-in zoom-in duration-100"
           style={{ left: contextMenu.x, top: contextMenu.y }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -612,7 +612,7 @@ const ProcessManager: React.FC = () => {
             <Trash2 size={16} />
             <span>{t("tools.process_manager.kill_process")}</span>
           </Button>
-          <div className="h-[1px] bg-[var(--border-color)] my-1" />
+          <div className="h-[1px] bg-(--border-color) my-1" />
           <Button
             variant="text"
             onClick={() => {
@@ -621,7 +621,7 @@ const ProcessManager: React.FC = () => {
               }
               closeContextMenu();
             }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--text-main)] hover:bg-[var(--bg-main)] transition-colors justify-start"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-(--text-main) hover:bg-(--bg-main) transition-colors justify-start"
           >
             <Hash size={16} />
             <span>{t("tools.process_manager.copy_pid")}</span>
@@ -634,7 +634,7 @@ const ProcessManager: React.FC = () => {
               }
               closeContextMenu();
             }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--text-main)] hover:bg-[var(--bg-main)] transition-colors justify-start"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-(--text-main) hover:bg-(--bg-main) transition-colors justify-start"
           >
             <Copy size={16} />
             <span>{t("tools.process_manager.copy_port")}</span>

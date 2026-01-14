@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import MUIButton, { ButtonProps as MUIButtonProps } from "@mui/material/Button";
 import TextField, { TextFieldProps } from "@mui/material/TextField";
