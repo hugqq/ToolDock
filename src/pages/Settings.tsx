@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import { useSettingsStore } from "../stores/useSettingsStore";
 import {
-  Key,
   Save,
   CheckCircle2,
   ExternalLink,
@@ -718,7 +717,7 @@ const Settings: React.FC = () => {
             <button
               key={p.id}
               onClick={() => setActiveAiTab(p.id)}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-all relative ${
+              className={`flex-1 px-4 py-3 text-sm font-medium relative transition-all duration-300 ${
                 activeAiTab === p.id
                   ? "text-blue-600 bg-(--card-bg)"
                   : "text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-main)/30"
@@ -726,14 +725,17 @@ const Settings: React.FC = () => {
             >
               {p.name}
               {activeAiTab === p.id && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 transition-all duration-300" />
               )}
             </button>
           ))}
         </div>
 
         {/* 标签内容 */}
-        <div className="p-6">
+        <div 
+          key={activeAiTab}
+          className="p-6 animate-fadeIn"
+        >
           {renderAiProviderContent(activeAiTab)}
         </div>
       </div>
@@ -1203,9 +1205,9 @@ const Settings: React.FC = () => {
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-300 ${
                     isActive
-                      ? "bg-(--bg-main) text-(--primary-color) font-semibold border border-(--primary-color)"
+                      ? "bg-(--bg-main) text-(--primary-color) font-semibold border border-(--primary-color) shadow-sm"
                       : "text-(--text-muted) hover:bg-(--bg-main) hover:text-(--text-main)"
                   }`}
                 >
@@ -1226,7 +1228,7 @@ const Settings: React.FC = () => {
           >
             {/* 卡片头部 */}
             <div
-              className="p-5 bg-(--bg-main)/50 border-b border-(--border-color) flex items-center gap-3"
+              className="p-5 bg-(--bg-main)/50 border-b border-(--border-color) flex items-center gap-3 transition-all duration-300"
             >
               {React.createElement(currentCategory.icon, {
                 size: 22,
@@ -1238,7 +1240,12 @@ const Settings: React.FC = () => {
             </div>
 
             {/* 卡片内容 */}
-            <div className="p-6">{renderCategoryContent()}</div>
+            <div 
+              key={activeCategory}
+              className="p-6 animate-fadeIn"
+            >
+              {renderCategoryContent()}
+            </div>
           </div>
         </div>
       </div>
