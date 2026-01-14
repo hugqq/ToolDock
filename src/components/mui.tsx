@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import MUIButton, { ButtonProps as MUIButtonProps } from "@mui/material/Button";
-import TextField, { TextFieldProps } from "@mui/material/TextField";
+import MUITextField, { TextFieldProps } from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import FormControl from "@mui/material/FormControl";
@@ -59,7 +59,7 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <div className={className}>
-      <TextField
+      <MUITextField
         label={label}
         error={!!error}
         helperText={error}
@@ -183,3 +183,53 @@ export const Box = MuiBox;
 export const Typography: React.FC<MuiTypographyProps> = (props) => (
   <MuiTypography {...props} />
 );
+
+// ========== 统一导出常用 MUI 组件 ==========
+// 布局组件
+export { default as Stack } from "@mui/material/Stack";
+export { default as Grid } from "@mui/material/Grid";
+export { default as Container } from "@mui/material/Container";
+export { default as Paper } from "@mui/material/Paper";
+export { default as Divider } from "@mui/material/Divider";
+
+// 卡片组件
+export { default as Card } from "@mui/material/Card";
+export { default as CardContent } from "@mui/material/CardContent";
+export { default as CardActions } from "@mui/material/CardActions";
+export { default as CardHeader } from "@mui/material/CardHeader";
+
+// 导航组件
+export { default as Tabs } from "@mui/material/Tabs";
+export { default as Tab } from "@mui/material/Tab";
+
+// 表单组件
+// 注意：TextField 也需要导出（项目中很多地方使用原生 TextField）
+// Input 是我们自定义封装的组件（带密码显示切换等功能）
+export { default as TextField } from "@mui/material/TextField";
+export { default as ToggleButton } from "@mui/material/ToggleButton";
+export { default as ToggleButtonGroup } from "@mui/material/ToggleButtonGroup";
+export { default as Checkbox } from "@mui/material/Checkbox";
+export { default as Radio } from "@mui/material/Radio";
+export { default as RadioGroup } from "@mui/material/RadioGroup";
+export { default as Slider } from "@mui/material/Slider";
+
+// 反馈组件
+export { default as Alert } from "@mui/material/Alert";
+export { default as Snackbar } from "@mui/material/Snackbar";
+export { default as CircularProgress } from "@mui/material/CircularProgress";
+export { default as Backdrop } from "@mui/material/Backdrop";
+
+// 弹窗组件
+export { default as Dialog } from "@mui/material/Dialog";
+export { default as DialogTitle } from "@mui/material/DialogTitle";
+export { default as DialogContent } from "@mui/material/DialogContent";
+export { default as DialogActions } from "@mui/material/DialogActions";
+
+// 其他组件
+export { default as Chip } from "@mui/material/Chip";
+export { default as Badge } from "@mui/material/Badge";
+export { default as Avatar } from "@mui/material/Avatar";
+export { default as Fade } from "@mui/material/Fade";
+export { default as Collapse } from "@mui/material/Collapse";
+export { default as Grow } from "@mui/material/Grow";
+

@@ -308,6 +308,7 @@
       "description": "Base64、URL、Hex、HTML、Unicode、Binary、JWT、Punycode、Morse 编解码工具",
       "tab_base64": "Base64",
       "tab_url": "URL 编码",
+      "mode": "模式",
       "encode": "编码",
       "decode": "解码",
       "input_placeholder": "在此输入要编码/解码的文本...",

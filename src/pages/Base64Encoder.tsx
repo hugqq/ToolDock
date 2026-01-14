@@ -1,13 +1,28 @@
 /**
  * Base64/URL 编解码器页面组件
  * 功能：提供 Base64 和 URL 编码解码功能
+ * UI: 使用 MUI 组件实现现代化界面设计
  */
 
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Copy, RefreshCw, Trash2, ArrowLeftRight } from "lucide-react";
 import { ToolLayout } from "../components/layout/ToolLayout";
-import { Button } from "../components/mui";
+import {
+  Button,
+  Switch,
+  Tabs,
+  Tab,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Stack,
+  Card,
+  CardContent,
+  Box,
+  Fade,
+  Chip,
+} from "../components/mui";
 import toast from "react-hot-toast";
 
 type TabType =
@@ -539,260 +554,236 @@ export default function Base64Encoder() {
 
   return (
     <ToolLayout title={t("tools.base64_encoder.name")}>
-      {/* 顶部工具栏 */}
-      <div className="mb-6">
-        {/* 标签页切换 */}
-        <div className="flex items-center gap-2 flex-wrap mb-4">
-          <Button
-            variant={activeTab === "base64" ? "contained" : "outlined"}
-            size="small"
-            onClick={() => setActiveTab("base64")}
+      <Stack spacing={3}>
+        {/* 标签页切换区域 - 使用 MUI Tabs */}
+        <Card variant="outlined">
+          <Tabs
+            value={activeTab}
+            onChange={(_, newValue) => setActiveTab(newValue as TabType)}
+            variant="scrollable"
+            scrollButtons="auto"
+            sx={{
+              borderBottom: 1,
+              borderColor: "divider",
+              "& .MuiTab-root": {
+                minHeight: 48,
+                textTransform: "none",
+                fontWeight: 500,
+              },
+            }}
           >
-            Base64
-          </Button>
-          <Button
-            variant={activeTab === "url" ? "contained" : "outlined"}
-            size="small"
-            onClick={() => setActiveTab("url")}
-          >
-            URL
-          </Button>
-          <Button
-            variant={activeTab === "hex" ? "contained" : "outlined"}
-            size="small"
-            onClick={() => setActiveTab("hex")}
-          >
-            Hex
-          </Button>
-          <Button
-            variant={activeTab === "html" ? "contained" : "outlined"}
-            size="small"
-            onClick={() => setActiveTab("html")}
-          >
-            HTML
-          </Button>
-          <Button
-            variant={activeTab === "unicode" ? "contained" : "outlined"}
-            size="small"
-            onClick={() => setActiveTab("unicode")}
-          >
-            Unicode
-          </Button>
-          <Button
-            variant={activeTab === "binary" ? "contained" : "outlined"}
-            size="small"
-            onClick={() => setActiveTab("binary")}
-          >
-            Binary
-          </Button>
-          <Button
-            variant={activeTab === "jwt" ? "contained" : "outlined"}
-            size="small"
-            onClick={() => setActiveTab("jwt")}
-          >
-            JWT
-          </Button>
-          <Button
-            variant={activeTab === "punycode" ? "contained" : "outlined"}
-            size="small"
-            onClick={() => setActiveTab("punycode")}
-          >
-            Punycode
-          </Button>
-          <Button
-            variant={activeTab === "morse" ? "contained" : "outlined"}
-            size="small"
-            onClick={() => setActiveTab("morse")}
-          >
-            Morse
-          </Button>
-        </div>
+            <Tab label="Base64" value="base64" />
+            <Tab label="URL" value="url" />
+            <Tab label="Hex" value="hex" />
+            <Tab label="HTML" value="html" />
+            <Tab label="Unicode" value="unicode" />
+            <Tab label="Binary" value="binary" />
+            <Tab label="JWT" value="jwt" />
+            <Tab label="Punycode" value="punycode" />
+            <Tab label="Morse" value="morse" />
+          </Tabs>
 
-        {/* 描述说明 */}
-        <div className="mt-3 p-3 bg-(--card-bg) rounded-lg border border-(--border-color)">
-          <p className="text-sm text-(--text-muted) leading-relaxed">
-            💡 {getDescription()}
-          </p>
-        </div>
+          {/* 描述说明卡片 */}
+          <Fade in key={activeTab}>
+            <CardContent>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  p: 1.5,
+                  bgcolor: "action.hover",
+                  borderRadius: 1,
+                }}
+              >
+                <span style={{ fontSize: "1.2rem" }}>💡</span>
+                <Box sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
+                  {getDescription()}
+                </Box>
+              </Box>
+            </CardContent>
+          </Fade>
+        </Card>
 
-        <div className="flex items-center justify-between gap-4 flex-wrap mt-4">
-          {/* 编码/解码切换 */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant={action === "encode" ? "contained" : "outlined"}
-              color="success"
-              size="small"
-              onClick={() => setAction("encode")}
-            >
-              {t("tools.base64_encoder.encode")}
-            </Button>
-            <Button
-              variant={action === "decode" ? "contained" : "outlined"}
-              color="primary"
-              size="small"
-              onClick={() => setAction("decode")}
-            >
-              {t("tools.base64_encoder.decode")}
-            </Button>
-          </div>
+        {/* 编码/解码切换 + 操作按钮 */}
+        <Card variant="outlined">
+          <CardContent>
+            <Stack spacing={2}>
+              {/* 编码/解码切换 */}
+              <Box>
+                <Box sx={{ fontSize: "0.875rem", fontWeight: 500, mb: 1 }}>
+                  {t("tools.base64_encoder.mode")}
+                </Box>
+                <ToggleButtonGroup
+                  value={action}
+                  exclusive
+                  onChange={(_, value) => value && setAction(value)}
+                  size="small"
+                  fullWidth
+                  sx={{ maxWidth: 300 }}
+                >
+                  <ToggleButton value="encode" color="success">
+                    {t("tools.base64_encoder.encode")}
+                  </ToggleButton>
+                  <ToggleButton value="decode" color="primary">
+                    {t("tools.base64_encoder.decode")}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </Box>
 
-          {/* 操作按钮 */}
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={handleTransform}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw size={16} />
-              {action === "encode"
-                ? t("tools.base64_encoder.encode")
-                : t("tools.base64_encoder.decode")}
-            </Button>
-            <Button
-              onClick={handleSwap}
-              variant="outlined"
-              className="flex items-center gap-2"
-            >
-              <ArrowLeftRight size={16} />
-              {t("tools.base64_encoder.swap")}
-            </Button>
-            <Button
-              onClick={handleClear}
-              color="error"
-              variant="contained"
-              className="flex items-center gap-2"
-            >
-              <Trash2 size={16} />
-              {t("tools.base64_encoder.clear")}
-            </Button>
-          </div>
-        </div>
-      </div>
+              {/* 操作按钮组 */}
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                <Button
+                  onClick={handleTransform}
+                  startIcon={<RefreshCw size={16} />}
+                  variant="contained"
+                >
+                  {action === "encode"
+                    ? t("tools.base64_encoder.encode")
+                    : t("tools.base64_encoder.decode")}
+                </Button>
+                <Button
+                  onClick={handleSwap}
+                  startIcon={<ArrowLeftRight size={16} />}
+                  variant="outlined"
+                >
+                  {t("tools.base64_encoder.swap")}
+                </Button>
+                <Button
+                  onClick={handleCopy}
+                  startIcon={<Copy size={16} />}
+                  variant="outlined"
+                  color="primary"
+                >
+                  {t("tools.base64_encoder.copy_result")}
+                </Button>
+                <Button
+                  onClick={handleClear}
+                  startIcon={<Trash2 size={16} />}
+                  variant="outlined"
+                  color="error"
+                >
+                  {t("tools.base64_encoder.clear")}
+                </Button>
+              </Stack>
+            </Stack>
+          </CardContent>
+        </Card>
 
-      {/* 选项区域 */}
-      <div className="mb-6 p-4 bg-(--card-bg) rounded-xl border border-(--border-color)">
-        <div className="flex items-center gap-6 flex-wrap">
-          <span className="text-sm font-medium text-(--text-main)">
-            {t("tools.base64_encoder.options")}
-          </span>
+        {/* 选项配置区域 */}
+        <Card variant="outlined">
+          <CardContent>
+            <Stack spacing={2}>
+              <Box sx={{ fontSize: "0.875rem", fontWeight: 500 }}>
+                {t("tools.base64_encoder.options")}
+              </Box>
 
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={autoTransform}
-              onChange={(e) => setAutoTransform(e.target.checked)}
-              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <span className="text-sm text-(--text-main)">
-              {t("tools.base64_encoder.auto_transform")}
-            </span>
-          </label>
+              <Stack direction="row" spacing={3} flexWrap="wrap">
+                {/* 自动转换 */}
+                <Switch
+                  label={t("tools.base64_encoder.auto_transform")}
+                  checked={autoTransform}
+                  onChange={(e) => setAutoTransform(e.target.checked)}
+                />
 
-          {(activeTab === "base64" ||
-            activeTab === "url" ||
-            activeTab === "jwt" ||
-            activeTab === "hex") && (
-            <div className="flex items-center gap-6">
-              {activeTab === "base64" && (
-                <>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
+                {/* Base64 专属选项 */}
+                {activeTab === "base64" && (
+                  <>
+                    <Switch
+                      label={t("tools.base64_encoder.base64_line_break")}
                       checked={base64LineBreak}
                       onChange={(e) => setBase64LineBreak(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-(--text-main)">
-                      {t("tools.base64_encoder.base64_line_break")}
-                    </span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
+                    <Switch
+                      label={t("tools.base64_encoder.url_safe")}
                       checked={base64UrlSafe}
                       onChange={(e) => setBase64UrlSafe(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-(--text-main)">
-                      {t("tools.base64_encoder.url_safe")}
-                    </span>
-                  </label>
-                </>
-              )}
-              {activeTab === "url" && (
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
+                  </>
+                )}
+
+                {/* URL 专属选项 */}
+                {activeTab === "url" && (
+                  <Switch
+                    label={t("tools.base64_encoder.url_encode_all")}
                     checked={urlEncodeAll}
                     onChange={(e) => setUrlEncodeAll(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm text-(--text-main)">
-                    {t("tools.base64_encoder.url_encode_all")}
-                  </span>
-                </label>
-              )}
-              {activeTab === "hex" && (
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
+                )}
+
+                {/* Hex 专属选项 */}
+                {activeTab === "hex" && (
+                  <Switch
+                    label={t("tools.base64_encoder.uppercase")}
                     checked={hexUppercase}
                     onChange={(e) => setHexUppercase(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm text-(--text-main)">
-                    {t("tools.base64_encoder.uppercase")}
-                  </span>
-                </label>
-              )}
-              {activeTab === "jwt" && (
-                <span className="text-sm text-(--text-muted)">
-                  仅解码，可查看 Header、Payload 和 Signature
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+                )}
 
-      {/* 输入输出区域 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 输入区域 */}
-        <div>
-          <label className="block text-sm font-medium text-(--text-main) mb-2">
-            {t("common.input")}
-          </label>
-          <textarea
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder={t("tools.base64_encoder.input_placeholder")}
-            className="w-full h-125 p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-          />
-        </div>
+                {/* JWT 提示 */}
+                {activeTab === "jwt" && (
+                  <Chip
+                    label="仅解码，可查看 Header、Payload 和 Signature"
+                    size="small"
+                    color="info"
+                    variant="outlined"
+                  />
+                )}
+              </Stack>
+            </Stack>
+          </CardContent>
+        </Card>
 
-        {/* 输出区域 */}
-        <div>
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-(--text-main) mb-2">
-              {t("common.output")}
-            </label>
-            <Button
-              onClick={handleCopy}
+        {/* 输入输出区域 */}
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" }, gap: 3 }}>
+          {/* 输入区域 */}
+          <Box>
+            <Box sx={{ fontSize: "0.875rem", fontWeight: 500, mb: 1 }}>
+              {t("common.input")}
+            </Box>
+            <TextField
+              multiline
+              rows={12}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder={t("tools.base64_encoder.input_placeholder")}
               variant="outlined"
-              size="small"
-              className="flex items-center gap-1.5"
-            >
-              <Copy size={14} />
-              {t("tools.base64_encoder.copy_result")}
-            </Button>
-          </div>
-          <textarea
-            value={outputText}
-            readOnly
-            placeholder={t("tools.base64_encoder.output_placeholder")}
-            className="w-full h-125 p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-sm font-mono resize-none focus:outline-none"
-          />
-        </div>
-      </div>
+              fullWidth
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  fontFamily: "monospace",
+                  fontSize: "0.875rem",
+                },
+              }}
+            />
+          </Box>
+
+          {/* 输出区域 */}
+          <Box>
+            <Box sx={{ fontSize: "0.875rem", fontWeight: 500, mb: 1 }}>
+              {t("common.output")}
+            </Box>
+            <TextField
+              multiline
+              rows={12}
+              value={outputText}
+              placeholder={t("tools.base64_encoder.output_placeholder")}
+              variant="outlined"
+              fullWidth
+              InputProps={{
+                readOnly: true,
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  fontFamily: "monospace",
+                  fontSize: "0.875rem",
+                  bgcolor: "action.hover",
+                },
+              }}
+            />
+          </Box>
+        </Box>
+      </Stack>
     </ToolLayout>
   );
 }

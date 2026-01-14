@@ -308,6 +308,7 @@
       "description": "Multi-format encoder/decoder: Base64, URL, Hex, HTML, Unicode, Binary, JWT, Punycode, Morse",
       "tab_base64": "Base64",
       "tab_url": "URL Encoding",
+      "mode": "Mode",
       "encode": "Encode",
       "decode": "Decode",
       "input_placeholder": "Enter text to encode/decode...",
