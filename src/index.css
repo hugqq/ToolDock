@@ -1,0 +1,318 @@
+﻿@import "tailwindcss";
+
+@theme {
+  --color-sidebar: var(--bg-sidebar);
+  --color-sidebar-text: var(--text-sidebar);
+  --color-sidebar-muted: var(--text-sidebar-muted);
+  --color-sidebar-hover: var(--hover-sidebar);
+  --color-sidebar-border: var(--border-sidebar);
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+
+  --spacing-sidebar: 240px;
+  --spacing-sidebar-collapsed: 72px;
+}
+
+@layer base {
+  :root {
+    --sidebar-width: 240px;
+    --sidebar-collapsed-width: 72px;
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --bg-main: #ffffff;
+    --bg-sidebar: #ffffff;
+    --text-sidebar: #000000;
+    --text-sidebar-muted: #64748b;
+    --hover-sidebar: rgba(0, 0, 0, 0.05);
+    --border-sidebar: #e2e8f0;
+    --text-main: #000000;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --card-bg: #ffffff;
+  }
+
+  [data-theme="dark"] {
+    --bg-main: #1a1a1a;
+    --bg-sidebar: #1a1a1a;
+    --text-sidebar: #ffffff;
+    --text-sidebar-muted: #94a3b8;
+    --hover-sidebar: rgba(255, 255, 255, 0.08);
+    --border-sidebar: #3a3a3a;
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    --border-color: #3a3a3a;
+    --card-bg: #252525;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    overflow: hidden;
+  }
+
+  #root {
+    height: 100vh;
+  }
+
+  /* Global Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  [data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #334155;
+  }
+
+  [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+
+  /* Custom Scrollbar Class */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  [data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #334155;
+  }
+
+  [data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+
+  /* JSON Editor Overrides */
+  .jsoneditor-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 针对 jsoneditor-react 的包装层及其内部结构 */
+  .jsoneditor-container > div,
+  .jsoneditor-container > div > div,
+  .jsoneditor-container .jsoneditor,
+  .jsoneditor-container .jsoneditor-outer {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+  }
+
+  .jsoneditor-menu {
+    display: none !important;
+  }
+
+  .jsoneditor-tree {
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* 确保内部滚动区域从顶部开始 */
+  .jsoneditor-tree-inner {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* 彻底重置表格布局，消除间距异常 */
+  .jsoneditor table.jsoneditor-tree {
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    min-width: 100% !important;
+    top: 0 !important;
+  }
+
+  .jsoneditor tbody,
+  .jsoneditor thead {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .jsoneditor tr {
+    height: 24px !important;
+    box-sizing: border-box !important;
+  }
+
+  .jsoneditor td {
+    padding: 0 !important;
+    height: 24px !important;
+    line-height: 24px !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+  }
+
+  .jsoneditor-field,
+  .jsoneditor-value {
+    padding: 0 4px !important;
+    margin: 0 !important;
+    line-height: 24px !important;
+    min-height: 24px !important;
+    white-space: nowrap !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+    word-break: keep-all !important;
+  }
+
+  .jsoneditor-values {
+    width: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .jsoneditor-separator {
+    padding: 0 4px !important;
+    line-height: 24px !important;
+    vertical-align: middle !important;
+  }
+
+  /* 增强层级感与引导线 */
+  .jsoneditor-tree td.jsoneditor-tree {
+    width: 18px !important;
+    min-width: 18px !important;
+    position: relative !important;
+  }
+
+  /* 绘制垂直引导线 */
+  .jsoneditor-tree td.jsoneditor-tree::before {
+    content: "";
+    position: absolute;
+    left: 9px;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid var(--border-color);
+    opacity: 0.5;
+  }
+
+  /* 悬停高亮整行 */
+  .jsoneditor-tree tr:hover {
+    background-color: rgba(59, 130, 246, 0.05) !important;
+  }
+
+  [data-theme="dark"] .jsoneditor-tree tr:hover {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+  }
+
+  /* 强化字段名显示 */
+  .jsoneditor-field {
+    font-weight: 600 !important;
+    color: var(--text-main) !important;
+    opacity: 0.9;
+    padding-right: 8px !important;
+  }
+
+  /* 确保上下文菜单可见 */
+  .jsoneditor-contextmenu {
+    z-index: 9999 !important;
+  }
+
+  .jsoneditor-contextmenu .jsoneditor-menu {
+    display: block !important;
+    position: static !important;
+  }
+
+  /* 树模式下的行号对齐 */
+  .tree-line-number {
+    height: 24px !important;
+    line-height: 24px !important;
+    padding-right: 8px;
+    font-size: 10px;
+    display: block !important;
+    text-align: right !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 隐藏 jsoneditor 默认的行号（如果有） */
+  .jsoneditor-line-number {
+    display: none !important;
+  }
+
+  /* Dark Mode for JSON Editor */
+  [data-theme="dark"] .jsoneditor-tree,
+  [data-theme="dark"] .jsoneditor-values,
+  [data-theme="dark"] .jsoneditor-field,
+  [data-theme="dark"] .jsoneditor-value {
+    color: #f1f5f9 !important;
+  }
+
+  [data-theme="dark"] .jsoneditor-field {
+    color: #94a3b8 !important;
+  }
+
+  [data-theme="dark"] .jsoneditor-value.jsoneditor-string {
+    color: #38bdf8 !important;
+  }
+
+  [data-theme="dark"] .jsoneditor-value.jsoneditor-number {
+    color: #fbbf24 !important;
+  }
+
+  [data-theme="dark"] .jsoneditor-value.jsoneditor-boolean {
+    color: #f472b6 !important;
+  }
+
+  [data-theme="dark"] .jsoneditor-empty {
+    color: #475569 !important;
+  }
+
+  [data-theme="dark"] .jsoneditor-contextmenu ul li button {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+  }
+
+  [data-theme="dark"] .jsoneditor-contextmenu ul li button:hover {
+    background-color: #334155 !important;
+  }
+}

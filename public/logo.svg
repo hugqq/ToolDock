@@ -1,0 +1,54 @@
+<svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mainGradient" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+
+    <!-- Bevel Filter for Tool (3D feel) -->
+    <filter id="innerBevel" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur"/>
+        <feOffset dx="0" dy="1" result="offsetBlur"/>
+        <feComposite in="offsetBlur" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowDiff"/>
+        <feFlood flood-color="black" flood-opacity="0.1"/>
+        <feComposite in2="shadowDiff" operator="in"/>
+        <feComposite in2="SourceGraphic" operator="over"/>
+    </filter>
+
+    <!-- Drop Shadow for Tool -->
+    <filter id="toolShadow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+        <feOffset dx="0" dy="4" result="offsetblur"/>
+        <feFlood flood-color="#1e3a8a" flood-opacity="0.3"/>
+        <feComposite in2="offsetblur" operator="in"/>
+        <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="115" fill="url(#mainGradient)" />
+  
+  <!-- Content Group -->
+  <g transform="translate(256, 265) scale(1.35)">
+    
+    <!-- The Tool (T-Wrench) -->
+    <g filter="url(#toolShadow)">
+        <g filter="url(#innerBevel)">
+            <path d="M-22 -80 L-18 100 C-18 110 -10 115 0 115 C10 115 18 110 18 100 L22 -80" fill="white" />
+            
+            <rect x="-14" y="20" width="28" height="4" rx="2" fill="#3b82f6" fill-opacity="0.2" />
+            <rect x="-13" y="32" width="26" height="4" rx="2" fill="#3b82f6" fill-opacity="0.2" />
+            <rect x="-12" y="44" width="24" height="4" rx="2" fill="#3b82f6" fill-opacity="0.2" />
+
+            <path d="M-90 -80 C-105 -80 -110 -90 -110 -100 C-110 -120 -80 -125 0 -130 C80 -125 110 -120 110 -100 C110 -90 105 -80 90 -80 H-90 Z" fill="white" />
+            
+            <circle cx="0" cy="-100" r="12" fill="#3b82f6" fill-opacity="0.1" />
+        </g>
+    </g>
+    
+  </g>
+</svg>
+                        

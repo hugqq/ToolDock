@@ -1,0 +1,79 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": ["main", "floating_widget", "screenshot-selector", "weread"],
+  "permissions": [
+    "core:default",
+    {
+      "identifier": "opener:allow-open-path",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        { "url": "https://massgrave.dev/" },
+        { "url": "https://console.cloud.google.com/apis/credentials" },
+        { "url": "https://www.deepl.com/en/your-account/keys" },
+        { "url": "https://api.deeplx.org/" },
+        { "url": "https://fanyi-api.baidu.com/manage/developer" },
+        { "url": "https://ai.youdao.com/console/#/" },
+        { "url": "https://console.cloud.tencent.com/cam/capi" },
+        { "url": "https://weread.qq.com" },
+        { "url": "https://weread.qq.com/*" }
+      ]
+    },
+    {
+      "identifier": "opener:allow-reveal-item-in-dir",
+      "allow": [{ "path": "**" }]
+    },
+    "dialog:default",
+    "fs:default",
+    "fs:allow-appdata-read-recursive",
+    "fs:allow-appdata-write-recursive",
+    "fs:allow-desktop-read-recursive",
+    "fs:allow-desktop-write-recursive",
+    "fs:allow-download-read-recursive",
+    "fs:allow-download-write-recursive",
+    "fs:allow-document-read-recursive",
+    "fs:allow-document-write-recursive",
+    {
+      "identifier": "fs:allow-write",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "fs:allow-read",
+      "allow": [{ "path": "**" }]
+    },
+    "clipboard-manager:allow-read-text",
+    "clipboard-manager:allow-read-image",
+    "clipboard-manager:allow-write-text",
+    "clipboard-manager:allow-write-image",
+    "core:window:allow-hide",
+    "core:window:allow-show",
+    "core:window:allow-minimize",
+    "core:window:allow-unminimize",
+    "core:window:allow-set-position",
+    "core:window:allow-outer-position",
+    "core:window:allow-set-focus",
+    "core:window:allow-close",
+    "core:window:allow-start-dragging",
+    "core:webview:allow-webview-show",
+    "core:webview:allow-webview-hide",
+    "core:webview:allow-set-webview-focus",
+    "core:webview:allow-create-webview-window",
+    "core:window:allow-create",
+    "core:event:allow-listen",
+    "core:event:allow-emit",
+    "autostart:default",
+    "notification:default",
+    "notification:allow-is-permission-granted",
+    "notification:allow-request-permission",
+    "notification:allow-notify",
+    "notification:allow-cancel",
+    "notification:allow-show",
+    "notification:allow-get-active",
+    "notification:allow-get-pending",
+    "core:image:default"
+  ]
+}
