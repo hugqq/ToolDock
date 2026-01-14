@@ -315,4 +315,10 @@
   [data-theme="dark"] .jsoneditor-contextmenu ul li button:hover {
     background-color: #334155 !important;
   }
+
+  /* Hide native password reveal button in Edge/Windows */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
 }
