@@ -20,7 +20,15 @@
         { "url": "https://ai.youdao.com/console/#/" },
         { "url": "https://console.cloud.tencent.com/cam/capi" },
         { "url": "https://weread.qq.com" },
-        { "url": "https://weread.qq.com/*" }
+        { "url": "https://weread.qq.com/*" },
+        { "url": "https://tauri.app/" },
+        { "url": "https://react.dev/" },
+        { "url": "https://mui.com/" },
+        { "url": "https://www.rust-lang.org/" },
+        { "url": "https://www.typescriptlang.org/" },
+        { "url": "https://vitejs.dev/" },
+        { "url": "https://github.com/*" },
+        { "url": "https://www.i18next.com/" }
       ]
     },
     {
@@ -75,5 +83,6 @@
     "notification:allow-get-active",
     "notification:allow-get-pending",
     "core:image:default"
+
   ]
 }

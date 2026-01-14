@@ -3,7 +3,7 @@
  * 捕获 React 组件树中的 JavaScript 错误，防止整个应用崩溃
  */
 import { Component, ErrorInfo, ReactNode } from "react";
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -32,10 +32,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(_error: Error, errorInfo: ErrorInfo): void {
     this.setState({ errorInfo });
-    // 生产环境可以上报错误到监控服务
-    if (process.env.NODE_ENV === "production") {
-      // TODO: 上报错误到 Sentry 等服务
-    }
+    // 本地桌面应用，仅在控制台记录错误，不做网络上报
   }
 
   handleReset = (): void => {
@@ -48,6 +45,9 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
+      // 检查是否为开发模式 (Vite 环境变量)
+      const isDev = import.meta.env.DEV;
+
       return (
         <div className="flex flex-col items-center justify-center min-h-[400px] p-8 bg-(--bg-main)">
           <div className="flex flex-col items-center gap-4 max-w-md text-center">
@@ -55,15 +55,15 @@ export class ErrorBoundary extends Component<Props, State> {
               <AlertTriangle size={32} className="text-red-500" />
             </div>
             <h2 className="text-xl font-bold text-(--text-main)">
-              出错了
+              Something went wrong
             </h2>
             <p className="text-(--text-muted) text-sm">
-              应用程序遇到了一个意外错误。请尝试刷新页面或返回首页。
+              An unexpected error occurred. Please try again or return to the home page.
             </p>
-            {process.env.NODE_ENV === "development" && this.state.error && (
+            {isDev && this.state.error && (
               <details className="w-full text-left mt-4">
                 <summary className="cursor-pointer text-sm text-(--text-muted) hover:text-(--text-main)">
-                  查看错误详情
+                  View error details
                 </summary>
                 <pre className="mt-2 p-4 bg-(--card-bg) border border-(--border-color) rounded-xl text-xs overflow-auto max-h-48 text-red-500">
                   {this.state.error.toString()}
@@ -77,13 +77,14 @@ export class ErrorBoundary extends Component<Props, State> {
                 className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-hover transition-colors font-medium"
               >
                 <RefreshCw size={16} />
-                重试
+                Retry
               </button>
               <button
                 onClick={() => window.location.replace("/")}
-                className="px-4 py-2 bg-(--card-bg) border border-(--border-color) text-(--text-main) rounded-xl hover:bg-(--bg-main) transition-colors font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-(--card-bg) border border-(--border-color) text-(--text-main) rounded-xl hover:bg-(--bg-main) transition-colors font-medium"
               >
-                返回首页
+                <Home size={16} />
+                Home
               </button>
             </div>
           </div>
