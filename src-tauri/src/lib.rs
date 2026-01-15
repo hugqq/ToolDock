@@ -50,7 +50,7 @@ use commands::nginx::{
     test_nginx_config, write_nginx_config,
 };
 use commands::notepad::{load_notepad_data, save_notepad_data, save_notepad_image, NotepadDbState};
-use commands::ocr::run_ocr;
+use commands::ocr::{run_ocr, run_ocr_detailed};
 use commands::pip_player::{
     clear_bilibili_cookie, close_pip_window, extract_and_save_cookies, get_bilibili_cookie,
     has_bilibili_cookie, open_bilibili_login_window, open_pip_window, resolve_bilibili_short_url,
@@ -284,6 +284,7 @@ pub fn run() {
             ask_ai,
             ask_nginx_ai,
             run_ocr,
+            run_ocr_detailed,
             export_config,
             import_config,
             set_run_as_admin,

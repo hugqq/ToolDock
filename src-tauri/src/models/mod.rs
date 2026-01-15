@@ -1,4 +1,5 @@
-﻿pub mod port_scanner;
+﻿pub mod ocr;
+pub mod port_scanner;
 pub mod system;
 pub mod unit_converter;
 pub mod variable_naming;

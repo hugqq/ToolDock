@@ -3,17 +3,22 @@ import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { listen } from "@tauri-apps/api/event";
-import { Camera, Copy, Trash2, Loader2, MousePointer2 } from "lucide-react";
+import { Copy, Trash2, Loader2, MousePointer2, Image as ImageIcon } from "lucide-react";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import { Button, Select } from "../components/mui";
 import { toast } from "react-hot-toast";
 import { useSettingsStore } from "../stores/useSettingsStore";
+import { OcrDetailResult } from "../types/ocr";
+import { ImagePreview } from "../components/ocr/ImagePreview";
+import { TextBoxList } from "../components/ocr/TextBoxList";
 
 const ScreenOcr: React.FC = () => {
   const { t } = useTranslation();
   const { ocr, setOcrEngine } = useSettingsStore();
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [ocrResult, setOcrResult] = useState<OcrDetailResult | null>(null);
+  const [selectedBoxIndex, setSelectedBoxIndex] = useState<number | null>(null);
 
   const ocrOptions = useMemo(() => {
     const options = [{ key: "windows", labelKey: "tools.ocr.engine_windows" }];
@@ -57,9 +62,11 @@ const ScreenOcr: React.FC = () => {
   useEffect(() => {
     const unlisten = listen("screenshot-captured", async (event: any) => {
       const { x, y, width, height } = event.payload;
+
       setLoading(true);
       try {
-        const response: any = await invoke("run_ocr", {
+        // 调用run_ocr_detailed获取详细结果
+        const detailResponse: any = await invoke("run_ocr_detailed", {
           x: Math.round(x),
           y: Math.round(y),
           width: Math.round(width),
@@ -73,15 +80,24 @@ const ScreenOcr: React.FC = () => {
             baidu_secret_key: ocr.baiduSecretKey,
           },
         });
-        if (response.ok) {
-          setText(response.data);
-          if (response.data) {
-            toast.success(t("common.success"));
+
+        console.log("OCR详细结果:", detailResponse);
+
+        if (detailResponse.ok) {
+          const result: OcrDetailResult = detailResponse.data;
+          setOcrResult(result);
+
+          // 提取所有文字用于文本显示
+          const allText = result.text_boxes.map(box => box.text).join(" ");
+          setText(allText);
+
+          if (result.text_boxes.length > 0) {
+            toast.success(`识别成功! 找到 ${result.text_boxes.length} 个文字框`);
           } else {
             toast.error(t("tools.ocr.no_text"));
           }
         } else {
-          toast.error(response.error?.message || t("tools.ocr.error_ocr"));
+          toast.error(detailResponse.error?.message || t("tools.ocr.error_ocr"));
         }
       } catch (error) {
         console.error("OCR failed:", error);
@@ -94,45 +110,17 @@ const ScreenOcr: React.FC = () => {
     return () => {
       unlisten.then((f) => f());
     };
-  }, [t, ocr]);
+  }, [t]);
 
-  const handleCapture = async () => {
-    setLoading(true);
-    try {
-      const response: any = await invoke("run_ocr", {
-        x: null,
-        y: null,
-        width: null,
-        height: null,
-        engine: ocr.engine,
-        settings: {
-          tencent_secret_id: ocr.tencentSecretId,
-          tencent_secret_key: ocr.tencentSecretKey,
-          tencent_region: ocr.tencentRegion,
-          baidu_api_key: ocr.baiduApiKey,
-          baidu_secret_key: ocr.baiduSecretKey,
-        },
-      });
-      if (response.ok) {
-        setText(response.data);
-        if (response.data) {
-          toast.success(t("common.success"));
-        } else {
-          toast.error(t("tools.ocr.no_text"));
-        }
-      } else {
-        toast.error(response.error?.message || t("tools.ocr.error_ocr"));
-      }
-    } catch (error) {
-      console.error("OCR failed:", error);
-      toast.error(t("tools.ocr.error_ocr"));
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   const handleManualCapture = async () => {
+    const appWindow = WebviewWindow.getCurrent();
+
     try {
+      // 隐藏主窗口,避免遮挡截图区域
+      await appWindow.hide();
+
       let selector = await WebviewWindow.getByLabel("screenshot-selector");
       if (selector) {
         await selector.show();
@@ -146,7 +134,7 @@ const ScreenOcr: React.FC = () => {
           transparent: true,
           alwaysOnTop: true,
           skipTaskbar: true,
-          visible: false, // 先创建，后显示
+          visible: false, // 先创建,后显示
           resizable: false,
           shadow: false,
           focus: true,
@@ -157,9 +145,30 @@ const ScreenOcr: React.FC = () => {
         await selector.show();
         await selector.setFocus();
       }
+
+      // 轮询检查截图选择器是否隐藏,隐藏后恢复主窗口
+      const checkInterval = setInterval(async () => {
+        try {
+          const isVisible = await selector!.isVisible();
+          if (!isVisible) {
+            clearInterval(checkInterval);
+            await appWindow.show();
+            await appWindow.setFocus();
+          }
+        } catch (e) {
+          // 窗口可能已销毁
+          clearInterval(checkInterval);
+          await appWindow.show();
+          await appWindow.setFocus();
+        }
+      }, 100);
+
     } catch (error) {
       console.error("Failed to open screenshot selector:", error);
       toast.error("无法启动截图工具");
+      // 出错时恢复显示主窗口
+      await appWindow.show();
+      await appWindow.setFocus();
     }
   };
 
@@ -172,6 +181,8 @@ const ScreenOcr: React.FC = () => {
 
   const handleClear = () => {
     setText("");
+    setOcrResult(null);
+    setSelectedBoxIndex(null);
   };
 
   return (
@@ -196,16 +207,6 @@ const ScreenOcr: React.FC = () => {
                   <MousePointer2 className="w-4 h-4 mr-2" />
                 )}
                 {loading ? t("tools.ocr.recognizing") : t("tools.ocr.capture")}
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={handleCapture}
-                disabled={loading}
-                className="h-10 px-4"
-                title={t("tools.ocr.capture_full")}
-              >
-                <Camera className="w-4 h-4 mr-2" />
-                {t("tools.ocr.capture_full")}
               </Button>
             </div>
 
@@ -247,23 +248,57 @@ const ScreenOcr: React.FC = () => {
         </div>
 
         {/* 结果区域 */}
-        <div className="flex-1 bg-(--card-bg) border border-(--border-color) rounded-2xl shadow-sm overflow-hidden flex flex-col relative">
-          {text ? (
+        {ocrResult ? (
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0">
+            {/* 图片预览 */}
+            <div className="flex flex-col gap-2 min-h-0">
+              <h3 className="text-sm font-bold text-(--text-muted) flex items-center gap-2">
+                <ImageIcon size={14} />
+                图片预览
+              </h3>
+              <div className="flex-1 min-h-0">
+                <ImagePreview
+                  imageBase64={ocrResult.image_base64}
+                  textBoxes={ocrResult.text_boxes}
+                  width={ocrResult.width}
+                  height={ocrResult.height}
+                />
+              </div>
+            </div>
+
+            {/* 文字框列表 */}
+            <div className="flex flex-col gap-2 min-h-0">
+              <h3 className="text-sm font-bold text-(--text-muted)">
+                识别结果 ({ocrResult.text_boxes.length}个文字框)
+              </h3>
+              <div className="flex-1 min-h-0">
+                <TextBoxList
+                  textBoxes={ocrResult.text_boxes}
+                  selectedIndex={selectedBoxIndex}
+                  onSelect={setSelectedBoxIndex}
+                />
+              </div>
+            </div>
+          </div>
+        ) : text ? (
+          <div className="flex-1 bg-(--card-bg) border border-(--border-color) rounded-2xl shadow-sm overflow-hidden flex flex-col relative">
             <textarea
               className="flex-1 w-full h-full p-6 bg-transparent border-none outline-none resize-none whitespace-pre-wrap font-mono text-(--text-main) text-sm leading-relaxed custom-scrollbar"
               value={text}
               onChange={(e) => setText(e.target.value)}
               spellCheck={false}
             />
-          ) : (
+          </div>
+        ) : (
+          <div className="flex-1 bg-(--card-bg) border border-(--border-color) rounded-2xl shadow-sm overflow-hidden flex flex-col relative">
             <div className="flex-1 flex flex-col items-center justify-center text-(--text-muted) gap-4">
               <div className="p-6 rounded-full bg-(--bg-main) opacity-20">
-                <Camera className="w-16 h-16" />
+                <MousePointer2 className="w-16 h-16" />
               </div>
               <p className="text-lg font-medium">{t("tools.ocr.no_text")}</p>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </ToolLayout>
   );
