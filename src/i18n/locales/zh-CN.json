@@ -644,34 +644,6 @@
       "wifi_qr_desc": "使用手机相机或支持WiFi二维码的应用扫描即可连接",
       "security_warning": "因为某些信息需要 PowerShell 命令获取可能被 360 等安全软件拦截，请将 ToolDock 添加到白名单以获取完整信息。公网 IP 查询已优化，不会被拦截。"
     },
-    "system_activator": {
-      "name": "系统激活",
-      "description": "使用 PowerShell 命令激活 Windows 系统",
-      "start": "启动激活程序",
-      "stop": "停止",
-      "clear": "清空日志",
-      "warning_title": "确认",
-      "warning_content": "您确定要开始系统激活吗？ \n\n\n请确保您以管理员身份运行。",
-      "running": "运行中...",
-      "ready": "准备就绪",
-      "view_docs": "查看官方文档",
-      "info_title": "使用说明",
-      "instructions": {
-        "title": "使用说明 & 免责声明",
-        "step1_title": "执行命令",
-        "step1_desc": "此工具将自动执行 PowerShell 命令来激活系统。命令为: irm https://get.activated.win | iex",
-        "step2_title": "权限要求",
-        "step2_desc": "需要以管理员身份运行才能生效。执行后将弹出一个新的 PowerShell 窗口进行交互。",
-        "step3_title": "网络 & 安全",
-        "step3_desc": "请确保网络连接正常。本产品不确保远程命令是否安全，请谨慎使用。",
-        "step4_title": "免责声明",
-        "step4_desc": "本工具仅提供脚本执行环境，不保证脚本的安全性、有效性或合法性。因使用本工具导致的任何系统故障、数据丢失或法律纠纷，本软件及开发者概不负责。"
-      },
-      "process_ended": "进程已结束，返回码: {code}",
-      "process_terminated": "进程已被用户终止",
-      "start_msg": "正在启动激活程序...",
-      "cmd_msg": "命令: irm https://get.activated.win | iex"
-    },
     "node_cleaner": {
       "name": "Node 管理",
       "description": "管理 Node.js 版本 (NVM) 及项目依赖 (node_modules)",

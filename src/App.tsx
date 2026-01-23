@@ -11,6 +11,7 @@ import { listen } from "@tauri-apps/api/event";
 import { useSettingsStore } from "./stores/useSettingsStore";
 import { Home } from "./pages/Home";
 import { Sidebar } from "./components/Sidebar";
+import { TitleBar } from "./components/layout/TitleBar";
 import { ModalProvider } from "./components/ModalContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Toaster } from "react-hot-toast";
@@ -22,7 +23,6 @@ const JsonFormat = lazy(() => import("./pages/JsonFormat"));
 const NodeCleaner = lazy(() => import("./pages/NodeCleaner"));
 const ColorPicker = lazy(() => import("./pages/ColorPicker"));
 const ProcessManager = lazy(() => import("./pages/ProcessManager"));
-const SystemActivator = lazy(() => import("./pages/SystemActivator"));
 const SystemInfo = lazy(() => import("./pages/SystemInfo"));
 const DnsTool = lazy(() => import("./pages/DnsTool"));
 const NginxEditor = lazy(() => import("./pages/NginxEditor"));
@@ -77,6 +77,8 @@ const STANDALONE_ROUTES: Record<string, React.LazyExoticComponent<React.Componen
 function AppContent() {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [activeCategory, setActiveCategory] = useState<CategoryType>(CATEGORY.ALL);
+  const [searchText, setSearchText] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { clipboardEnabled, clipboardPrefix, clipboardSuffix } =
@@ -128,63 +130,72 @@ function AppContent() {
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
       />
-      <main className="flex-1 flex flex-col min-w-0 bg-(--bg-main) relative">
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <Home
-                  activeCategory={activeCategory}
-                  setActiveCategory={setActiveCategory}
-                />
-              }
-            />
-            <Route path="/tools/folder-size" element={<FolderSize />} />
-            <Route path="/tools/json-format" element={<JsonFormat />} />
-            <Route path="/tools/node-cleaner" element={<NodeCleaner />} />
-            <Route path="/tools/color-picker" element={<ColorPicker />} />
-            <Route path="/tools/process-manager" element={<ProcessManager />} />
-            <Route path="/tools/system-activator" element={<SystemActivator />} />
-            <Route path="/tools/system-info" element={<SystemInfo />} />
-            <Route path="/tools/dns-tool" element={<DnsTool />} />
-            <Route path="/tools/nginx-editor" element={<NginxEditor />} />
-            <Route
-              path="/tools/clipboard-manager"
-              element={<ClipboardManager />}
-            />
-            <Route path="/tools/translator" element={<Translator />} />
-            <Route path="/tools/variable-naming" element={<VariableNaming />} />
-            <Route path="/tools/hash-calculator" element={<HashCalculator />} />
-            <Route path="/tools/batch-renamer" element={<BatchRenamer />} />
-            <Route path="/tools/base64-encoder" element={<Base64Encoder />} />
-            <Route path="/tools/unit-converter" element={<UnitConverter />} />
-            <Route path="/tools/cron-generator" element={<CronGenerator />} />
-            <Route path="/tools/qrcode" element={<QRCodeTool />} />
-            <Route path="/tools/diff-tool" element={<DiffTool />} />
-            <Route path="/tools/ocr" element={<ScreenOcr />} />
-            <Route path="/tools/image-converter" element={<ImageConverter />} />
-            <Route
-              path="/tools/timestamp-converter"
-              element={<TimestampConverter />}
-            />
-            <Route path="/tools/ip-lookup" element={<IpLookup />} />
-            <Route path="/tools/clicker" element={<Clicker />} />
-            <Route path="/tools/wechat-assistant" element={<WeChatAssistant />} />
-            <Route
-              path="/tools/simple-web-server"
-              element={<SimpleWebServer />}
-            />
-            <Route path="/tools/port-scanner" element={<PortScanner />} />
-            <Route path="/tools/pip-player" element={<PipPlayer />} />
-            <Route path="/tools/weread-book" element={<WeReadBook />} />
-            <Route path="/tools/2048" element={<Game2048 />} />
-            <Route path="/tools/notepad" element={<NotePad />} />
-            <Route path="/othello" element={<Othello />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
-        </Suspense>
-      </main>
+      <div className="flex-1 flex flex-col min-w-0">
+        <TitleBar
+          searchText={searchText}
+          setSearchText={setSearchText}
+          isSearchOpen={isSearchOpen}
+          setIsSearchOpen={setIsSearchOpen}
+        />
+        <main className="flex-1 flex flex-col min-w-0 bg-(--bg-main) relative overflow-hidden">
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <Home
+                    activeCategory={activeCategory}
+                    setActiveCategory={setActiveCategory}
+                    searchText={searchText}
+                    setSearchText={setSearchText}
+                  />
+                }
+              />
+              <Route path="/tools/folder-size" element={<FolderSize />} />
+              <Route path="/tools/json-format" element={<JsonFormat />} />
+              <Route path="/tools/node-cleaner" element={<NodeCleaner />} />
+              <Route path="/tools/color-picker" element={<ColorPicker />} />
+              <Route path="/tools/process-manager" element={<ProcessManager />} />
+              <Route path="/tools/system-info" element={<SystemInfo />} />
+              <Route path="/tools/dns-tool" element={<DnsTool />} />
+              <Route path="/tools/nginx-editor" element={<NginxEditor />} />
+              <Route
+                path="/tools/clipboard-manager"
+                element={<ClipboardManager />}
+              />
+              <Route path="/tools/translator" element={<Translator />} />
+              <Route path="/tools/variable-naming" element={<VariableNaming />} />
+              <Route path="/tools/hash-calculator" element={<HashCalculator />} />
+              <Route path="/tools/batch-renamer" element={<BatchRenamer />} />
+              <Route path="/tools/base64-encoder" element={<Base64Encoder />} />
+              <Route path="/tools/unit-converter" element={<UnitConverter />} />
+              <Route path="/tools/cron-generator" element={<CronGenerator />} />
+              <Route path="/tools/qrcode" element={<QRCodeTool />} />
+              <Route path="/tools/diff-tool" element={<DiffTool />} />
+              <Route path="/tools/ocr" element={<ScreenOcr />} />
+              <Route path="/tools/image-converter" element={<ImageConverter />} />
+              <Route
+                path="/tools/timestamp-converter"
+                element={<TimestampConverter />}
+              />
+              <Route path="/tools/ip-lookup" element={<IpLookup />} />
+              <Route path="/tools/clicker" element={<Clicker />} />
+              <Route path="/tools/wechat-assistant" element={<WeChatAssistant />} />
+              <Route
+                path="/tools/simple-web-server"
+                element={<SimpleWebServer />}
+              />
+              <Route path="/tools/port-scanner" element={<PortScanner />} />
+              <Route path="/tools/pip-player" element={<PipPlayer />} />
+              <Route path="/tools/weread-book" element={<WeReadBook />} />
+              <Route path="/tools/2048" element={<Game2048 />} />
+              <Route path="/tools/notepad" element={<NotePad />} />
+              <Route path="/othello" element={<Othello />} />
+              <Route path="/settings" element={<Settings />} />
+            </Routes>
+          </Suspense>
+        </main>
+      </div>
     </div>
   );
 }

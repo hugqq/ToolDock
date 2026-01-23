@@ -86,9 +86,20 @@ pub async fn run_ocr_detailed(
     width: u32,
     height: u32,
     engine: Option<String>,
+    mode: Option<String>,
     settings: Option<OcrSettings>,
 ) -> ApiResponse<OcrDetailResult> {
-    let engine_str = engine.unwrap_or_else(|| "windows".to_string());
+    let mut engine_str = engine.unwrap_or_else(|| "windows".to_string());
+    let mode_str = mode.unwrap_or_else(|| "normal".to_string());
+
+    // 根据mode调整engine
+    if mode_str == "accurate" {
+        match engine_str.as_str() {
+            "tencent" => engine_str = "tencent_high_precision".to_string(),
+            "baidu" => engine_str = "baidu_high_precision".to_string(),
+            _ => {} // Windows OCR没有高精度模式
+        }
+    }
 
     let result = match engine_str.as_str() {
         "tencent" | "tencent_high_precision" => {

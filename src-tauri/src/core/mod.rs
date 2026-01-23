@@ -18,7 +18,6 @@ pub mod port_scanner;
 pub mod renamer;
 pub mod settings;
 pub mod system;
-pub mod system_activator;
 pub mod timestamp;
 pub mod translator;
 pub mod unit_converter;

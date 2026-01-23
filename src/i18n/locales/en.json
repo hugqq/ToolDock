@@ -637,34 +637,6 @@
       "wifi_qr_desc": "Scan with your phone camera or a WiFi QR-supported app to connect",
       "security_warning": "Some system information requires PowerShell commands that may be blocked by security software like 360. Please add ToolDock to the whitelist for complete information. Public IP query has been optimized and won't be blocked."
     },
-    "system_activator": {
-      "name": "System Activation",
-      "description": "Activate Windows using PowerShell commands",
-      "start": "Start Activation",
-      "stop": "Stop",
-      "clear": "Clear Logs",
-      "warning_title": "Confirm",
-      "warning_content": "Are you sure you want to start the system activation? \n\nPlease ensure you are running as administrator.",
-      "running": "Running...",
-      "ready": "Ready",
-      "view_docs": "View Official Docs",
-      "info_title": "Instructions",
-      "instructions": {
-        "title": "Instructions & Disclaimer",
-        "step1_title": "Command Execution",
-        "step1_desc": "This tool will automatically execute a PowerShell command to activate the system. Command: irm https://get.activated.win | iex",
-        "step2_title": "Permission Requirements",
-        "step2_desc": "Administrator privileges are required. A new PowerShell window will pop up for interaction after execution.",
-        "step3_title": "Network & Security",
-        "step3_desc": "Ensure your internet connection is stable. This product does not guarantee the safety of remote commands. Use with caution.",
-        "step4_title": "Disclaimer",
-        "step4_desc": "This tool only provides a script execution environment and does not guarantee the safety, effectiveness, or legality of the script. The software and developers are not responsible for any system failure, data loss, or legal disputes caused by using this tool."
-      },
-      "process_ended": "Process ended with code: {code}",
-      "process_terminated": "Process terminated by user",
-      "start_msg": "Starting activation program...",
-      "cmd_msg": "Command: irm https://get.activated.win | iex"
-    },
     "node_cleaner": {
       "name": "Node Manager",
       "description": "Manage Node.js versions (NVM) and project dependencies (node_modules)",

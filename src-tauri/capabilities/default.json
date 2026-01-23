@@ -2,38 +2,85 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main", "floating_widget", "screenshot-selector", "weread"],
+  "windows": [
+    "main",
+    "floating_widget",
+    "screenshot-selector",
+    "weread"
+  ],
   "permissions": [
     "core:default",
     {
       "identifier": "opener:allow-open-path",
-      "allow": [{ "path": "**" }]
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     {
       "identifier": "opener:allow-open-url",
       "allow": [
-        { "url": "https://massgrave.dev/" },
-        { "url": "https://console.cloud.google.com/apis/credentials" },
-        { "url": "https://www.deepl.com/en/your-account/keys" },
-        { "url": "https://api.deeplx.org/" },
-        { "url": "https://fanyi-api.baidu.com/manage/developer" },
-        { "url": "https://ai.youdao.com/console/#/" },
-        { "url": "https://console.cloud.tencent.com/cam/capi" },
-        { "url": "https://weread.qq.com" },
-        { "url": "https://weread.qq.com/*" },
-        { "url": "https://tauri.app/" },
-        { "url": "https://react.dev/" },
-        { "url": "https://mui.com/" },
-        { "url": "https://www.rust-lang.org/" },
-        { "url": "https://www.typescriptlang.org/" },
-        { "url": "https://vitejs.dev/" },
-        { "url": "https://github.com/*" },
-        { "url": "https://www.i18next.com/" }
+        {
+          "url": "https://massgrave.dev/"
+        },
+        {
+          "url": "https://console.cloud.google.com/apis/credentials"
+        },
+        {
+          "url": "https://www.deepl.com/en/your-account/keys"
+        },
+        {
+          "url": "https://api.deeplx.org/"
+        },
+        {
+          "url": "https://fanyi-api.baidu.com/manage/developer"
+        },
+        {
+          "url": "https://ai.youdao.com/console/#/"
+        },
+        {
+          "url": "https://console.cloud.tencent.com/cam/capi"
+        },
+        {
+          "url": "https://weread.qq.com"
+        },
+        {
+          "url": "https://weread.qq.com/*"
+        },
+        {
+          "url": "https://tauri.app/"
+        },
+        {
+          "url": "https://react.dev/"
+        },
+        {
+          "url": "https://mui.com/"
+        },
+        {
+          "url": "https://www.rust-lang.org/"
+        },
+        {
+          "url": "https://www.typescriptlang.org/"
+        },
+        {
+          "url": "https://vitejs.dev/"
+        },
+        {
+          "url": "https://github.com/*"
+        },
+        {
+          "url": "https://www.i18next.com/"
+        }
       ]
     },
     {
       "identifier": "opener:allow-reveal-item-in-dir",
-      "allow": [{ "path": "**" }]
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     "dialog:default",
     "fs:default",
@@ -47,11 +94,19 @@
     "fs:allow-document-write-recursive",
     {
       "identifier": "fs:allow-write",
-      "allow": [{ "path": "**" }]
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-read",
-      "allow": [{ "path": "**" }]
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     "clipboard-manager:allow-read-text",
     "clipboard-manager:allow-read-image",
@@ -61,6 +116,9 @@
     "core:window:allow-show",
     "core:window:allow-minimize",
     "core:window:allow-unminimize",
+    "core:window:allow-maximize",
+    "core:window:allow-unmaximize",
+    "core:window:allow-is-maximized",
     "core:window:allow-set-position",
     "core:window:allow-outer-position",
     "core:window:allow-set-focus",
@@ -83,6 +141,5 @@
     "notification:allow-get-active",
     "notification:allow-get-pending",
     "core:image:default"
-
   ]
 }

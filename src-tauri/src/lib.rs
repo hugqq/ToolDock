@@ -12,7 +12,6 @@ use tauri::Manager;
 
 pub struct AppState {
     pub cancel_scan: AtomicBool,
-    pub activation_child: Mutex<Option<std::process::Child>>,
     pub network_tasks: Mutex<HashMap<String, Arc<AtomicBool>>>,
     pub port_scanner_tasks: Mutex<HashMap<String, Arc<AtomicBool>>>,
 }
@@ -69,7 +68,6 @@ use commands::settings::{
 use commands::system::{
     find_occupying_processes, get_system_info, is_admin, test_disk_speed, toggle_floating_window,
 };
-use commands::system_activator::{start_activation, stop_activation};
 use commands::timestamp::{
     batch_convert_timestamps, convert_timestamp, get_current_datetime, get_current_timestamp,
 };
@@ -191,7 +189,6 @@ pub fn run() {
         })
         .manage(AppState {
             cancel_scan: AtomicBool::new(false),
-            activation_child: Mutex::new(None),
             network_tasks: Mutex::new(HashMap::new()),
             port_scanner_tasks: Mutex::new(HashMap::new()),
         })
@@ -244,8 +241,6 @@ pub fn run() {
             get_system_info,
             test_disk_speed,
             toggle_floating_window,
-            start_activation,
-            stop_activation,
             flush_dns,
             get_dns_settings,
             set_dns,
