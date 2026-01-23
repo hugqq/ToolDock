@@ -23,7 +23,6 @@ const JsonFormat = lazy(() => import("./pages/JsonFormat"));
 const NodeCleaner = lazy(() => import("./pages/NodeCleaner"));
 const ColorPicker = lazy(() => import("./pages/ColorPicker"));
 const ProcessManager = lazy(() => import("./pages/ProcessManager"));
-const SystemInfo = lazy(() => import("./pages/SystemInfo"));
 const DnsTool = lazy(() => import("./pages/DnsTool"));
 const NginxEditor = lazy(() => import("./pages/NginxEditor"));
 const ClipboardManager = lazy(() => import("./pages/ClipboardManager"));
@@ -156,7 +155,6 @@ function AppContent() {
               <Route path="/tools/node-cleaner" element={<NodeCleaner />} />
               <Route path="/tools/color-picker" element={<ColorPicker />} />
               <Route path="/tools/process-manager" element={<ProcessManager />} />
-              <Route path="/tools/system-info" element={<SystemInfo />} />
               <Route path="/tools/dns-tool" element={<DnsTool />} />
               <Route path="/tools/nginx-editor" element={<NginxEditor />} />
               <Route

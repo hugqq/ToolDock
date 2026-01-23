@@ -83,15 +83,6 @@ export const TOOLS: Tool[] = [
     route: "/tools/batch-renamer",
   },
   {
-    id: "system_info",
-    nameKey: "tools.system_info.name",
-    icon: Cpu,
-    categoryKey: "categories.system",
-    descriptionKey: "tools.system_info.description",
-    color: "#8b5cf6",
-    route: "/tools/system-info",
-  },
-  {
     id: "ocr",
     nameKey: "tools.ocr.name",
     icon: Camera,

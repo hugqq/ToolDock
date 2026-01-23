@@ -65,9 +65,6 @@ use commands::settings::{
     export_config, get_global_shortcut, import_config, is_run_as_admin, set_global_shortcut,
     set_run_as_admin, test_ai_connection,
 };
-use commands::system::{
-    find_occupying_processes, get_system_info, is_admin, test_disk_speed, toggle_floating_window,
-};
 use commands::timestamp::{
     batch_convert_timestamps, convert_timestamp, get_current_datetime, get_current_timestamp,
 };
@@ -236,11 +233,6 @@ pub fn run() {
             kill_process,
             start_network_task,
             stop_network_task,
-            find_occupying_processes,
-            is_admin,
-            get_system_info,
-            test_disk_speed,
-            toggle_floating_window,
             flush_dns,
             get_dns_settings,
             set_dns,
