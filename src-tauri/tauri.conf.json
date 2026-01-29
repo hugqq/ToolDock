@@ -52,11 +52,7 @@
       "csp": null,
       "assetProtocol": {
         "enable": true,
-        "scope": [
-          "$APPDATA/**",
-          "$APPLOCALDATA/**",
-          "$HOME/**"
-        ]
+        "scope": ["$APPDATA/**", "$APPLOCALDATA/**", "$HOME/**"]
       }
     }
   },
@@ -75,7 +71,9 @@
         "type": "embedBootstrapper"
       },
       "nsis": {
-        "compression": "lzma"
+        "compression": "lzma",
+        "installerHooks": "scripts/nsis/installer.nsi",
+        "languages": ["SimpChinese", "English"]
       }
     }
   }

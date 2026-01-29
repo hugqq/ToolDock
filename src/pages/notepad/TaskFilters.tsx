@@ -23,7 +23,6 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
           TaskType.TodayPlan,
           TaskType.ShortTerm,
           TaskType.LongTerm,
-          TaskType.Memo,
         ].map((type) => (
           <button
             key={type}
@@ -37,7 +36,6 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
             {type === TaskType.TodayPlan && t("tools.notepad.today_plan")}
             {type === TaskType.ShortTerm && t("tools.notepad.short_term")}
             {type === TaskType.LongTerm && t("tools.notepad.long_term")}
-            {type === TaskType.Memo && t("tools.notepad.memo")}
           </button>
         ))}
       </div>
@@ -46,7 +44,7 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
         className="flex items-center gap-2 px-3 py-1.5 bg-(--primary-color) text-white rounded-lg hover:bg-(--primary-hover) active:scale-95 transition-all text-sm font-medium"
       >
         <Plus size={16} />
-        {t("tools.notepad.add_task")}
+        {t("tools.notepad.add_plan")}
       </button>
     </div>
   );

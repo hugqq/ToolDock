@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   X,
-  ImageIcon,
+  Paperclip,
   Bell,
   Flame,
   ClipboardList,
   Clock3,
+  FileIcon,
 } from "lucide-react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
@@ -59,38 +60,43 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
     return new Date(value).getTime();
   };
 
-  const handleImageUpload = async () => {
+  const handleAttachmentUpload = async () => {
     try {
       const selected = await open({
-        multiple: false,
-        filters: [{ name: "Images", extensions: ["png", "jpg", "jpeg", "gif"] }],
+        multiple: true,
       });
 
-      if (selected && typeof selected === "string") {
-        const contents = await readFile(selected);
-        const fileName = `img_${Date.now()}.png`;
-        const response = await invoke<{
-          ok: boolean;
-          data?: string;
-          error?: any;
-        }>("save_notepad_image", {
-          fileName,
-          data: Array.from(contents),
-        });
+      if (selected) {
+        const files = Array.isArray(selected) ? selected : [selected];
+        const newAttachments: string[] = [];
 
-        if (!response.ok || !response.data) {
-          toast.error(t("tools.notepad.save_image_error"));
-          return;
+        for (const filePath of files) {
+          const contents = await readFile(filePath);
+          const fileName = filePath.split(/[\\/]/).pop() || `file_${Date.now()}`;
+          const response = await invoke<{
+            ok: boolean;
+            data?: string;
+            error?: any;
+          }>("save_notepad_image", {
+            fileName,
+            data: Array.from(contents),
+          });
+
+          if (response.ok && response.data) {
+            newAttachments.push(response.data);
+          }
         }
 
-        setCurrentTask((prev) => ({
-          ...prev,
-          images: [...(prev?.images || []), response.data!],
-        }));
+        if (newAttachments.length > 0) {
+          setCurrentTask((prev) => ({
+            ...prev,
+            attachments: [...(prev?.attachments || []), ...newAttachments],
+          }));
+        }
       }
     } catch (e) {
       console.error(e);
-      toast.error(t("error"));
+      toast.error(t("common.error"));
     }
   };
 
@@ -114,21 +120,6 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
         </div>
 
         <div className="p-6 overflow-y-auto space-y-4">
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-medium text-(--text-secondary) mb-1">
-              {t("tools.notepad.title") || "Title"}
-            </label>
-            <input
-              type="text"
-              value={currentTask.title || ""}
-              onChange={(e) =>
-                setCurrentTask({ ...currentTask, title: e.target.value })
-              }
-              className="w-full bg-(--bg-main) border border-(--border-color) rounded-lg px-3 py-2 text-(--text-main) focus:ring-2 focus:ring-(--primary-color) focus:outline-hidden"
-            />
-          </div>
-
           {/* Type Specific Fields */}
           {activeTab === TaskType.ShortTerm && (
             <div className="grid grid-cols-2 gap-4">
@@ -184,20 +175,20 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
                   className="w-full bg-(--bg-main) border border-(--border-color) rounded-lg px-3 py-2 text-(--text-main)"
                 >
                   <option value={RecurrenceType.None}>
-                    {t("tools.notepad.recurrence.None") || "None"}
+                    {t("tools.notepad.recurrence.none") || "None"}
                   </option>
                   <option value={RecurrenceType.Workdays}>
-                    {t("tools.notepad.recurrence.Workdays") ||
+                    {t("tools.notepad.recurrence.workdays") ||
                       "Weekdays (Mon-Fri)"}
                   </option>
                   <option value={RecurrenceType.Daily}>
-                    {t("tools.notepad.recurrence.Daily") || "Every Day"}
+                    {t("tools.notepad.recurrence.daily") || "Every Day"}
                   </option>
                   <option value={RecurrenceType.FixedDate}>
-                    {t("tools.notepad.recurrence.FixedDate") || "Fixed Date"}
+                    {t("tools.notepad.recurrence.fixedDate") || "Fixed Date"}
                   </option>
                   <option value={RecurrenceType.CustomRange}>
-                    {t("tools.notepad.recurrence.CustomRange") || "Date Range"}
+                    {t("tools.notepad.recurrence.customRange") || "Date Range"}
                   </option>
                 </select>
               </div>
@@ -237,42 +228,55 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
             />
           </div>
 
-          {/* Images */}
+          {/* Attachments */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium text-(--text-secondary)">
-                {t("tools.notepad.images") || "Images"}
+                {t("tools.notepad.attachments") || "Attachments"}
               </label>
               <button
-                onClick={handleImageUpload}
+                onClick={handleAttachmentUpload}
                 className="text-xs flex items-center gap-1 text-(--primary-color) hover:underline"
               >
-                <ImageIcon size={14} /> {t("tools.notepad.upload") || "Upload"}
+                <Paperclip size={14} /> {t("tools.notepad.upload") || "Upload"}
               </button>
             </div>
-            <div className="flex gap-2 overflow-x-auto py-2">
-              {currentTask.images?.map((path, idx) => (
-                <div key={idx} className="relative group shrink-0">
-                  <img
-                    src={convertFileSrc(path)}
-                    className="w-20 h-20 object-cover rounded-lg border border-(--border-color)"
-                  />
-                  <button
-                    onClick={() =>
-                      setCurrentTask((prev) => ({
-                        ...prev,
-                        images: prev.images?.filter((_, i) => i !== idx),
-                      }))
-                    }
-                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-1/3 -translate-y-1/3"
-                  >
-                    <X size={12} />
-                  </button>
-                </div>
-              ))}
-              {(!currentTask.images || currentTask.images.length === 0) && (
+            <div className="flex gap-2 flex-wrap py-2">
+              {currentTask.attachments?.map((path, idx) => {
+                const fileName = path.split(/[\\/]/).pop() || "file";
+                const isImage = /\.(png|jpg|jpeg|gif|webp|bmp)$/i.test(fileName);
+                return (
+                  <div key={idx} className="relative group shrink-0">
+                    {isImage ? (
+                      <img
+                        src={convertFileSrc(path)}
+                        className="w-20 h-20 object-cover rounded-lg border border-(--border-color)"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 flex flex-col items-center justify-center rounded-lg border border-(--border-color) bg-(--bg-main) p-1">
+                        <FileIcon size={24} className="text-(--text-secondary)" />
+                        <span className="text-xs text-(--text-secondary) truncate w-full text-center mt-1">
+                          {fileName.length > 10 ? fileName.slice(0, 8) + "..." : fileName}
+                        </span>
+                      </div>
+                    )}
+                    <button
+                      onClick={() =>
+                        setCurrentTask((prev) => ({
+                          ...prev,
+                          attachments: prev.attachments?.filter((_, i) => i !== idx),
+                        }))
+                      }
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-1/3 -translate-y-1/3"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                );
+              })}
+              {(!currentTask.attachments || currentTask.attachments.length === 0) && (
                 <div className="text-sm text-(--text-secondary) italic">
-                  {t("tools.notepad.no_images")}
+                  {t("tools.notepad.no_attachments")}
                 </div>
               )}
             </div>

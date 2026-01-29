@@ -180,28 +180,6 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
         </div>
       )}
 
-      {/* Task Selector */}
-      <div className="w-full mb-4">
-        <div className="flex items-center gap-2 text-sm text-(--text-secondary) mb-2">
-          <Target size={14} />
-          <span>{t("tools.notepad.focus_task") || "专注任务"}</span>
-        </div>
-        <select
-          value={focusedTaskId}
-          onChange={handleTaskChange}
-          className="w-full px-3 py-2 bg-(--bg-secondary) border border-(--border-color) rounded-lg text-sm text-(--text-main) cursor-pointer"
-        >
-          <option value="">
-            {t("tools.notepad.no_task_selected") || "-- 未选择任务 --"}
-          </option>
-          {incompleteTasks.map((task) => (
-            <option key={task.id} value={task.id}>
-              {task.title}
-            </option>
-          ))}
-        </select>
-      </div>
-
       {/* Timer Display */}
       <div className="text-5xl font-mono font-bold text-(--text-main) mb-6 tracking-wider">
         {formatTime(time)}

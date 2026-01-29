@@ -8,8 +8,15 @@ import { Task, NoteData, TaskType } from "../types/notepad";
 export function useNotePadData() {
   const { t } = useTranslation();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [dailyMemo, setDailyMemo] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [notificationPermission, setNotificationPermission] = useState<string>("default");
+
+  // Get today's date string
+  const getTodayDate = () => {
+    const today = new Date();
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  };
 
   // Load data
   useEffect(() => {
@@ -31,6 +38,17 @@ export function useNotePadData() {
           setTasks(response.data.tasks);
         } else {
           setTasks([]);
+        }
+
+        // Handle daily memo - clear if date is different
+        if (response.data?.dailyMemo) {
+          const todayDate = getTodayDate();
+          if (response.data.dailyMemo.date === todayDate) {
+            setDailyMemo(response.data.dailyMemo.content);
+          } else {
+            // Different date, clear the memo
+            setDailyMemo("");
+          }
         }
       } catch (e) {
         toast.error(t("tools.notepad.load_error"));
@@ -59,12 +77,19 @@ export function useNotePadData() {
     }
   };
 
-  const saveTasksData = async (tasksToSave: Task[]) => {
+  const saveTasksData = async (tasksToSave: Task[], memoContent?: string) => {
     try {
+      const dataToSave: NoteData = {
+        tasks: tasksToSave,
+        dailyMemo: {
+          content: memoContent !== undefined ? memoContent : dailyMemo,
+          date: getTodayDate()
+        }
+      };
       const response = await invoke<{ ok: boolean; error?: any }>(
         "save_notepad_data",
         {
-          data: { tasks: tasksToSave },
+          data: dataToSave,
         }
       );
 
@@ -80,6 +105,28 @@ export function useNotePadData() {
       return false;
     }
   };
+
+  const updateDailyMemo = useCallback(async (content: string) => {
+    setDailyMemo(content);
+    // Auto-save the memo
+    try {
+      const dataToSave: NoteData = {
+        tasks,
+        dailyMemo: {
+          content,
+          date: getTodayDate()
+        }
+      };
+      await invoke<{ ok: boolean; error?: any }>(
+        "save_notepad_data",
+        {
+          data: dataToSave,
+        }
+      );
+    } catch (e) {
+      console.error("Failed to save daily memo:", e);
+    }
+  }, [tasks]);
 
   // Reminder Logic
   useEffect(() => {
@@ -193,6 +240,8 @@ export function useNotePadData() {
     tasks,
     loading,
     notificationPermission,
+    dailyMemo,
+    updateDailyMemo,
     addTask,
     updateTask,
     deleteTask,

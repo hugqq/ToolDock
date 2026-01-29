@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import { Info, Copy } from "lucide-react";
 import { Button } from "../../../components/mui";
 import { toast } from "react-hot-toast";
-import type { RenameRule } from "../types";
 
 interface RegexHelpModalProps {
   open: boolean;
@@ -99,7 +98,10 @@ export const RegexHelpModal: React.FC<RegexHelpModalProps> = ({
                     { pattern: "bar$", i18nKey: "example_end_bar" },
                     { pattern: "^test.*bar$", i18nKey: "example_test_bar" },
                     { pattern: ".+?(?=bar)", i18nKey: "example_until_bar" },
-                    { pattern: "first[\\s\\S]*end", i18nKey: "example_between" },
+                    {
+                      pattern: "first[\\s\\S]*end",
+                      i18nKey: "example_between",
+                    },
                   ].map(({ pattern, i18nKey }) => (
                     <tr key={pattern}>
                       <td className="px-3 py-2 flex items-center justify-between">
@@ -107,7 +109,9 @@ export const RegexHelpModal: React.FC<RegexHelpModalProps> = ({
                         <Button
                           variant="text"
                           size="small"
-                          title={t("tools.batch_renamer.regex_help.copy.copy_pattern")}
+                          title={t(
+                            "tools.batch_renamer.regex_help.copy.copy_pattern",
+                          )}
                           className="ml-2 p-1 rounded text-(--text-muted) hover:text-blue-500 hover:bg-blue-500/5 h-auto"
                           onClick={() => handleCopyPattern(pattern)}
                         >
@@ -137,7 +141,9 @@ export const RegexHelpModal: React.FC<RegexHelpModalProps> = ({
                       {t("tools.batch_renamer.regex_help.variables.col_search")}
                     </th>
                     <th className="px-3 py-2 text-left">
-                      {t("tools.batch_renamer.regex_help.variables.col_replace")}
+                      {t(
+                        "tools.batch_renamer.regex_help.variables.col_replace",
+                      )}
                     </th>
                     <th className="px-3 py-2 text-left">
                       {t("tools.batch_renamer.regex_help.variables.col_desc")}
@@ -146,12 +152,36 @@ export const RegexHelpModal: React.FC<RegexHelpModalProps> = ({
                 </thead>
                 <tbody className="divide-y divide-(--border-color)">
                   {[
-                    { pattern: "(.*).png", replace: "test_${1}.png", i18nKey: "add_prefix" },
-                    { pattern: "(.*).png", replace: "${1}_test.png", i18nKey: "add_suffix" },
-                    { pattern: "(.*)", replace: "${1}.txt", i18nKey: "append_ext" },
-                    { pattern: "(^\\w+\\.$)\\|(^\\w+$)", replace: "${2}.txt", i18nKey: "cond_append" },
-                    { pattern: "(\\d\\d)-(\\d\\d)-(\\d\\d\\d\\d)", replace: "${3}-${2}-${1}", i18nKey: "reorder_date" },
-                    { pattern: "^(.{n})(.*) 或 (.*)(.{n})$", replace: "${1}test${2}", i18nKey: "insert_at_n" },
+                    {
+                      pattern: "(.*).png",
+                      replace: "test_${1}.png",
+                      i18nKey: "add_prefix",
+                    },
+                    {
+                      pattern: "(.*).png",
+                      replace: "${1}_test.png",
+                      i18nKey: "add_suffix",
+                    },
+                    {
+                      pattern: "(.*)",
+                      replace: "${1}.txt",
+                      i18nKey: "append_ext",
+                    },
+                    {
+                      pattern: "(^\\w+\\.$)\\|(^\\w+$)",
+                      replace: "${2}.txt",
+                      i18nKey: "cond_append",
+                    },
+                    {
+                      pattern: "(\\d\\d)-(\\d\\d)-(\\d\\d\\d\\d)",
+                      replace: "${3}-${2}-${1}",
+                      i18nKey: "reorder_date",
+                    },
+                    {
+                      pattern: "^(.{n})(.*) 或 (.*)(.{n})$",
+                      replace: "${1}test${2}",
+                      i18nKey: "insert_at_n",
+                    },
                   ].map(({ pattern, replace, i18nKey }, idx) => (
                     <tr key={`${pattern}-${idx}`}>
                       <td className="px-3 py-2 flex items-center justify-between">
@@ -159,7 +189,9 @@ export const RegexHelpModal: React.FC<RegexHelpModalProps> = ({
                         <Button
                           variant="text"
                           size="small"
-                          title={t("tools.batch_renamer.regex_help.copy.copy_pattern")}
+                          title={t(
+                            "tools.batch_renamer.regex_help.copy.copy_pattern",
+                          )}
                           className="ml-2 p-1 rounded text-(--text-muted) hover:text-blue-500 hover:bg-blue-500/5 h-auto"
                           onClick={() => handleCopyPattern(pattern)}
                         >
@@ -170,7 +202,9 @@ export const RegexHelpModal: React.FC<RegexHelpModalProps> = ({
                         <span>{replace}</span>
                       </td>
                       <td className="px-3 py-2">
-                        {t(`tools.batch_renamer.regex_help.variables.${i18nKey}`)}
+                        {t(
+                          `tools.batch_renamer.regex_help.variables.${i18nKey}`,
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -180,7 +214,9 @@ export const RegexHelpModal: React.FC<RegexHelpModalProps> = ({
                       <Button
                         variant="text"
                         size="small"
-                        title={t("tools.batch_renamer.regex_help.copy.copy_pattern")}
+                        title={t(
+                          "tools.batch_renamer.regex_help.copy.copy_pattern",
+                        )}
                         className="ml-2 p-1 rounded text-(--text-muted) hover:text-blue-500 hover:bg-blue-500/5 h-auto"
                         onClick={() => handleCopyPattern("^.{n} 或 .{n}$")}
                       >
@@ -208,6 +244,6 @@ export const RegexHelpModal: React.FC<RegexHelpModalProps> = ({
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };

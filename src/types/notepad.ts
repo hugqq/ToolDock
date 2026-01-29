@@ -35,12 +35,17 @@ export interface Task {
   reminderTime?: number;
   isCompleted: boolean;
   images: string[];
+  attachments?: string[]; // Support any file format
   reminderNotified?: boolean;
   tags?: string[];
 }
 
 export interface NoteData {
   tasks: Task[];
+  dailyMemo?: {
+    content: string;
+    date: string; // YYYY-MM-DD format, used to check if should clear
+  };
 }
 
 export interface PomodoroSession {

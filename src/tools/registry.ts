@@ -2,7 +2,6 @@
   Activity,
   Globe,
   Zap,
-  Cpu,
   Settings2,
   Box,
   Code,

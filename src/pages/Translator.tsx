@@ -52,7 +52,6 @@ const Translator: React.FC = () => {
   const [autoCopy, setAutoCopy] = useState(true);
   const [detectedLang, setDetectedLang] = useState<string | null>(null);
   const [responseTime, setResponseTime] = useState<number | null>(null);
-  const [screenshotMode, setScreenshotMode] = useState(false);
   const [ocrResult, setOcrResult] = useState<OcrDetailResult | null>(null);
   const [ocrEngine, setOcrEngine] = useState("windows");
   const [ocrMode, setOcrMode] = useState("normal");
@@ -90,7 +89,7 @@ const Translator: React.FC = () => {
 
       return keyMap[engineName]?.trim().length > 0;
     },
-    [translator]
+    [translator],
   );
 
   // 切换引擎时重置状态
@@ -174,7 +173,6 @@ const Translator: React.FC = () => {
     setResponseTime(null);
     setOcrResult(null);
     setTranslations([]);
-    setScreenshotMode(false);
   };
 
   // 截图翻译功能
@@ -224,7 +222,6 @@ const Translator: React.FC = () => {
           await appWindow.setFocus();
         }
       }, 100);
-
     } catch (error) {
       console.error("Failed to open screenshot selector:", error);
       setError("无法启动截图工具");
@@ -239,7 +236,6 @@ const Translator: React.FC = () => {
       const { x, y, width, height } = event.payload;
 
       setLoading(true);
-      setScreenshotMode(true);
       setError(null);
 
       try {
@@ -263,10 +259,13 @@ const Translator: React.FC = () => {
         });
 
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("OCR识别超时(60秒)")), 60000)
+          setTimeout(() => reject(new Error("OCR识别超时(60秒)")), 60000),
         );
 
-        const detailResponse: any = await Promise.race([ocrPromise, timeoutPromise]);
+        const detailResponse: any = await Promise.race([
+          ocrPromise,
+          timeoutPromise,
+        ]);
 
         console.log("OCR识别结果:", detailResponse);
 
@@ -275,16 +274,18 @@ const Translator: React.FC = () => {
           setOcrResult(result);
 
           // 提取所有文字显示在输入框
-          const allText = result.text_boxes.map(box => box.text).join(" ");
+          const allText = result.text_boxes.map((box) => box.text).join(" ");
           setInput(allText);
 
           // 批量翻译所有文字框
           if (result.text_boxes.length > 0) {
-            toast.success(`OCR识别成功! 找到 ${result.text_boxes.length} 个文字框,正在翻译...`);
+            toast.success(
+              `OCR识别成功! 找到 ${result.text_boxes.length} 个文字框,正在翻译...`,
+            );
 
             try {
               // 批量翻译,每个翻译也添加超时
-              const translationPromises = result.text_boxes.map(box => {
+              const translationPromises = result.text_boxes.map((box) => {
                 const translatePromise = invoke("translate_text", {
                   text: box.text,
                   target: target,
@@ -294,22 +295,27 @@ const Translator: React.FC = () => {
                 });
 
                 const timeout = new Promise((_, reject) =>
-                  setTimeout(() => reject(new Error("翻译超时")), 30000)
+                  setTimeout(() => reject(new Error("翻译超时")), 30000),
                 );
 
                 return Promise.race([translatePromise, timeout]);
               });
 
               const translationResults = await Promise.all(translationPromises);
-              const translatedTexts = translationResults.map((res: any) => res.translated_text || "");
+              const translatedTexts = translationResults.map(
+                (res: any) => res.translated_text || "",
+              );
               setTranslations(translatedTexts);
 
               toast.success(`翻译完成!`);
             } catch (err) {
               console.error("Translation failed:", err);
-              toast.error("翻译失败: " + (err instanceof Error ? err.message : String(err)));
+              toast.error(
+                "翻译失败: " +
+                  (err instanceof Error ? err.message : String(err)),
+              );
               // 翻译失败也显示OCR结果
-              setTranslations(result.text_boxes.map(box => box.text));
+              setTranslations(result.text_boxes.map((box) => box.text));
             }
           } else {
             toast.error("未识别到文字");
@@ -319,7 +325,8 @@ const Translator: React.FC = () => {
         }
       } catch (error) {
         console.error("Screenshot translate failed:", error);
-        const errorMsg = error instanceof Error ? error.message : "截图翻译失败";
+        const errorMsg =
+          error instanceof Error ? error.message : "截图翻译失败";
         toast.error(errorMsg);
         setError(errorMsg);
       } finally {
@@ -360,12 +367,13 @@ const Translator: React.FC = () => {
                       disabled={!available}
                       variant={engine === e ? "contained" : "text"}
                       size="small"
-                      className={`px-3 py-1 text-xs font-medium rounded-md transition-all relative group h-auto ${engine === e
-                        ? "shadow-sm"
-                        : available
-                          ? "text-(--text-muted) hover:text-(--text-main) hover:bg-(--card-bg)"
-                          : "text-(--text-muted) opacity-40 cursor-not-allowed"
-                        }`}
+                      className={`px-3 py-1 text-xs font-medium rounded-md transition-all relative group h-auto ${
+                        engine === e
+                          ? "shadow-sm"
+                          : available
+                            ? "text-(--text-muted) hover:text-(--text-main) hover:bg-(--card-bg)"
+                            : "text-(--text-muted) opacity-40 cursor-not-allowed"
+                      }`}
                       title={
                         !available
                           ? t("tools.translator.engine_not_configured")
@@ -402,12 +410,15 @@ const Translator: React.FC = () => {
                   onClick={() => setOcrEngine(e)}
                   variant={ocrEngine === e ? "contained" : "text"}
                   size="small"
-                  className={`px-2 py-0.5 text-xs font-medium rounded-md transition-all h-auto ${ocrEngine === e
-                    ? "shadow-sm"
-                    : "text-(--text-muted) hover:text-(--text-main) hover:bg-(--card-bg)"
-                    }`}
+                  className={`px-2 py-0.5 text-xs font-medium rounded-md transition-all h-auto ${
+                    ocrEngine === e
+                      ? "shadow-sm"
+                      : "text-(--text-muted) hover:text-(--text-main) hover:bg-(--card-bg)"
+                  }`}
                 >
-                  {e === "windows" ? "Windows" : e.charAt(0).toUpperCase() + e.slice(1)}
+                  {e === "windows"
+                    ? "Windows"
+                    : e.charAt(0).toUpperCase() + e.slice(1)}
                 </Button>
               ))}
             </div>
@@ -431,10 +442,11 @@ const Translator: React.FC = () => {
                       onClick={() => setOcrMode(mode)}
                       variant={ocrMode === mode ? "contained" : "text"}
                       size="small"
-                      className={`px-2 py-0.5 text-xs font-medium rounded-md transition-all h-auto ${ocrMode === mode
-                        ? "shadow-sm"
-                        : "text-(--text-muted) hover:text-(--text-main) hover:bg-(--card-bg)"
-                        }`}
+                      className={`px-2 py-0.5 text-xs font-medium rounded-md transition-all h-auto ${
+                        ocrMode === mode
+                          ? "shadow-sm"
+                          : "text-(--text-muted) hover:text-(--text-main) hover:bg-(--card-bg)"
+                      }`}
                     >
                       {mode === "normal" ? "普通" : "高精度"}
                     </Button>
@@ -460,10 +472,11 @@ const Translator: React.FC = () => {
                 size="small"
                 onClick={handleSwap}
                 disabled={source === "auto"}
-                className={`p-2 rounded-full hover:bg-(--bg-main) transition-colors h-auto flex-none ${source === "auto"
-                  ? "opacity-30 cursor-not-allowed"
-                  : "text-(--text-muted) hover:text-(--text-main)"
-                  }`}
+                className={`p-2 rounded-full hover:bg-(--bg-main) transition-colors h-auto flex-none ${
+                  source === "auto"
+                    ? "opacity-30 cursor-not-allowed"
+                    : "text-(--text-muted) hover:text-(--text-main)"
+                }`}
               >
                 <ArrowRightLeft size={18} />
               </Button>
@@ -486,8 +499,12 @@ const Translator: React.FC = () => {
           <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center gap-3">
             <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
             <div className="flex-1">
-              <div className="text-sm font-medium text-blue-600">正在处理...</div>
-              <div className="text-xs text-(--text-muted)">OCR识别和翻译可能需要一些时间,请耐心等待</div>
+              <div className="text-sm font-medium text-blue-600">
+                正在处理...
+              </div>
+              <div className="text-xs text-(--text-muted)">
+                OCR识别和翻译可能需要一些时间,请耐心等待
+              </div>
             </div>
             <Button
               variant="outlined"
@@ -538,12 +555,13 @@ const Translator: React.FC = () => {
               </div>
             </div>
 
-
             {/* 翻译图片和结果列表 */}
             <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 gap-3">
               {/* 左侧:翻译后的图片 */}
               <div className="flex flex-col gap-2 min-h-0">
-                <h3 className="text-sm font-bold text-(--text-muted)">翻译图片</h3>
+                <h3 className="text-sm font-bold text-(--text-muted)">
+                  翻译图片
+                </h3>
                 <div className="flex-1 min-h-0">
                   <TranslatedImageEditor
                     imageBase64={ocrResult.image_base64}
@@ -557,7 +575,9 @@ const Translator: React.FC = () => {
 
               {/* 右侧:翻译结果列表 */}
               <div className="flex flex-col gap-2 min-h-0">
-                <h3 className="text-sm font-bold text-(--text-muted)">翻译结果</h3>
+                <h3 className="text-sm font-bold text-(--text-muted)">
+                  翻译结果
+                </h3>
                 <div className="flex-1 min-h-0 overflow-auto custom-scrollbar space-y-2">
                   {ocrResult.text_boxes.map((box, index) => (
                     <div
@@ -565,12 +585,16 @@ const Translator: React.FC = () => {
                       className="p-3 rounded-xl border border-(--border-color) bg-(--card-bg) hover:border-primary/50 transition-all"
                     >
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="text-xs font-bold text-primary">#{index + 1}</span>
+                        <span className="text-xs font-bold text-primary">
+                          #{index + 1}
+                        </span>
                         <Button
                           variant="text"
                           size="small"
                           onClick={() => {
-                            navigator.clipboard.writeText(translations[index] || box.text);
+                            navigator.clipboard.writeText(
+                              translations[index] || box.text,
+                            );
                             toast.success("已复制");
                           }}
                           className="p-1.5 h-auto"
@@ -580,11 +604,17 @@ const Translator: React.FC = () => {
                       </div>
                       <div className="space-y-2">
                         <div>
-                          <div className="text-xs text-(--text-muted) mb-1">原文:</div>
-                          <div className="text-sm text-(--text-main)">{box.text}</div>
+                          <div className="text-xs text-(--text-muted) mb-1">
+                            原文:
+                          </div>
+                          <div className="text-sm text-(--text-main)">
+                            {box.text}
+                          </div>
                         </div>
                         <div>
-                          <div className="text-xs text-(--text-muted) mb-1">译文:</div>
+                          <div className="text-xs text-(--text-muted) mb-1">
+                            译文:
+                          </div>
                           <div className="text-sm text-primary font-medium">
                             {translations[index] || box.text}
                           </div>
@@ -651,10 +681,11 @@ const Translator: React.FC = () => {
                     size="small"
                     onClick={handleCopy}
                     disabled={!output}
-                    className={`p-2 rounded-lg hover:bg-(--bg-main) transition-colors h-auto ${copied
-                      ? "text-green-500"
-                      : "text-(--text-muted) hover:text-(--text-main)"
-                      }`}
+                    className={`p-2 rounded-lg hover:bg-(--bg-main) transition-colors h-auto ${
+                      copied
+                        ? "text-green-500"
+                        : "text-(--text-muted) hover:text-(--text-main)"
+                    }`}
                     title={t("common.copy")}
                   >
                     {copied ? <Check size={18} /> : <Copy size={18} />}
