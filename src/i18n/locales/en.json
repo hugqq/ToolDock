@@ -42,7 +42,14 @@
     "favorite": "Favorite",
     "unfavorite": "Unfavorite",
     "pin": "Pin",
-    "unpin": "Unpin"
+    "unpin": "Unpin",
+    "pinned": "Pinned"
+  },
+  "home": {
+    "toolsCount": "tools",
+    "listView": "List View",
+    "groupedView": "Grouped View",
+    "noToolsFound": "No tools found"
   },
   "categories": {
     "all": "All Tools",

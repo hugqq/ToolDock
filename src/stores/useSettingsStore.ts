@@ -50,6 +50,8 @@ interface OthelloSettings {
   nickname: string;
 }
 
+export type HomeViewMode = "list" | "grouped";
+
 interface SettingsState {
   translator: TranslatorSettings;
   ai: AiSettings;
@@ -63,10 +65,12 @@ interface SettingsState {
   wechatSystemPrompt: string;
   globalShortcut: string;
   closeBehavior: "minimize" | "exit";
+  homeViewMode: HomeViewMode;
   favoriteTools: string[];
   pinnedTools: string[];
   toggleFavorite: (toolId: string) => void;
   togglePin: (toolId: string) => void;
+  setHomeViewMode: (mode: HomeViewMode) => void;
   setTranslatorKey: (
     engine:
       | "google"
@@ -150,6 +154,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
       runAsAdmin: false,
       closeBehavior: "minimize",
+      homeViewMode: "grouped",
       clipboardEnabled: false,
       clipboardPrefix: "",
       clipboardSuffix: "",
@@ -171,6 +176,7 @@ export const useSettingsStore = create<SettingsState>()(
             ? state.pinnedTools.filter((id) => id !== toolId)
             : [...state.pinnedTools, toolId],
         })),
+      setHomeViewMode: (mode) => set({ homeViewMode: mode }),
       setTranslatorKey: (engine, key) =>
         set((state) => ({
           translator: {

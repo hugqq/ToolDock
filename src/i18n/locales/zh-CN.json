@@ -42,7 +42,14 @@
     "favorite": "收藏",
     "unfavorite": "取消收藏",
     "pin": "置顶",
-    "unpin": "取消置顶"
+    "unpin": "取消置顶",
+    "pinned": "已置顶"
+  },
+  "home": {
+    "toolsCount": "个工具",
+    "listView": "列表视图",
+    "groupedView": "分组视图",
+    "noToolsFound": "未找到相关工具"
   },
   "categories": {
     "all": "全部工具",

@@ -77,7 +77,6 @@ function AppContent() {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [activeCategory, setActiveCategory] = useState<CategoryType>(CATEGORY.ALL);
   const [searchText, setSearchText] = useState("");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { clipboardEnabled, clipboardPrefix, clipboardSuffix } =
@@ -130,12 +129,7 @@ function AppContent() {
         setActiveCategory={setActiveCategory}
       />
       <div className="flex-1 flex flex-col min-w-0">
-        <TitleBar
-          searchText={searchText}
-          setSearchText={setSearchText}
-          isSearchOpen={isSearchOpen}
-          setIsSearchOpen={setIsSearchOpen}
-        />
+        <TitleBar />
         <main className="flex-1 flex flex-col min-w-0 bg-(--bg-main) relative overflow-hidden">
           <Suspense fallback={<PageLoader />}>
             <Routes>
