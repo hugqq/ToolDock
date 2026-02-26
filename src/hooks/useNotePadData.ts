@@ -169,7 +169,8 @@ export function useNotePadData() {
   }, [tasks, loading, t]);
 
   const addTask = async (newTask: Task) => {
-    const newTasks = [...tasks, newTask];
+    // 新任务插入到开头
+    const newTasks = [newTask, ...tasks];
     await saveTasksData(newTasks);
     setTasks(newTasks);
   };
@@ -195,11 +196,17 @@ export function useNotePadData() {
   };
 
   const toggleTask = async (id: string) => {
-    const newTasks = tasks.map((t) =>
-      t.id === id
-        ? { ...t, isCompleted: !t.isCompleted, reminderNotified: false }
-        : t
-    );
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+
+    const updatedTask = { ...task, isCompleted: !task.isCompleted, reminderNotified: false };
+
+    // 如果标记为完成，移到末端；如果取消完成，移到开头
+    const otherTasks = tasks.filter((t) => t.id !== id);
+    const newTasks = updatedTask.isCompleted
+      ? [...otherTasks, updatedTask]  // 完成的任务移到末端
+      : [updatedTask, ...otherTasks]; // 未完成的任务移到开头
+
     await saveTasksData(newTasks);
     setTasks(newTasks);
   };

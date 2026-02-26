@@ -56,6 +56,7 @@ const Translator: React.FC = () => {
   const [ocrEngine, setOcrEngine] = useState("windows");
   const [ocrMode, setOcrMode] = useState("normal");
   const [translations, setTranslations] = useState<string[]>([]);
+  const [isOcrLoading, setIsOcrLoading] = useState(false);
 
   // 获取当前引擎对应的 Key
   const currentApiKey = React.useMemo(() => {
@@ -236,6 +237,7 @@ const Translator: React.FC = () => {
       const { x, y, width, height } = event.payload;
 
       setLoading(true);
+      setIsOcrLoading(true);
       setError(null);
 
       try {
@@ -331,6 +333,7 @@ const Translator: React.FC = () => {
         setError(errorMsg);
       } finally {
         setLoading(false);
+        setIsOcrLoading(false);
       }
     });
 
@@ -495,7 +498,7 @@ const Translator: React.FC = () => {
         </div>
 
         {/* Loading提示 */}
-        {loading && (
+        {loading && isOcrLoading && (
           <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center gap-3">
             <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
             <div className="flex-1">

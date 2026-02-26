@@ -39,13 +39,15 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
           </button>
         ))}
       </div>
-      <button
-        onClick={onAddTask}
-        className="flex items-center gap-2 px-3 py-1.5 bg-(--primary-color) text-white rounded-lg hover:bg-(--primary-hover) active:scale-95 transition-all text-sm font-medium"
-      >
-        <Plus size={16} />
-        {t("tools.notepad.add_plan")}
-      </button>
+      {activeTab !== TaskType.TodayPlan && (
+        <button
+          onClick={onAddTask}
+          className="flex items-center gap-2 px-3 py-1.5 bg-(--primary-color) text-white rounded-lg hover:bg-(--primary-hover) active:scale-95 transition-all text-sm font-medium"
+        >
+          <Plus size={16} />
+          {t("tools.notepad.add_plan")}
+        </button>
+      )}
     </div>
   );
 };

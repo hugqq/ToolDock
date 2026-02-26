@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { X, Eye } from "lucide-react";
+import { X, Eye, FileText, File, FileImage, FileVideo, FileAudio, FileCode, FileArchive, ExternalLink } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { convertFileSrc } from "@tauri-apps/api/core";
+import { openPath } from "@tauri-apps/plugin-opener";
 import { Task } from "../../types/notepad";
 
 interface TaskPreviewProps {
@@ -11,6 +12,43 @@ interface TaskPreviewProps {
   onClose: () => void;
 }
 
+// Get file extension from path
+const getFileExtension = (path: string): string => {
+  const parts = path.split(".");
+  return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : "";
+};
+
+// Get file name from path
+const getFileName = (path: string): string => {
+  const parts = path.split(/[/\\]/);
+  return parts[parts.length - 1] || path;
+};
+
+// Get appropriate icon for file type
+const getFileIcon = (path: string) => {
+  const ext = getFileExtension(path);
+  const imageExts = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "ico"];
+  const videoExts = ["mp4", "avi", "mov", "mkv", "webm", "flv"];
+  const audioExts = ["mp3", "wav", "ogg", "flac", "aac", "m4a"];
+  const codeExts = ["js", "ts", "jsx", "tsx", "py", "java", "cpp", "c", "h", "css", "html", "json", "xml", "yaml", "yml"];
+  const archiveExts = ["zip", "rar", "7z", "tar", "gz", "bz2"];
+  const docExts = ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "md"];
+
+  if (imageExts.includes(ext)) return FileImage;
+  if (videoExts.includes(ext)) return FileVideo;
+  if (audioExts.includes(ext)) return FileAudio;
+  if (codeExts.includes(ext)) return FileCode;
+  if (archiveExts.includes(ext)) return FileArchive;
+  if (docExts.includes(ext)) return FileText;
+  return File;
+};
+
+// Check if file is previewable image
+const isPreviewableImage = (path: string): boolean => {
+  const ext = getFileExtension(path);
+  return ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(ext);
+};
+
 export const TaskPreview: React.FC<TaskPreviewProps> = ({
   isOpen,
   task,
@@ -18,6 +56,14 @@ export const TaskPreview: React.FC<TaskPreviewProps> = ({
 }) => {
   const { t } = useTranslation();
   const [viewingImage, setViewingImage] = useState<string | null>(null);
+
+  const handleOpenFile = async (path: string) => {
+    try {
+      await openPath(path);
+    } catch (error) {
+      console.error("Failed to open file:", error);
+    }
+  };
 
   if (!isOpen || !task) return null;
 
@@ -140,8 +186,80 @@ export const TaskPreview: React.FC<TaskPreviewProps> = ({
               </div>
             )}
 
+            {/* Attachments */}
+            {task.attachments && task.attachments.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-medium text-(--text-main)">
+                  {t("tools.notepad.attachments") || "Attachments"}
+                </h4>
+                <div className="space-y-2">
+                  {task.attachments.map((path, idx) => {
+                    const FileIcon = getFileIcon(path);
+                    const fileName = getFileName(path);
+                    const isImage = isPreviewableImage(path);
+
+                    return (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-(--border-color) bg-(--bg-secondary) hover:border-(--primary-color) transition-colors group"
+                      >
+                        {/* Thumbnail for images */}
+                        {isImage ? (
+                          <div
+                            className="w-12 h-12 rounded overflow-hidden shrink-0 cursor-pointer"
+                            onClick={() => setViewingImage(path)}
+                          >
+                            <img
+                              src={convertFileSrc(path)}
+                              alt={fileName}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-12 h-12 rounded bg-(--bg-main) flex items-center justify-center shrink-0">
+                            <FileIcon size={24} className="text-(--text-secondary)" />
+                          </div>
+                        )}
+
+                        {/* File info */}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-(--text-main) text-sm font-medium truncate">
+                            {fileName}
+                          </p>
+                          <p className="text-(--text-secondary) text-xs uppercase">
+                            {getFileExtension(path) || "File"}
+                          </p>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2">
+                          {isImage && (
+                            <button
+                              onClick={() => setViewingImage(path)}
+                              className="p-2 rounded-lg hover:bg-(--bg-hover) text-(--text-secondary) hover:text-(--primary-color) transition-colors"
+                              title={t("common.preview") || "Preview"}
+                            >
+                              <Eye size={18} />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleOpenFile(path)}
+                            className="p-2 rounded-lg hover:bg-(--bg-hover) text-(--text-secondary) hover:text-(--primary-color) transition-colors"
+                            title={t("common.open") || "Open"}
+                          >
+                            <ExternalLink size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {!task.content &&
-              (!task.images || task.images.length === 0) && (
+              (!task.images || task.images.length === 0) &&
+              (!task.attachments || task.attachments.length === 0) && (
                 <div className="text-(--text-secondary) italic">
                   {t("common.no_results")}
                 </div>

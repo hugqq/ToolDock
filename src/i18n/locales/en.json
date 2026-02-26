@@ -43,7 +43,8 @@
     "unfavorite": "Unfavorite",
     "pin": "Pin",
     "unpin": "Unpin",
-    "pinned": "Pinned"
+    "pinned": "Pinned",
+    "view": "View"
   },
   "home": {
     "toolsCount": "tools",
@@ -112,6 +113,7 @@
       "reminder": "Reminder",
       "reminder_msg": "Reminder: {{title}}",
       "title": "Title",
+      "untitled": "Untitled",
       "deadline": "Deadline",
       "no_deadline": "No Deadline",
       "pomodoro": "Pomodoro",
@@ -122,7 +124,7 @@
       "minutes": "min",
       "todo_placeholder": "Add new task...",
       "today_tasks": "Today's Tasks",
-      "no_today_tasks": "No tasks for today, click + to add",
+      "no_today_tasks": "No tasks for today",
       "work_mode": "Work Mode",
       "break_mode": "Break Mode",
       "load_error": "Failed to load data",

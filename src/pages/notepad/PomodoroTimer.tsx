@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import {
   Timer,
   Settings,
-  Target,
   Pause,
   Play,
   RotateCcw,
@@ -35,18 +34,15 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
   mode,
   settings,
   sessions,
-  tasks,
   onToggleTimer,
   onResetTimer,
   onUpdateSettings,
-  onUpdateFocusedTask,
   onTestSound,
   notificationPermission,
   onTestNotification,
 }) => {
   const { t } = useTranslation();
   const [showSettings, setShowSettings] = useState(false);
-  const [focusedTaskId, setFocusedTaskId] = useState<string>("");
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -59,15 +55,6 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
     today.setHours(0, 0, 0, 0);
     return s.completedAt >= today.getTime() && s.mode === "work";
   }).length;
-
-  const incompleteTasks = tasks.filter((t) => !t.isCompleted);
-
-  const handleTaskChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const id = e.target.value;
-      setFocusedTaskId(id);
-      const task = tasks.find(t => t.id === id);
-      onUpdateFocusedTask(id || null, task?.title);
-  }
 
   return (
     <div className="bg-(--bg-main) rounded-xl border border-(--border-color) p-6 flex flex-col items-center justify-center sticky top-0">

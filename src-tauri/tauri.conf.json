@@ -72,6 +72,7 @@
       },
       "nsis": {
         "compression": "lzma",
+        "installMode": "both",
         "installerHooks": "scripts/nsis/installer.nsi",
         "languages": ["SimpChinese", "English"]
       }

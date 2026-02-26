@@ -58,8 +58,8 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             }`}
           >
             <div className="flex items-center gap-2">
-              <h4 className="font-medium text-(--text-main) text-lg">
-                {task.title}
+              <h4 className="font-medium text-(--text-main) text-lg line-clamp-1">
+                {task.title || (task.content && task.content.length > 50 ? task.content.slice(0, 50) + '...' : task.content) || t("tools.notepad.untitled")}
               </h4>
               {task.tags && task.tags.length > 0 && (
                 <div className="flex gap-1">
@@ -114,7 +114,10 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               {task.reminderTime && (
                 <span className="flex items-center gap-1 text-amber-500">
                   <Bell size={14} />
-                  {new Date(task.reminderTime).toLocaleTimeString([], {
+                  {new Date(task.reminderTime).toLocaleString([], {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
                     hour: "2-digit",
                     minute: "2-digit",
                   })}

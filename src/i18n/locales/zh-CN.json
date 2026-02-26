@@ -43,7 +43,9 @@
     "unfavorite": "取消收藏",
     "pin": "置顶",
     "unpin": "取消置顶",
-    "pinned": "已置顶"
+    "pinned": "已置顶",
+    "view": "查看",
+    "preview": "预览"
   },
   "home": {
     "toolsCount": "个工具",
@@ -112,6 +114,7 @@
       "reminder": "设置提醒",
       "reminder_msg": "闹钟提醒：{{title}}",
       "title": "标题",
+      "untitled": "无标题",
       "deadline": "截止时间",
       "no_deadline": "无截止时间",
       "pomodoro": "番茄钟",
@@ -120,9 +123,9 @@
       "break_time": "休息一下",
       "focus_time": "专注时间",
       "minutes": "分钟",
-      "todo_placeholder": "添加新任务...",
-      "today_tasks": "今日任务",
-      "no_today_tasks": "今天还没有任务，点击右上角添加",
+      "todo_placeholder": "添加新计划...",
+      "today_tasks": "今日计划",
+      "no_today_tasks": "今天还没有计划",
       "work_mode": "工作模式",
       "break_mode": "休息模式",
       "load_error": "加载数据失败",
