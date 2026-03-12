@@ -4,6 +4,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
+import { invokeWrapper } from "../api";
 import { listen } from "@tauri-apps/api/event";
 import {
   Activity,
@@ -112,13 +113,12 @@ export default function DnsTool() {
       setIsLoading(false);
 
       // 管理员权限检测独立执行，不阻塞主界面
-      invoke<boolean>("is_admin")
-        .then((adminStatus) => {
-          setIsAdmin(adminStatus);
+      invokeWrapper<boolean>("is_run_as_admin")
+        .then((res) => {
+          setIsAdmin(res.ok ? (res.data ?? false) : false);
         })
         .catch((error) => {
           console.error("Failed to check admin status:", error);
-          // 权限检测失败时默认为非管理员
           setIsAdmin(false);
         });
     } catch (error) {

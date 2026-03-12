@@ -83,27 +83,40 @@ pub fn set_run_as_admin(enabled: bool) -> Result<(), AppError> {
     Ok(())
 }
 
-/// 检查是否已设置以管理员身份启动
+/// 检查当前进程是否以管理员（提权）身份运行
 pub fn is_run_as_admin() -> Result<bool, AppError> {
-    let exe_path = env::current_exe()
-        .map_err(|e| AppError::Io(e))?
-        .to_string_lossy()
-        .to_string();
+    use std::mem;
+    use winapi::shared::minwindef::FALSE;
+    use winapi::um::handleapi::CloseHandle;
+    use winapi::um::processthreadsapi::{GetCurrentProcess, OpenProcessToken};
+    use winapi::um::securitybaseapi::GetTokenInformation;
+    use winapi::um::winnt::{TokenElevation, TOKEN_ELEVATION, TOKEN_QUERY};
 
-    let hkcu = RegKey::predef(HKEY_CURRENT_USER);
-    let path = r"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers";
+    unsafe {
+        let mut token = std::ptr::null_mut();
+        if OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &mut token) == FALSE {
+            return Ok(false);
+        }
 
-    let key = match hkcu.open_subkey(path) {
-        Ok(k) => k,
-        Err(_) => return Ok(false),
-    };
+        let mut elevation: TOKEN_ELEVATION = mem::zeroed();
+        let mut return_length: u32 = 0;
 
-    let value: String = match key.get_value(&exe_path) {
-        Ok(v) => v,
-        Err(_) => return Ok(false),
-    };
+        let result = GetTokenInformation(
+            token,
+            TokenElevation,
+            &mut elevation as *mut _ as *mut _,
+            mem::size_of::<TOKEN_ELEVATION>() as u32,
+            &mut return_length,
+        );
 
-    Ok(value.contains("RUNASADMIN"))
+        CloseHandle(token);
+
+        if result == FALSE {
+            return Ok(false);
+        }
+
+        Ok(elevation.TokenIsElevated != 0)
+    }
 }
 
 /// 注册全局快捷键（保存到注册表，供下次启动时使用）

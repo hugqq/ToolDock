@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 设置状态管理
  * 职责：持久化存储全局设置，如 API Keys
  */
@@ -15,20 +15,17 @@ interface TranslatorSettings {
   deeplxKey: string;
 }
 
-interface AiProviderSettings {
+export interface AiProviderSettings {
+  id: string;
+  name: string;
+  baseUrl: string;
   apiKey: string;
   model: string;
-  baseUrl?: string;
 }
 
 interface AiSettings {
-  activeProvider: "deepseek" | "doubao" | "openai" | "siliconflow";
-  providers: {
-    deepseek: AiProviderSettings;
-    doubao: AiProviderSettings;
-    openai: AiProviderSettings;
-    siliconflow: AiProviderSettings;
-  };
+  activeProvider: string;
+  providers: AiProviderSettings[];
 }
 
 interface OcrSettings {
@@ -46,11 +43,28 @@ interface OcrSettings {
 }
 
 interface OthelloSettings {
-  serverUrl: string; // e.g. "ws://localhost:3030"
+  serverUrl: string;
   nickname: string;
 }
 
 export type HomeViewMode = "list" | "grouped";
+
+export const DEFAULT_AI_PROVIDERS: AiProviderSettings[] = [
+  {
+    id: "deepseek",
+    name: "DeepSeek",
+    baseUrl: "https://api.deepseek.com",
+    apiKey: "",
+    model: "deepseek-chat",
+  },
+  {
+    id: "openai",
+    name: "OpenAI",
+    baseUrl: "https://api.openai.com/v1",
+    apiKey: "",
+    model: "gpt-4o",
+  },
+];
 
 interface SettingsState {
   translator: TranslatorSettings;
@@ -82,14 +96,14 @@ interface SettingsState {
       | "deeplx",
     key: string
   ) => void;
-  setAiActiveProvider: (
-    provider: "deepseek" | "doubao" | "openai" | "siliconflow"
-  ) => void;
-  setAiProviderSetting: (
-    provider: "deepseek" | "doubao" | "openai" | "siliconflow",
+  setAiActiveProvider: (id: string) => void;
+  addAiProvider: (provider: AiProviderSettings) => void;
+  updateAiProvider: (
+    id: string,
     key: keyof AiProviderSettings,
     value: string
   ) => void;
+  removeAiProvider: (id: string) => void;
   setAiConfig: (config: AiSettings) => void;
   setOcrEngine: (engine: OcrSettings["engine"]) => void;
   setOcrSetting: (key: keyof OcrSettings, value: string) => void;
@@ -119,26 +133,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
       ai: {
         activeProvider: "deepseek",
-        providers: {
-          deepseek: {
-            apiKey: "",
-            model: "deepseek-chat",
-          },
-          doubao: {
-            apiKey: "",
-            model: "",
-          },
-          openai: {
-            apiKey: "",
-            model: "gpt-4o",
-            baseUrl: "https://api.openai.com/v1",
-          },
-          siliconflow: {
-            apiKey: "",
-            model: "deepseek-ai/DeepSeek-V3",
-            baseUrl: "https://api.siliconflow.cn/v1",
-          },
-        },
+        providers: DEFAULT_AI_PROVIDERS,
       },
       othello: {
         serverUrl: "ws://localhost:3030",
@@ -184,26 +179,40 @@ export const useSettingsStore = create<SettingsState>()(
             [`${engine}Key`]: key,
           },
         })),
-      setAiActiveProvider: (provider) =>
+      setAiActiveProvider: (id) =>
+        set((state) => ({
+          ai: { ...state.ai, activeProvider: id },
+        })),
+      addAiProvider: (provider) =>
         set((state) => ({
           ai: {
             ...state.ai,
-            activeProvider: provider,
+            providers: [...state.ai.providers, provider],
           },
         })),
-      setAiProviderSetting: (provider, key, value) =>
+      updateAiProvider: (id, key, value) =>
         set((state) => ({
           ai: {
             ...state.ai,
-            providers: {
-              ...state.ai.providers,
-              [provider]: {
-                ...state.ai.providers[provider],
-                [key]: value,
-              },
+            providers: state.ai.providers.map((p) =>
+              p.id === id ? { ...p, [key]: value } : p
+            ),
+          },
+        })),
+      removeAiProvider: (id) =>
+        set((state) => {
+          const remaining = state.ai.providers.filter((p) => p.id !== id);
+          const newActive =
+            state.ai.activeProvider === id
+              ? (remaining[0]?.id ?? "")
+              : state.ai.activeProvider;
+          return {
+            ai: {
+              activeProvider: newActive,
+              providers: remaining,
             },
-          },
-        })),
+          };
+        }),
       setAiConfig: (config) => set({ ai: config }),
       setOcrEngine: (engine) =>
         set((state) => ({ ocr: { ...state.ocr, engine } })),
@@ -225,80 +234,28 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "tooldock-settings",
-      version: 5,
-      migrate: (persistedState: any, version: number) => {
+      version: 6,
+      migrate: (persistedState: any, _version: number) => {
         let state = persistedState;
 
-        if (version === 0) {
-          // 从旧的单服务商结构迁移到新的多服务商结构
+        // version 0: 从旧的单服务商结构迁移
+        if (state.ai && !state.ai.providers) {
           const oldAi = state.ai;
-          if (oldAi && !oldAi.providers) {
-            state = {
-              ...state,
-              ai: {
-                activeProvider: "deepseek",
-                providers: {
-                  deepseek: {
-                    apiKey: oldAi.apiKey || "",
-                    model: oldAi.model || "deepseek-chat",
-                  },
-                  doubao: {
-                    apiKey: "",
-                    model: "",
-                  },
-                  openai: {
-                    apiKey: "",
-                    model: "gpt-4o",
-                    baseUrl: "https://api.openai.com/v1",
-                  },
-                  siliconflow: {
-                    apiKey: "",
-                    model: "deepseek-ai/DeepSeek-V3",
-                    baseUrl: "https://api.siliconflow.cn/v1",
-                  },
-                },
-              },
-            };
-          }
-        }
-
-        // 补全 openai (version 1)
-        if (state.ai && state.ai.providers && !state.ai.providers.openai) {
           state = {
             ...state,
             ai: {
-              ...state.ai,
+              activeProvider: "deepseek",
               providers: {
-                ...state.ai.providers,
-                openai: {
-                  apiKey: "",
-                  model: "gpt-4o",
-                  baseUrl: "https://api.openai.com/v1",
-                },
+                deepseek: { apiKey: oldAi.apiKey || "", model: oldAi.model || "deepseek-chat" },
+                doubao: { apiKey: "", model: "" },
+                openai: { apiKey: "", model: "gpt-4o", baseUrl: "https://api.openai.com/v1" },
+                siliconflow: { apiKey: "", model: "deepseek-ai/DeepSeek-V3", baseUrl: "https://api.siliconflow.cn/v1" },
               },
             },
           };
         }
 
-        // 补全 siliconflow (version 2)
-        if (state.ai && state.ai.providers && !state.ai.providers.siliconflow) {
-          state = {
-            ...state,
-            ai: {
-              ...state.ai,
-              providers: {
-                ...state.ai.providers,
-                siliconflow: {
-                  apiKey: "",
-                  model: "deepseek-ai/DeepSeek-V3",
-                  baseUrl: "https://api.siliconflow.cn/v1",
-                },
-              },
-            },
-          };
-        }
-
-        // 补全 ocr (version 3)
+        // 补全 ocr
         if (!state.ocr) {
           state = {
             ...state,
@@ -312,25 +269,64 @@ export const useSettingsStore = create<SettingsState>()(
             },
           };
         }
-
-        // 补全 baidu ocr (version 4)
         if (state.ocr && state.ocr.baiduApiKey === undefined) {
-          state = {
-            ...state,
-            ocr: {
-              ...state.ocr,
-              baiduApiKey: "",
-              baiduSecretKey: "",
-            },
-          };
+          state = { ...state, ocr: { ...state.ocr, baiduApiKey: "", baiduSecretKey: "" } };
         }
 
-        // 补全 wechatSystemPrompt (version 5)
+        // 补全 wechatSystemPrompt
         if (!state.wechatSystemPrompt) {
           state = {
             ...state,
-            wechatSystemPrompt:
-              "你是一个友好且专业的助手，请根据收到的消息生成合适的回复。回复要简洁、自然、有礼貌。",
+            wechatSystemPrompt: "你是一个友好且专业的助手，请根据收到的消息生成合适的回复。回复要简洁、自然、有礼貌。",
+          };
+        }
+
+        // version 5 → 6: providers 从 object 迁移到 array
+        if (state.ai?.providers && !Array.isArray(state.ai.providers)) {
+          const old = state.ai.providers as any;
+          const newProviders: AiProviderSettings[] = [
+            {
+              id: "deepseek",
+              name: "DeepSeek",
+              baseUrl: "https://api.deepseek.com",
+              apiKey: old.deepseek?.apiKey || "",
+              model: old.deepseek?.model || "deepseek-chat",
+            },
+            {
+              id: "openai",
+              name: "OpenAI",
+              baseUrl: old.openai?.baseUrl || "https://api.openai.com/v1",
+              apiKey: old.openai?.apiKey || "",
+              model: old.openai?.model || "gpt-4o",
+            },
+          ];
+          // 保留已配置的豆包/SiliconFlow 作为自定义提供商
+          if (old.doubao?.apiKey) {
+            newProviders.push({
+              id: "doubao",
+              name: "豆包",
+              baseUrl: "https://ark.cn-beijing.volces.com/api/v3",
+              apiKey: old.doubao.apiKey,
+              model: old.doubao.model || "",
+            });
+          }
+          if (old.siliconflow?.apiKey) {
+            newProviders.push({
+              id: "siliconflow",
+              name: "SiliconFlow",
+              baseUrl: old.siliconflow?.baseUrl || "https://api.siliconflow.cn/v1",
+              apiKey: old.siliconflow.apiKey,
+              model: old.siliconflow.model || "",
+            });
+          }
+          const oldActive = state.ai.activeProvider || "deepseek";
+          const activeExists = newProviders.find((p) => p.id === oldActive);
+          state = {
+            ...state,
+            ai: {
+              activeProvider: activeExists ? oldActive : newProviders[0]?.id ?? "deepseek",
+              providers: newProviders,
+            },
           };
         }
 

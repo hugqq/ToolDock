@@ -19,33 +19,6 @@
         "center": true,
         "decorations": false,
         "dragDropEnabled": false
-      },
-      {
-        "label": "magnifier",
-        "url": "index.html#/magnifier",
-        "title": "Magnifier",
-        "maximized": true,
-        "decorations": false,
-        "transparent": true,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "visible": false,
-        "resizable": false,
-        "shadow": false
-      },
-      {
-        "label": "screenshot-selector",
-        "url": "index.html#/screenshot-selector",
-        "title": "Screenshot Selector",
-        "maximized": true,
-        "decorations": false,
-        "transparent": true,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "visible": false,
-        "resizable": false,
-        "shadow": false,
-        "focus": true
       }
     ],
     "security": {

@@ -40,7 +40,7 @@ rayon = "1.11.0"
 uuid = { version = "1.19.0", features = ["v4"] }
 screenshots = "0.8.10"
 device_query = "4.0.1"
-winapi = { version = "0.3.9", features = ["winuser", "restartmanager", "winerror", "wingdi", "minwindef", "winbase", "shellapi", "shlobj", "errhandlingapi", "psapi", "tlhelp32"] }
+winapi = { version = "0.3.9", features = ["winuser", "restartmanager", "winerror", "wingdi", "minwindef", "winbase", "shellapi", "shlobj", "errhandlingapi", "psapi", "tlhelp32", "processthreadsapi", "securitybaseapi", "handleapi", "winnt"] }
 sysinfo = "0.37.2"
 scopeguard = "1.2.0"
 tracing = "0.1.44"

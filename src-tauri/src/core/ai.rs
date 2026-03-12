@@ -18,21 +18,15 @@ pub async fn ask_ai(
         .build()
         .map_err(|e| AppError::Internal(format!("Failed to create HTTP client: {}", e)))?;
 
-    let url = if provider == "deepseek" {
+    // 优先使用传入的 base_url，回退到 deepseek/openai 的内置默认值
+    let url = if !base_url.is_empty() {
+        format!("{}/chat/completions", base_url.trim_end_matches('/'))
+    } else if provider == "deepseek" {
         "https://api.deepseek.com/chat/completions".to_string()
-    } else if provider == "openai" || provider == "siliconflow" {
-        if base_url.is_empty() {
-            if provider == "openai" {
-                "https://api.openai.com/v1/chat/completions".to_string()
-            } else {
-                "https://api.siliconflow.cn/v1/chat/completions".to_string()
-            }
-        } else {
-            format!("{}/chat/completions", base_url.trim_end_matches('/'))
-        }
+    } else if provider == "openai" {
+        "https://api.openai.com/v1/chat/completions".to_string()
     } else {
-        // Doubao (Volcengine)
-        "https://ark.cn-beijing.volces.com/api/v3/chat/completions".to_string()
+        return Err(AppError::Internal("base_url is required for this provider".to_string()));
     };
 
     tracing::info!("[AI] provider={}, model={}, url={}", provider, model, url);
@@ -91,20 +85,14 @@ where
         .build()
         .map_err(|e| AppError::Internal(format!("Failed to create HTTP client: {}", e)))?;
 
-    let url = if provider == "deepseek" {
+    let url = if !base_url.is_empty() {
+        format!("{}/chat/completions", base_url.trim_end_matches('/'))
+    } else if provider == "deepseek" {
         "https://api.deepseek.com/chat/completions".to_string()
-    } else if provider == "openai" || provider == "siliconflow" {
-        if base_url.is_empty() {
-            if provider == "openai" {
-                "https://api.openai.com/v1/chat/completions".to_string()
-            } else {
-                "https://api.siliconflow.cn/v1/chat/completions".to_string()
-            }
-        } else {
-            format!("{}/chat/completions", base_url.trim_end_matches('/'))
-        }
+    } else if provider == "openai" {
+        "https://api.openai.com/v1/chat/completions".to_string()
     } else {
-        "https://ark.cn-beijing.volces.com/api/v3/chat/completions".to_string()
+        return Err(AppError::Internal("base_url is required for this provider".to_string()));
     };
 
     tracing::info!("[AI-Stream] provider={}, model={}, url={}", provider, model, url);

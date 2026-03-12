@@ -23,6 +23,8 @@ import {
   Settings2,
   Languages,
   FolderInput,
+  PlusCircle,
+  X,
 } from "lucide-react";
 import { openPath } from "@tauri-apps/plugin-opener";
 import { invoke } from "@tauri-apps/api/core";
@@ -93,42 +95,7 @@ const CATEGORIES: CategoryConfig[] = [
   },
 ];
 
-// AI Provider 定义
-type AIProvider = "deepseek" | "doubao" | "openai" | "siliconflow";
 
-interface ProviderConfig {
-  id: AIProvider;
-  name: string;
-  url: string;
-  color: string;
-}
-
-const AI_PROVIDERS: ProviderConfig[] = [
-  {
-    id: "deepseek",
-    name: "DeepSeek",
-    url: "https://platform.deepseek.com/",
-    color: "blue",
-  },
-  {
-    id: "doubao",
-    name: "豆包",
-    url: "https://console.volcengine.com/ark/region:ark+cn-beijing/endpoint",
-    color: "orange",
-  },
-  {
-    id: "openai",
-    name: "OpenAI",
-    url: "https://platform.openai.com/",
-    color: "green",
-  },
-  {
-    id: "siliconflow",
-    name: "SiliconFlow",
-    url: "https://cloud.siliconflow.cn/",
-    color: "purple",
-  },
-];
 
 const Settings: React.FC = () => {
   const { t } = useTranslation();
@@ -138,7 +105,9 @@ const Settings: React.FC = () => {
     setTranslatorKey,
     ai,
     setAiActiveProvider,
-    setAiProviderSetting,
+    addAiProvider,
+    updateAiProvider,
+    removeAiProvider,
     setAiConfig,
     runAsAdmin,
     setRunAsAdmin,
@@ -166,8 +135,6 @@ const Settings: React.FC = () => {
   const [tempShortcut, setTempShortcut] = React.useState("");
   const [activeCategory, setActiveCategory] =
     React.useState<SettingsCategory>("general");
-  const [activeAiTab, setActiveAiTab] = React.useState<AIProvider>("deepseek");
-
   // 导出导入相关状态
   const [encryptExport, setEncryptExport] = React.useState(false);
   const [exportPassword, setExportPassword] = React.useState("");
@@ -198,34 +165,9 @@ const Settings: React.FC = () => {
     });
   }, []);
 
-  // 同步 AI 活动 Provider 到标签页
-  React.useEffect(() => {
-    if (ai?.activeProvider) {
-      setActiveAiTab(ai.activeProvider as AIProvider);
-    }
-  }, [ai?.activeProvider]);
-
-  // 防御性检查 AI 配置
-  const safeAi = {
-    activeProvider: ai?.activeProvider || "deepseek",
-    providers: {
-      deepseek: ai?.providers?.deepseek || {
-        apiKey: "",
-        model: "deepseek-chat",
-      },
-      doubao: ai?.providers?.doubao || { apiKey: "", model: "" },
-      openai: ai?.providers?.openai || {
-        apiKey: "",
-        model: "gpt-4o",
-        baseUrl: "https://api.openai.com/v1",
-      },
-      siliconflow: ai?.providers?.siliconflow || {
-        apiKey: "",
-        model: "deepseek-ai/DeepSeek-V3",
-        baseUrl: "https://api.siliconflow.cn/v1",
-      },
-    },
-  };
+  // AI 服务商列表（带防御性默认值）
+  const aiProviders = Array.isArray(ai?.providers) ? ai!.providers : [];
+  const activeProviderId = ai?.activeProvider || aiProviders[0]?.id || "";
 
   const handleSave = async () => {
     await invokeWrapper("set_run_as_admin", { enabled: runAsAdmin });
@@ -292,8 +234,8 @@ const Settings: React.FC = () => {
     await invoke("set_close_behavior", { behavior: val });
   };
 
-  const handleTestAi = async (provider: string) => {
-    const config = (safeAi.providers as Record<string, any>)[provider];
+  const handleTestAi = async (providerId: string) => {
+    const config = aiProviders.find((p) => p.id === providerId);
     if (!config?.apiKey) {
       await confirm({
         title: t("common.error"),
@@ -303,10 +245,10 @@ const Settings: React.FC = () => {
       return;
     }
 
-    setTestingAi(provider);
+    setTestingAi(providerId);
     try {
       const res = await invokeWrapper<string>("test_ai_connection", {
-        provider,
+        provider: providerId,
         apiKey: config.apiKey,
         model: config.model,
         baseUrl: config.baseUrl,
@@ -336,6 +278,16 @@ const Settings: React.FC = () => {
     } finally {
       setTestingAi(null);
     }
+  };
+
+  const handleAddProvider = () => {
+    addAiProvider({
+      id: `provider-${Date.now()}`,
+      name: "",
+      baseUrl: "",
+      apiKey: "",
+      model: "",
+    });
   };
 
   const handleExport = async () => {
@@ -673,149 +625,118 @@ const Settings: React.FC = () => {
   );
 
   const renderAiSettings = () => (
-    <div className="space-y-6">
-      {/* Provider 选择 */}
-      <div className="space-y-3">
-        <label className="block text-sm font-medium text-(--text-main)">
-          {t("tools.settings.ai_active_provider")}
-        </label>
-        <div className="flex flex-wrap gap-3">
-          {AI_PROVIDERS.map((p) => (
-            <label
-              key={p.id}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer transition-all ${
-                safeAi.activeProvider === p.id
-                  ? "border-blue-500 bg-blue-500/10 text-blue-600"
-                  : "border-(--border-color) hover:border-blue-300 text-(--text-muted)"
-              }`}
-            >
-              <input
-                type="radio"
-                name="active-provider"
-                className="hidden"
-                checked={safeAi.activeProvider === p.id}
-                onChange={() => setAiActiveProvider(p.id)}
-              />
+    <div className="space-y-4">
+      {aiProviders.map((provider) => (
+        <div
+          key={provider.id}
+          className="p-4 rounded-xl border border-(--border-color) bg-(--bg-main)/50 space-y-3"
+        >
+          {/* 标题行 */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
               <div
                 className={`w-2 h-2 rounded-full ${
-                  safeAi.activeProvider === p.id
+                  activeProviderId === provider.id
                     ? "bg-green-500 animate-pulse"
                     : "bg-gray-400"
                 }`}
               />
-              <span className="text-sm font-medium">{p.name}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      {/* Provider 配置内容 */}
-      <div className="border border-(--border-color) rounded-xl overflow-hidden">
-        <div 
-          key={activeAiTab}
-          className="p-6 animate-fadeIn"
-        >
-          {renderAiProviderContent(activeAiTab)}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderAiProviderContent = (provider: AIProvider) => {
-    const config = safeAi.providers[provider];
-    const providerInfo = AI_PROVIDERS.find((p) => p.id === provider)!;
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-(--text-main) flex items-center gap-2">
-            <div
-              className={`w-2 h-2 rounded-full ${
-                safeAi.activeProvider === provider
-                  ? "bg-green-500 animate-pulse"
-                  : "bg-gray-400"
-              }`}
-            />
-            {providerInfo.name}
-          </h3>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="text"
-              size="small"
-              onClick={() => handleTestAi(provider)}
-              disabled={testingAi === provider}
-              className="text-xs text-green-500 hover:text-green-600 flex items-center gap-1 h-auto p-0"
-            >
-              {testingAi === provider ? (
-                <Loader2 size={12} className="animate-spin" />
-              ) : (
-                <Zap size={12} />
+              <span className="text-sm font-semibold text-(--text-main)">
+                {provider.name || (
+                  <span className="text-(--text-muted) italic">
+                    {t("tools.settings.ai_provider_name_placeholder")}
+                  </span>
+                )}
+              </span>
+              {activeProviderId === provider.id && (
+                <span className="text-[10px] bg-green-500/15 text-green-600 px-2 py-0.5 rounded-full font-medium">
+                  {t("tools.settings.ai_active_badge")}
+                </span>
               )}
-              {t("tools.settings.ai_test_connection")}
-            </Button>
-            <Button
-              variant="text"
-              size="small"
-              onClick={() => openPath(providerInfo.url)}
-              className="text-xs text-blue-500 hover:underline flex items-center gap-1 h-auto p-0"
-            >
-              {t("tools.translator.get_key")} <ExternalLink size={12} />
-            </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              {activeProviderId !== provider.id && (
+                <button
+                  onClick={() => setAiActiveProvider(provider.id)}
+                  className="text-xs text-blue-500 hover:text-blue-600 px-2 py-1 rounded border border-blue-500/30 hover:border-blue-500 transition-colors"
+                >
+                  {t("tools.settings.ai_set_active")}
+                </button>
+              )}
+              <Button
+                variant="text"
+                size="small"
+                onClick={() => handleTestAi(provider.id)}
+                disabled={testingAi === provider.id}
+                className="text-xs text-green-500 hover:text-green-600 flex items-center gap-1 h-auto p-0 min-w-0"
+              >
+                {testingAi === provider.id ? (
+                  <Loader2 size={12} className="animate-spin" />
+                ) : (
+                  <Zap size={12} />
+                )}
+                {t("tools.settings.ai_test_connection")}
+              </Button>
+              {aiProviders.length > 1 && (
+                <button
+                  onClick={() => removeAiProvider(provider.id)}
+                  className="p-1 text-red-400 hover:text-red-500 rounded hover:bg-red-500/10 transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-4">
-          <Input
-            label={t("tools.settings.ai_api_key")}
-            type="password"
-            value={config.apiKey}
-            placeholder={t("tools.settings.ai_api_key_placeholder")}
-            onChange={(e) =>
-              setAiProviderSetting(provider, "apiKey", e.target.value)
-            }
-          />
-
-          <Input
-            label={
-              provider === "doubao"
-                ? t("tools.settings.ai_doubao_model_desc")
-                : t("tools.settings.ai_model")
-            }
-            type="text"
-            placeholder={
-              provider === "deepseek"
-                ? "deepseek-chat"
-                : provider === "doubao"
-                ? "ep-2024..."
-                : provider === "openai"
-                ? "gpt-4o"
-                : "deepseek-ai/DeepSeek-V3"
-            }
-            value={config.model}
-            onChange={(e) =>
-              setAiProviderSetting(provider, "model", e.target.value)
-            }
-          />
-
-          {(provider === "openai" || provider === "siliconflow") && (
+          {/* 表单字段 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Input
+              label={t("tools.settings.ai_provider_name")}
+              value={provider.name}
+              placeholder={t("tools.settings.ai_provider_name_placeholder")}
+              onChange={(e) =>
+                updateAiProvider(provider.id, "name", e.target.value)
+              }
+            />
+            <Input
+              label={t("tools.settings.ai_model")}
+              value={provider.model}
+              placeholder={t("tools.settings.ai_model_placeholder")}
+              onChange={(e) =>
+                updateAiProvider(provider.id, "model", e.target.value)
+              }
+            />
             <Input
               label={t("tools.settings.ai_base_url")}
-              type="text"
-              placeholder={
-                provider === "openai"
-                  ? "https://api.openai.com/v1"
-                  : "https://api.siliconflow.cn/v1"
-              }
-              value={(config as { baseUrl?: string }).baseUrl || ""}
+              value={provider.baseUrl}
+              placeholder={t("tools.settings.ai_base_url_placeholder")}
               onChange={(e) =>
-                setAiProviderSetting(provider, "baseUrl", e.target.value)
+                updateAiProvider(provider.id, "baseUrl", e.target.value)
               }
             />
-          )}
+            <Input
+              label={t("tools.settings.ai_api_key")}
+              type="password"
+              value={provider.apiKey}
+              placeholder={t("tools.settings.ai_api_key_placeholder")}
+              onChange={(e) =>
+                updateAiProvider(provider.id, "apiKey", e.target.value)
+              }
+            />
+          </div>
         </div>
-      </div>
-    );
-  };
+      ))}
+
+      {/* 添加服务商 */}
+      <button
+        onClick={handleAddProvider}
+        className="w-full py-3 rounded-xl border border-dashed border-(--border-color) text-sm text-(--text-muted) hover:text-(--text-main) hover:border-blue-400 transition-colors flex items-center justify-center gap-2"
+      >
+        <PlusCircle size={16} />
+        {t("tools.settings.ai_add_provider")}
+      </button>
+    </div>
+  );
 
   const renderOcrSettings = () => (
     <div className="space-y-8">

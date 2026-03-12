@@ -539,9 +539,10 @@ const NginxEditor: React.FC = () => {
 
   const handlePerformAiRequest = async () => {
     const activeProvider = ai.activeProvider;
-    const providerConfig = ai.providers[activeProvider];
+    const aiProviders = Array.isArray(ai.providers) ? ai.providers : [];
+    const providerConfig = aiProviders.find((p) => p.id === activeProvider);
 
-    if (!providerConfig.apiKey) {
+    if (!providerConfig?.apiKey) {
       toast.error(t("tools.nginx_editor.ai_config_missing"));
       return;
     }
@@ -1461,20 +1462,11 @@ const NginxEditor: React.FC = () => {
               <Select
                 value={ai.activeProvider}
                 label={t("common.engine")}
-                onChange={(e) =>
-                  setAiActiveProvider(
-                    e.target.value as
-                      | "deepseek"
-                      | "doubao"
-                      | "openai"
-                      | "siliconflow"
-                  )
-                }
+                onChange={(e) => setAiActiveProvider(e.target.value)}
               >
-                <MenuItem value="deepseek">DeepSeek</MenuItem>
-                <MenuItem value="siliconflow">SiliconFlow</MenuItem>
-                <MenuItem value="openai">OpenAI</MenuItem>
-                <MenuItem value="doubao">豆包 (Doubao)</MenuItem>
+                {(Array.isArray(ai?.providers) ? ai.providers : []).map((p) => (
+                  <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Box>

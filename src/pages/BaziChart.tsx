@@ -668,20 +668,10 @@ export default function BaziChart() {
   );
 
   const availableProviders = useMemo(() => {
-    const providers = ai?.providers || {};
-    return Object.entries(providers)
-      .filter(([, config]) => (config as any)?.apiKey?.trim())
-      .map(([id]) => ({
-        id,
-        label:
-          id === "deepseek"
-            ? "DeepSeek"
-            : id === "doubao"
-              ? "豆包"
-              : id === "openai"
-                ? "OpenAI"
-                : "SiliconFlow",
-      }));
+    const providers = Array.isArray(ai?.providers) ? ai!.providers : [];
+    return providers
+      .filter((p) => p.apiKey?.trim())
+      .map((p) => ({ id: p.id, label: p.name }));
   }, [ai?.providers]);
 
   useEffect(() => {
@@ -797,6 +787,15 @@ export default function BaziChart() {
   }, [result, gender, year, month, day, hour, i18n.language]);
 
   const streamingRef = useRef("");
+  const abortRef = useRef(false);
+  const unlistenRef = useRef<(() => void) | null>(null);
+
+  const handleStop = useCallback(() => {
+    abortRef.current = true;
+    unlistenRef.current?.();
+    unlistenRef.current = null;
+    setChatLoading(false);
+  }, []);
 
   const callAiStream = useCallback(
     async (
@@ -804,34 +803,41 @@ export default function BaziChart() {
       userPrompt: string,
       onUpdate: (text: string) => void,
     ): Promise<string | null> => {
-      const config =
-        ai?.providers?.[selectedProvider as keyof typeof ai.providers];
+      const providers = Array.isArray(ai?.providers) ? ai!.providers : [];
+      const config = providers.find((p) => p.id === selectedProvider);
       if (!config?.apiKey) {
         setChatError(t("tools.bazi_chart.ai_no_key"));
         return null;
       }
 
+      abortRef.current = false;
       streamingRef.current = "";
       const unlisten = await listen<string>("ai-stream-chunk", (event) => {
+        if (abortRef.current) return;
         streamingRef.current += event.payload;
         onUpdate(streamingRef.current);
       });
+      unlistenRef.current = unlisten;
 
       try {
         const res = await invokeWrapper<string>("ask_ai_stream", {
           provider: selectedProvider,
           apiKey: config.apiKey,
           model: config.model,
-          baseUrl: (config as any).baseUrl || null,
+          baseUrl: config.baseUrl || null,
           systemPrompt,
           userPrompt,
         });
-        unlisten();
+        unlistenRef.current?.();
+        unlistenRef.current = null;
+        if (abortRef.current) return null;
         if (res.ok) return res.data;
         setChatError(res.message);
         return null;
       } catch (e: any) {
-        unlisten();
+        unlistenRef.current?.();
+        unlistenRef.current = null;
+        if (abortRef.current) return null;
         setChatError(e.message || String(e));
         return null;
       }
@@ -1355,13 +1361,22 @@ export default function BaziChart() {
                       disabled={chatLoading}
                       className="flex-1 px-4 py-2 rounded-lg border border-(--border-color) bg-(--bg-main) text-(--text-main) text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50"
                     />
-                    <button
-                      onClick={() => handleAskQuestion(chatInput)}
-                      disabled={chatLoading || !chatInput.trim()}
-                      className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      {t("tools.bazi_chart.ai_send")}
-                    </button>
+                    {chatLoading ? (
+                      <button
+                        onClick={handleStop}
+                        className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-colors"
+                      >
+                        {t("tools.bazi_chart.ai_stop")}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleAskQuestion(chatInput)}
+                        disabled={!chatInput.trim()}
+                        className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {t("tools.bazi_chart.ai_send")}
+                      </button>
+                    )}
                   </div>
                   <div className="mt-2 text-center">
                     <span className="text-[10px] text-(--text-muted)">

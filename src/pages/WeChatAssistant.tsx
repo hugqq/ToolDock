@@ -40,30 +40,10 @@ export default function WeChatAssistant() {
   const { ai, setAiActiveProvider, wechatSystemPrompt, setWechatSystemPrompt } =
     useSettingsStore();
 
-  // 防御性检查 AI 配置
-  const safeAi = {
-    activeProvider: ai?.activeProvider || "deepseek",
-    providers: {
-      deepseek: ai?.providers?.deepseek || {
-        apiKey: "",
-        model: "deepseek-chat",
-      },
-      doubao: ai?.providers?.doubao || { apiKey: "", model: "" },
-      openai: ai?.providers?.openai || {
-        apiKey: "",
-        model: "gpt-4o",
-        baseUrl: "https://api.openai.com/v1",
-      },
-      siliconflow: ai?.providers?.siliconflow || {
-        apiKey: "",
-        model: "deepseek-ai/DeepSeek-V3",
-        baseUrl: "https://api.siliconflow.cn/v1",
-      },
-    },
-  };
-
-  // 当前选中的 provider 配置
-  const currentProvider = (safeAi.providers as any)[safeAi.activeProvider];
+  const aiProviders = Array.isArray(ai?.providers) ? ai!.providers : [];
+  const activeProviderId = ai?.activeProvider || aiProviders[0]?.id || "";
+  const currentProvider = aiProviders.find((p) => p.id === activeProviderId) ?? aiProviders[0];
+  const safeAi = { activeProvider: activeProviderId };
 
   const [windowInfo, setWindowInfo] = useState<WeChatWindowInfo | null>(null);
   const [capturedMessage, setCapturedMessage] = useState("");
@@ -299,15 +279,14 @@ export default function WeChatAssistant() {
             {/* AI Provider 下拉选择 */}
             <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel>{t("tools.wechat_assistant.ai_provider")}</InputLabel>
-              <Select
+                <Select
                 value={safeAi.activeProvider}
                 label={t("tools.wechat_assistant.ai_provider")}
-                onChange={(e) => setAiActiveProvider(e.target.value as any)}
+                onChange={(e) => setAiActiveProvider(e.target.value)}
               >
-                <MenuItem value="deepseek">DeepSeek</MenuItem>
-                <MenuItem value="doubao">豆包 (Doubao)</MenuItem>
-                <MenuItem value="openai">OpenAI</MenuItem>
-                <MenuItem value="siliconflow">SiliconFlow</MenuItem>
+                {aiProviders.map((p) => (
+                  <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>
+                ))}
               </Select>
             </FormControl>
 

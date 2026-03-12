@@ -113,45 +113,15 @@ const CronGenerator: React.FC = () => {
     "years",
   ];
 
-  // 获取当前激活的服务商配置
-  const safeAi = {
-    activeProvider: ai?.activeProvider || "deepseek",
-    providers: {
-      deepseek: ai?.providers?.deepseek || {
-        apiKey: "",
-        model: "deepseek-chat",
-      },
-      doubao: ai?.providers?.doubao || { apiKey: "", model: "" },
-      openai: ai?.providers?.openai || {
-        apiKey: "",
-        model: "gpt-4o",
-        baseUrl: "https://api.openai.com/v1",
-      },
-      siliconflow: ai?.providers?.siliconflow || {
-        apiKey: "",
-        model: "deepseek-ai/DeepSeek-V3",
-        baseUrl: "https://api.siliconflow.cn/v1",
-      },
-    },
-  };
+  const aiProviders = Array.isArray(ai?.providers) ? ai!.providers : [];
 
   // 过滤出已配置 API Key 的服务商
-  const availableProviders = Object.entries(safeAi.providers)
-    .filter(([_, config]) => config.apiKey.trim() !== "")
-    .map(([id]) => ({
-      key: id,
-      label:
-        id === "deepseek"
-          ? t("tools.settings.ai_deepseek_name")
-          : id === "doubao"
-          ? t("tools.settings.ai_doubao_name")
-          : id === "openai"
-          ? t("tools.settings.ai_openai_name")
-          : t("tools.settings.ai_siliconflow_name"),
-    }));
+  const availableProviders = aiProviders
+    .filter((p) => p.apiKey.trim() !== "")
+    .map((p) => ({ key: p.id, label: p.name }));
 
   const activeConfig =
-    (safeAi.providers as any)[selectedProvider] || safeAi.providers.deepseek;
+    aiProviders.find((p) => p.id === selectedProvider) ?? aiProviders[0];
 
   const fetchNextRuns = async (expr: string) => {
     try {

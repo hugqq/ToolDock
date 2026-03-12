@@ -348,10 +348,23 @@ const ColorPicker: React.FC = () => {
       }
 
       // 无论是否隐藏主窗口，都显示放大镜窗口
-      const magnifier = await WebviewWindow.getByLabel("magnifier");
-      if (magnifier) {
-        await magnifier.show();
+      let magnifier = await WebviewWindow.getByLabel("magnifier");
+      if (!magnifier) {
+        magnifier = new WebviewWindow("magnifier", {
+          url: "index.html#/magnifier",
+          title: "Magnifier",
+          maximized: true,
+          decorations: false,
+          transparent: true,
+          alwaysOnTop: true,
+          skipTaskbar: true,
+          visible: false,
+          resizable: false,
+          shadow: false,
+        });
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
+      await magnifier.show();
 
       // 调用 Rust 命令，该命令会等待用户点击
       // 增加前端超时保护 (65秒，略长于后端的60秒)
@@ -370,9 +383,9 @@ const ColorPicker: React.FC = () => {
       setStatusText(typeof e === "string" ? e : e.message || "Pick failed");
     } finally {
       // 隐藏放大镜
-      const magnifier = await WebviewWindow.getByLabel("magnifier");
-      if (magnifier) {
-        await magnifier.hide();
+      const magnifierToHide = await WebviewWindow.getByLabel("magnifier");
+      if (magnifierToHide) {
+        await magnifierToHide.hide();
       }
 
       // 如果之前隐藏了主窗口，则恢复显示
