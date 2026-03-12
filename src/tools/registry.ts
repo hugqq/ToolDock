@@ -30,6 +30,8 @@
   BookOpen,
   Gamepad2,
   Notebook,
+  Star,
+  Compass,
 } from "lucide-react";
 import { CATEGORY } from "../constants";
 
@@ -314,6 +316,24 @@ export const TOOLS: Tool[] = [
     descriptionKey: "tools.othello.description",
     color: "#1b5e20",
     route: "/othello",
+  },
+  {
+    id: "bazi_chart",
+    nameKey: "tools.bazi_chart.name",
+    icon: Compass,
+    categoryKey: "categories.entertainment",
+    descriptionKey: "tools.bazi_chart.description",
+    color: "#8b5cf6",
+    route: "/tools/bazi-chart",
+  },
+  {
+    id: "zodiac",
+    nameKey: "tools.zodiac.name",
+    icon: Star,
+    categoryKey: "categories.entertainment",
+    descriptionKey: "tools.zodiac.description",
+    color: "#6366f1",
+    route: "/tools/zodiac",
   },
   {
     id: "settings",

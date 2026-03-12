@@ -709,29 +709,8 @@ const Settings: React.FC = () => {
         </div>
       </div>
 
-      {/* Provider 标签页 */}
+      {/* Provider 配置内容 */}
       <div className="border border-(--border-color) rounded-xl overflow-hidden">
-        {/* 标签头 */}
-        <div className="flex border-b border-(--border-color) bg-(--bg-main)/50">
-          {AI_PROVIDERS.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => setActiveAiTab(p.id)}
-              className={`flex-1 px-4 py-3 text-sm font-medium relative transition-all duration-300 ${
-                activeAiTab === p.id
-                  ? "text-blue-600 bg-(--card-bg)"
-                  : "text-(--text-muted) hover:text-(--text-main) hover:bg-(--bg-main)/30"
-              }`}
-            >
-              {p.name}
-              {activeAiTab === p.id && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 transition-all duration-300" />
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* 标签内容 */}
         <div 
           key={activeAiTab}
           className="p-6 animate-fadeIn"

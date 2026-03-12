@@ -16,7 +16,7 @@ pub struct AppState {
     pub port_scanner_tasks: Mutex<HashMap<String, Arc<AtomicBool>>>,
 }
 
-use commands::ai::{ask_ai, ask_nginx_ai};
+use commands::ai::{ask_ai, ask_ai_stream, ask_nginx_ai};
 use commands::clicker::{
     is_keyboard_clicker_running, is_mouse_clicker_running, send_text_input, start_keyboard_clicker,
     start_mouse_clicker, stop_keyboard_clicker, stop_mouse_clicker,
@@ -121,7 +121,7 @@ pub fn run() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_autostart::init(
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            Some(vec![]),
+            Some(vec!["--autostart"]),
         ))
         .setup(|app| {
             let manager = Arc::new(ClipboardManager::new(app.handle()));
@@ -181,6 +181,13 @@ pub fn run() {
                 })
                 .icon(app.default_window_icon().unwrap().clone())
                 .build(app)?;
+
+            // 如果是通过自启动启动的，隐藏主窗口（静默启动）
+            if std::env::args().any(|arg| arg == "--autostart") {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.hide();
+                }
+            }
 
             Ok(())
         })
@@ -269,6 +276,7 @@ pub fn run() {
             get_cron_next_runs,
             generate_cron_with_ai,
             ask_ai,
+            ask_ai_stream,
             ask_nginx_ai,
             run_ocr,
             run_ocr_detailed,
