@@ -60,10 +60,10 @@ impl HotkeyManager {
 
         for part in &parts[..parts.len() - 1] {
             match *part {
-                "Ctrl" => modifiers |= 0x0002,         // MOD_CONTROL
-                "Shift" => modifiers |= 0x0004,        // MOD_SHIFT
-                "Alt" => modifiers |= 0x0001,          // MOD_ALT
-                "Meta" | "Win" => modifiers |= 0x0008, // MOD_WIN
+                "Ctrl" => modifiers |= MOD_CONTROL as u32,
+                "Shift" => modifiers |= MOD_SHIFT as u32,
+                "Alt" => modifiers |= MOD_ALT as u32,
+                "Meta" | "Win" => modifiers |= MOD_WIN as u32,
                 _ => {}
             }
         }

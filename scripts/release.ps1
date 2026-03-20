@@ -54,12 +54,22 @@ git add $packageJson $cargoToml $tauriConf
 git commit -m "chore: bump version to $Version"
 
 # Step 5: Create and push tag
-Write-Host "`n🏷️  Creating tag v$Version..." -ForegroundColor Green
-git tag "v$Version"
+$tagName = "v$Version"
+Write-Host "`n🏷️  Creating tag $tagName..." -ForegroundColor Green
+
+# Check if tag already exists
+$existingTag = git tag -l $tagName
+if ($existingTag) {
+    Write-Host "⚠️  Tag $tagName already exists, replacing..." -ForegroundColor Yellow
+    git tag -d $tagName
+    git push origin ":refs/tags/$tagName" 2>$null
+}
+
+git tag $tagName
 
 Write-Host "`n📤 Pushing to remote..." -ForegroundColor Green
 git push
-git push origin "v$Version"
+git push origin $tagName
 
 Write-Host "`n✨ Release v$Version created successfully!" -ForegroundColor Cyan
 Write-Host "GitHub Actions will now build and publish the release." -ForegroundColor Gray
