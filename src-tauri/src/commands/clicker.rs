@@ -1,4 +1,4 @@
-﻿use crate::core::clicker::{simulate_text_input, ClickType, ClickerManager, MouseButton};
+use crate::core::clicker::{simulate_text_input, ClickType, ClickerManager, MouseButton};
 use crate::models::ApiResponse;
 use tauri::State;
 
@@ -64,4 +64,22 @@ pub async fn send_text_input(text: String, delay_ms: u64) -> Result<ApiResponse<
         .map_err(|e| e.to_string())?;
 
     Ok(ApiResponse::ok(()))
+}
+
+/// 设置 F8/F9 快捷键启用状态
+#[tauri::command]
+pub async fn set_clicker_hotkey_enabled(
+    manager: State<'_, ClickerManager>,
+    enabled: bool,
+) -> Result<ApiResponse<()>, String> {
+    manager.set_hotkey_enabled(enabled);
+    Ok(ApiResponse::ok(()))
+}
+
+/// 获取 F8/F9 快捷键当前启用状态
+#[tauri::command]
+pub async fn get_clicker_hotkey_enabled(
+    manager: State<'_, ClickerManager>,
+) -> Result<ApiResponse<bool>, String> {
+    Ok(ApiResponse::ok(manager.is_hotkey_enabled()))
 }

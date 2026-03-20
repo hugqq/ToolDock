@@ -56,6 +56,7 @@ const Game2048 = lazy(() => import("./pages/Game2048"));
 const NotePad = lazy(() => import("./pages/NotePad"));
 const BaziChart = lazy(() => import("./pages/BaziChart"));
 const ZodiacHoroscope = lazy(() => import("./pages/ZodiacHoroscope"));
+const PdfToImage = lazy(() => import("./pages/PdfToImage"));
 
 // Loading fallback component
 function PageLoader() {
@@ -186,6 +187,7 @@ function AppContent() {
               <Route path="/tools/notepad" element={<NotePad />} />
               <Route path="/tools/bazi-chart" element={<BaziChart />} />
               <Route path="/tools/zodiac" element={<ZodiacHoroscope />} />
+              <Route path="/tools/pdf-to-image" element={<PdfToImage />} />
               <Route path="/othello" element={<Othello />} />
               <Route path="/settings" element={<Settings />} />
             </Routes>

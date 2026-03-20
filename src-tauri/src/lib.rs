@@ -18,8 +18,9 @@ pub struct AppState {
 
 use commands::ai::{ask_ai, ask_ai_stream, ask_nginx_ai};
 use commands::clicker::{
-    is_keyboard_clicker_running, is_mouse_clicker_running, send_text_input, start_keyboard_clicker,
-    start_mouse_clicker, stop_keyboard_clicker, stop_mouse_clicker,
+    get_clicker_hotkey_enabled, is_keyboard_clicker_running, is_mouse_clicker_running,
+    send_text_input, set_clicker_hotkey_enabled, start_keyboard_clicker, start_mouse_clicker,
+    stop_keyboard_clicker, stop_mouse_clicker,
 };
 use commands::clipboard::{
     clear_clipboard_history, copy_clipboard_item, delete_clipboard_item, get_clipboard_history,
@@ -306,6 +307,8 @@ pub fn run() {
             stop_keyboard_clicker,
             is_keyboard_clicker_running,
             send_text_input,
+            set_clicker_hotkey_enabled,
+            get_clicker_hotkey_enabled,
             wait_for_wechat_window,
             capture_wechat_message,
             fill_wechat_reply,

@@ -19,6 +19,8 @@ import {
   Card,
   CardContent,
   CardActions,
+  Switch,
+  Chip,
 } from "@mui/material";
 import {
   PlayArrow,
@@ -31,6 +33,7 @@ import {
   Delete,
   ContentCopy,
   Send,
+  Bolt as BoltIcon,
 } from "@mui/icons-material";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -100,6 +103,11 @@ const Clicker: React.FC = () => {
   const [macroName, setMacroName] = useState("");
   const [macroContent, setMacroContent] = useState("");
 
+  // F8/F9 热键开关，默认关闭，持久化到 localStorage
+  const [hotkeyEnabled, setHotkeyEnabled] = useState<boolean>(() => {
+    return localStorage.getItem("clicker_hotkey_enabled") === "true";
+  });
+
   // Load macros from localStorage
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -110,12 +118,26 @@ const Clicker: React.FC = () => {
         console.error("Failed to load macros:", err);
       }
     }
+    // 初始化时将热键状态同步到后端
+    const enabled = localStorage.getItem("clicker_hotkey_enabled") === "true";
+    invoke("set_clicker_hotkey_enabled", { enabled }).catch(console.error);
   }, []);
 
   // Save macros to localStorage
   const saveMacros = (newMacros: Macro[]) => {
     setMacros(newMacros);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newMacros));
+  };
+
+  // 切换 F8/F9 热键开关
+  const handleHotkeyToggle = async (enabled: boolean) => {
+    setHotkeyEnabled(enabled);
+    localStorage.setItem("clicker_hotkey_enabled", String(enabled));
+    try {
+      await invoke("set_clicker_hotkey_enabled", { enabled });
+    } catch (err) {
+      console.error("Failed to set hotkey enabled:", err);
+    }
   };
 
   useEffect(() => {
@@ -325,6 +347,51 @@ const Clicker: React.FC = () => {
               },
             ]}
           />
+          {/* F8/F9 热键全局开关 */}
+          <Paper
+            sx={{
+              borderRadius: 1,
+              overflow: "hidden",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              px: 3,
+              py: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 2,
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <BoltIcon color={hotkeyEnabled ? "warning" : "disabled"} />
+              <Box>
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {t("tools.clicker.mouse_hotkey_tip").replace(/快捷键：|Shortcut: /, "").replace("按 F8 开始/停止", "").replace("Press F8 to Start/Stop", "")}
+                  {t("tools.clicker.hotkey_switch_label", "F8 / F9 快捷键")}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {hotkeyEnabled
+                    ? t("tools.clicker.hotkey_switch_on", "已启用 · F8 控制鼠标，F9 控制键盘")
+                    : t("tools.clicker.hotkey_switch_off", "已关闭 · 启用后可用 F8/F9 全局快捷控制连点")}
+                </Typography>
+              </Box>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              {hotkeyEnabled && (
+                <Chip
+                  label="F8 · F9"
+                  size="small"
+                  color="warning"
+                  variant="outlined"
+                />
+              )}
+              <Switch
+                checked={hotkeyEnabled}
+                onChange={(e) => handleHotkeyToggle(e.target.checked)}
+                color="warning"
+              />
+            </Box>
+          </Paper>
+
           <Paper
             sx={{
               borderRadius: 1,
@@ -445,9 +512,10 @@ const Clicker: React.FC = () => {
 
                   <Typography
                     variant="caption"
-                    sx={{ color: "text.secondary", textAlign: "center" }}
+                    sx={{ color: "text.secondary", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}
                   >
-                    💡 {t("tools.clicker.mouse_hotkey_tip")}
+                    <BoltIcon sx={{ fontSize: "0.9rem" }} />
+                    {t("tools.clicker.mouse_hotkey_tip")}
                   </Typography>
                 </Stack>
               )}
@@ -514,9 +582,10 @@ const Clicker: React.FC = () => {
 
                   <Typography
                     variant="caption"
-                    sx={{ color: "text.secondary", textAlign: "center" }}
+                    sx={{ color: "text.secondary", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}
                   >
-                    💡 {t("tools.clicker.keyboard_hotkey_tip")}
+                    <BoltIcon sx={{ fontSize: "0.9rem" }} />
+                    {t("tools.clicker.keyboard_hotkey_tip")}
                   </Typography>
                 </Stack>
               )}

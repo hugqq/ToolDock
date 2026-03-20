@@ -1287,7 +1287,10 @@
       "macro_deleted": "Macro deleted",
       "no_macros": "No macros configured, click below to add",
       "delay_between_keys": "Key Delay (ms)",
-      "delay_helper": "Delay between each character when typing text"
+      "delay_helper": "Delay between each character when typing text",
+      "hotkey_switch_label": "F8 / F9 Hotkeys",
+      "hotkey_switch_on": "Enabled · F8 controls mouse, F9 controls keyboard",
+      "hotkey_switch_off": "Disabled · Enable to use F8/F9 as global shortcuts for clicker"
     },
     "wechat_assistant": {
       "name": "WeChat AI Assistant",
@@ -1443,7 +1446,7 @@
       }
     },
     "pip_player": {
-      "name": "PIP Player",
+      "name": "Bilibili Slacking Player",
       "description": "Play Bilibili videos",
       "video_url": "Video URL",
       "video_url_placeholder": "Paste Bilibili video link (BV/av/short link supported)",
@@ -1627,7 +1630,11 @@
     },
     "bazi_chart": {
       "name": "Bazi Chart",
-    "description": "Enter birth date and time to generate Four Pillars, Five Elements analysis",
+    "description": "Four Pillars of Destiny calculator with elemental analysis",
+    "calendar_type": "Calendar",
+    "solar": "Solar",
+    "lunar": "Lunar",
+    "leap_month": "Leap",
     "year": "Year",
     "month": "Month",
     "day": "Day",
@@ -1669,7 +1676,10 @@
       "ai_topic_health": "Health",
       "ai_topic_year": "This Year",
       "ai_topic_lucky": "Lucky Tips",
-      "ai_disclaimer": "Based on traditional Chinese astrology, for entertainment only"
+      "ai_disclaimer": "Based on traditional Chinese astrology, for entertainment only",
+      "copy_msg": "Copy",
+      "copy_success": "Copied to clipboard",
+      "export_image": "Export Image"
     },
     "zodiac": {
       "name": "Horoscope",
@@ -1814,8 +1824,53 @@
       "pisces_3": "Music and movies will bring emotional comfort.",
       "pisces_4": "Trust your dreams — they may be guiding you.",
       "pisces_5": "Helping those in need will bring inner fulfillment."
+    },
+    "ai_analysis": "AI Horoscope Reading",
+    "ai_start": "Start Today's Analysis",
+    "ai_analyzing": "The oracle is reading the stars...",
+    "ai_hint": "AI will provide a detailed horoscope reading based on your sign (requires AI API key in Settings)",
+    "ai_no_key": "Please configure an AI provider API Key in Settings first",
+    "ai_chat_placeholder": "Ask a question about your horoscope...",
+    "ai_send": "Send",
+    "ai_stop": "Stop",
+    "ai_clear_chat": "Clear Chat",
+    "ai_quick_topics": "Quick Topics",
+    "ai_disclaimer": "Based on Western astrology, for entertainment purposes only",
+    "ai_topic_today": "Today's Overview",
+    "ai_topic_love": "Love & Romance",
+    "ai_topic_career": "Career & Finance",
+    "ai_topic_week": "This Week",
+    "ai_topic_match": "Sign Compatibility",
+    "ai_topic_advice": "Lucky Tips"
     }
-    }
+  },
+  "pdf_to_image": {
+    "name": "PDF to Image",
+    "description": "Convert each page of a PDF document to high-quality images, supports batch export",
+    "drop_hint": "Drag & drop a PDF file here, or click to select",
+    "select_file": "Select PDF File",
+    "replace_file": "Change File",
+    "page_count": "{{count}} pages total",
+    "format": "Output Format",
+    "scale": "Render Resolution (scale factor)",
+    "scale_hint": "1x = 72 DPI, 2x = 144 DPI (recommended), 3x = 216 DPI",
+    "converting": "Converting...",
+    "convert_all": "Convert All Pages",
+    "download_all": "Download All (ZIP)",
+    "download_single": "Download",
+    "preview_page": "Page {{page}}",
+    "loading_pdf": "Loading PDF...",
+    "error_load": "Failed to load PDF, please check the file",
+    "error_render": "Page render failed",
+    "processing": "Processing page {{current}} / {{total}}...",
+    "done": "Done! {{count}} pages converted",
+    "quality": "Image Quality",
+    "step1": "Select PDF File",
+    "step1_desc": "Drag in or click to select a local PDF file",
+    "step2": "Adjust Settings",
+    "step2_desc": "Choose output format and resolution",
+    "step3": "Convert & Download",
+    "step3_desc": "Click convert, then download individually or as a ZIP"
   },
   "about": {
     "title": "About ToolDock",

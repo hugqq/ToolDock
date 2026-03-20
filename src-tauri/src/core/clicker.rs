@@ -1,4 +1,4 @@
-﻿use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -27,6 +27,8 @@ pub enum ClickType {
 pub struct ClickerManager {
     mouse_running: Arc<AtomicBool>,
     keyboard_running: Arc<AtomicBool>,
+    /// F8/F9 全局热键是否启用，默认 false（关闭），避免干扰日常使用
+    hotkey_enabled: Arc<AtomicBool>,
     mouse_settings: Arc<Mutex<Option<(u64, MouseButton, ClickType)>>>,
     keyboard_settings: Arc<Mutex<Option<(u64, u16)>>>,
     app_handle: AppHandle,
@@ -37,6 +39,8 @@ impl ClickerManager {
         let manager = Self {
             mouse_running: Arc::new(AtomicBool::new(false)),
             keyboard_running: Arc::new(AtomicBool::new(false)),
+            // 默认关闭热键，必须用户手动在前端开启
+            hotkey_enabled: Arc::new(AtomicBool::new(false)),
             mouse_settings: Arc::new(Mutex::new(Some((
                 100,
                 MouseButton::Left,
@@ -49,19 +53,40 @@ impl ClickerManager {
         manager
     }
 
+    /// 设置热键启用状态
+    pub fn set_hotkey_enabled(&self, enabled: bool) {
+        self.hotkey_enabled.store(enabled, Ordering::SeqCst);
+        tracing::info!("Clicker hotkeys (F8/F9) {}", if enabled { "enabled" } else { "disabled" });
+    }
+
+    /// 获取热键启用状态
+    pub fn is_hotkey_enabled(&self) -> bool {
+        self.hotkey_enabled.load(Ordering::SeqCst)
+    }
+
     fn start_hotkey_listener(&self) {
         let mouse_running = self.mouse_running.clone();
         let mouse_settings = self.mouse_settings.clone();
         let keyboard_running = self.keyboard_running.clone();
         let keyboard_settings = self.keyboard_settings.clone();
+        let hotkey_enabled = self.hotkey_enabled.clone();
         let app_handle = self.app_handle.clone();
 
         std::thread::spawn(move || {
             let mut f8_pressed = false;
             let mut f9_pressed = false;
             loop {
+                // 热键未启用时跳过所有处理，避免干扰系统
+                if !hotkey_enabled.load(Ordering::SeqCst) {
+                    // 重置按键状态，防止启用时触发积压事件
+                    f8_pressed = false;
+                    f9_pressed = false;
+                    std::thread::sleep(Duration::from_millis(100));
+                    continue;
+                }
+
                 unsafe {
-                    // F8 for Mouse
+                    // F8 切换鼠标连点
                     let state_f8 = GetAsyncKeyState(0x77); // VK_F8
                     let is_down_f8 = (state_f8 as u16 & 0x8000) != 0;
 
@@ -104,7 +129,7 @@ impl ClickerManager {
                         f8_pressed = false;
                     }
 
-                    // F9 for Keyboard
+                    // F9 切换键盘连点
                     let state_f9 = GetAsyncKeyState(0x78); // VK_F9
                     let is_down_f9 = (state_f9 as u16 & 0x8000) != 0;
 

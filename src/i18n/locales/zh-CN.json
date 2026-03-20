@@ -1295,7 +1295,10 @@
       "macro_deleted": "宏已删除",
       "no_macros": "暂无宏配置，点击下方按钮添加",
       "delay_between_keys": "按键间隔 (ms)",
-      "delay_helper": "输入文本时每个字符之间的延迟"
+      "delay_helper": "输入文本时每个字符之间的延迟",
+      "hotkey_switch_label": "F8 / F9 快捷键",
+      "hotkey_switch_on": "已启用 · F8 控制鼠标，F9 控制键盘",
+      "hotkey_switch_off": "已关闭 · 启用后可用 F8/F9 全局快捷控制连点"
     },
     "wechat_assistant": {
       "name": "微信 AI 助手",
@@ -1451,7 +1454,7 @@
       }
     },
     "pip_player": {
-      "name": "画中画播放器",
+      "name": "B站摸鱼播放器",
       "description": "播放B站视频，支持画中画模式",
       "video_url": "视频地址",
       "video_url_placeholder": "粘贴 B 站视频链接（支持 BV/av 号、短链接）",
@@ -1635,6 +1638,10 @@
     "bazi_chart": {
       "name": "八字排盘",
     "description": "输入出生日期时辰，排出四柱八字、五行分析、喜用神",
+    "calendar_type": "历法",
+    "solar": "公历",
+    "lunar": "农历",
+    "leap_month": "闰月",
     "year": "年份",
     "month": "月份",
     "day": "日期",
@@ -1676,7 +1683,10 @@
       "ai_topic_health": "健康建议",
       "ai_topic_year": "今年运势",
       "ai_topic_lucky": "开运建议",
-      "ai_disclaimer": "以上分析基于传统命理学，仅供参考娱乐"
+      "ai_disclaimer": "以上分析基于传统命理学，仅供参考娱乐",
+      "copy_msg": "复制",
+      "copy_success": "已复制到剪贴板",
+      "export_image": "导出图片"
     },
     "zodiac": {
       "name": "星座运势",
@@ -1821,8 +1831,53 @@
       "pisces_3": "音乐和电影会给你情感上的慰藉。",
       "pisces_4": "相信你的梦境，它可能在给你指引。",
       "pisces_5": "帮助弱者会给你带来内心的满足。"
+    },
+    "ai_analysis": "AI 星座解读",
+    "ai_start": "开始分析今日运势",
+    "ai_analyzing": "大师正在占卜中...",
+    "ai_hint": "AI 将根据您的星座信息进行详细的今日运势解读（需在设置中配置 AI 服务商密钥）",
+    "ai_no_key": "请先在设置中配置 AI 服务商的 API Key",
+    "ai_chat_placeholder": "输入您想了解的星座问题...",
+    "ai_send": "发送",
+    "ai_stop": "停止生成",
+    "ai_clear_chat": "清空对话",
+    "ai_quick_topics": "快速提问",
+    "ai_disclaimer": "以上分析基于西方占星学，仅供参考娱乐",
+    "ai_topic_today": "今日总运",
+    "ai_topic_love": "爱情运势",
+    "ai_topic_career": "事业财运",
+    "ai_topic_week": "本周运势",
+    "ai_topic_match": "星座配对",
+    "ai_topic_advice": "开运建议"
     }
-    }
+  },
+  "pdf_to_image": {
+    "name": "PDF 转图片",
+    "description": "将 PDF 文档的每一页转换为高清图片，支持批量导出",
+    "drop_hint": "拖拽 PDF 文件到这里，或点击选择",
+    "select_file": "选择 PDF 文件",
+    "replace_file": "重新选择",
+    "page_count": "共 {{count}} 页",
+    "format": "输出格式",
+    "scale": "渲染分辨率 (缩放倍数)",
+    "scale_hint": "1x = 72 DPI，2x = 144 DPI（推荐），3x = 216 DPI",
+    "converting": "转换中...",
+    "convert_all": "转换全部页面",
+    "download_all": "打包下载 (ZIP)",
+    "download_single": "下载",
+    "preview_page": "第 {{page}} 页",
+    "loading_pdf": "正在加载 PDF...",
+    "error_load": "PDF 加载失败，请检查文件是否损坏",
+    "error_render": "页面渲染失败",
+    "processing": "正在处理第 {{current}} / {{total}} 页...",
+    "done": "转换完成！共 {{count}} 页",
+    "quality": "图片质量",
+    "step1": "选择 PDF 文件",
+    "step1_desc": "拖入或点击选择本地 PDF 文件",
+    "step2": "调整参数",
+    "step2_desc": "选择输出格式和分辨率",
+    "step3": "转换下载",
+    "step3_desc": "点击转换，预览后可单张下载或 ZIP 打包下载"
   },
   "about": {
     "title": "关于 ToolDock",

@@ -1,4 +1,4 @@
-﻿import {
+import {
   Activity,
   Globe,
   Zap,
@@ -32,6 +32,7 @@
   Notebook,
   Star,
   Compass,
+  FileImage,
 } from "lucide-react";
 import { CATEGORY } from "../constants";
 
@@ -190,6 +191,15 @@ export const TOOLS: Tool[] = [
     descriptionKey: "tools.image_converter.description",
     color: "#ff7043",
     route: "/tools/image-converter",
+  },
+  {
+    id: "pdf_to_image",
+    nameKey: "pdf_to_image.name",
+    icon: FileImage,
+    categoryKey: "categories.files",
+    descriptionKey: "pdf_to_image.description",
+    color: "#e53935",
+    route: "/tools/pdf-to-image",
   },
   {
     id: "clipboard_manager",

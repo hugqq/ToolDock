@@ -5,6 +5,14 @@ import { useSettingsStore } from "../stores/useSettingsStore";
 import { invokeWrapper } from "../api";
 import { listen } from "@tauri-apps/api/event";
 import ReactMarkdown from "react-markdown";
+import { Solar, Lunar } from "lunar-typescript";
+import { toPng } from "html-to-image";
+import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import FavoriteOutlineIcon from "@mui/icons-material/FavoriteBorder";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
+import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafetyOutlined";
+import CalendarTodayIcon from "@mui/icons-material/CalendarTodayOutlined";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
 // ========== 天干地支数据 ==========
 const TIAN_GAN = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
@@ -340,7 +348,7 @@ const JIEQI_SOLAR = [
 
 function getMonthPillar(year: number, month: number, day: number) {
   // 确定月支（基于节气）
-  let monthZhiIdx: number;
+  let monthZhiIdx = 0;
   // 按节气判断属于哪个月
   if (month === 1 && day < JIEQI_SOLAR[11].day) {
     // 小寒前，属于上一年丑月之前的子月
@@ -426,9 +434,7 @@ function getHourPillar(dayGan: string, hour: number) {
 function getNaYin(gan: string, zhi: string): string {
   const ganIdx = TIAN_GAN.indexOf(gan);
   const zhiIdx = DI_ZHI.indexOf(zhi);
-  const jiaziIdx = ((ganIdx % 10) + ((zhiIdx - ganIdx + 120) % 12) * 5) % 60;
-  // 简化计算纳音索引
-  const idx60 = ((ganIdx % 10) * 12 + zhiIdx) % 60;
+  
   // 映射到六十甲子顺序
   for (let i = 0; i < 60; i++) {
     const g = i % 10;
@@ -466,27 +472,35 @@ interface ChatMessage {
   content: string;
 }
 
-const BAZI_TOPICS = [
+const BAZI_TOPICS: { labelKey: string; icon: React.ElementType; prompt: string }[] = [
   {
     labelKey: "ai_topic_career",
-    icon: "💼",
+    icon: WorkOutlineIcon,
     prompt: "详细分析我的事业运势和适合的职业方向",
   },
   {
     labelKey: "ai_topic_love",
-    icon: "💕",
+    icon: FavoriteOutlineIcon,
     prompt: "分析我的感情婚姻运势，包括桃花运和姻缘",
   },
-  { labelKey: "ai_topic_wealth", icon: "💰", prompt: "分析我的财运和理财建议" },
+  {
+    labelKey: "ai_topic_wealth",
+    icon: AccountBalanceWalletIcon,
+    prompt: "分析我的财运和理财建议",
+  },
   {
     labelKey: "ai_topic_health",
-    icon: "🏥",
+    icon: HealthAndSafetyIcon,
     prompt: "分析我需要注意的健康问题和养生建议",
   },
-  { labelKey: "ai_topic_year", icon: "📅", prompt: "分析我今年的整体运势走向" },
+  {
+    labelKey: "ai_topic_year",
+    icon: CalendarTodayIcon,
+    prompt: "分析我今年的整体运势走向",
+  },
   {
     labelKey: "ai_topic_lucky",
-    icon: "🍀",
+    icon: AutoAwesomeIcon,
     prompt: "给我开运建议，包括幸运颜色、方位、数字和注意事项",
   },
 ];
@@ -494,11 +508,9 @@ const BAZI_TOPICS = [
 // ========== 组件 ==========
 function FourPillarsTable({
   pillars,
-  dayGan,
   titles,
 }: {
   pillars: PillarData[];
-  dayGan: string;
   titles: string[];
 }) {
   const rows = [
@@ -620,6 +632,8 @@ function loadBirthCache() {
     const raw = localStorage.getItem(BAZI_CACHE_KEY);
     if (raw)
       return JSON.parse(raw) as {
+        calendarType: "solar" | "lunar";
+        isLeapMonth: boolean;
         year: number;
         month: number;
         day: number;
@@ -633,6 +647,8 @@ function loadBirthCache() {
 }
 
 function saveBirthCache(data: {
+  calendarType: "solar" | "lunar";
+  isLeapMonth: boolean;
   year: number;
   month: number;
   day: number;
@@ -646,6 +662,10 @@ export default function BaziChart() {
   const { t, i18n } = useTranslation();
   const cached = useMemo(() => loadBirthCache(), []);
   const now = new Date();
+  const [calendarType, setCalendarType] = useState<"solar" | "lunar">(
+    cached?.calendarType ?? "solar"
+  );
+  const [isLeapMonth, setIsLeapMonth] = useState(cached?.isLeapMonth ?? false);
   const [year, setYear] = useState(cached?.year ?? now.getFullYear());
   const [month, setMonth] = useState(cached?.month ?? now.getMonth() + 1);
   const [day, setDay] = useState(cached?.day ?? now.getDate());
@@ -655,13 +675,17 @@ export default function BaziChart() {
   );
 
   useEffect(() => {
-    saveBirthCache({ year, month, day, hour, gender });
-  }, [year, month, day, hour, gender]);
+    saveBirthCache({ calendarType, isLeapMonth, year, month, day, hour, gender });
+  }, [calendarType, isLeapMonth, year, month, day, hour, gender]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] = useState("");
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [exporting, setExporting] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  // 导出图片时截图的容器 ref
+  const exportRef = useRef<HTMLDivElement>(null);
   const ai = useSettingsStore((s) => s.ai);
   const [selectedProvider, setSelectedProvider] = useState<string>(
     ai?.activeProvider || "deepseek",
@@ -681,9 +705,27 @@ export default function BaziChart() {
   const result = useMemo(() => {
     if (year < 1900 || year > 2100) return null;
 
-    const yearP = getYearPillar(year);
-    const monthP = getMonthPillar(year, month, day);
-    const dayP = getDayPillar(year, month, day);
+    let solarDate: Solar;
+
+    try {
+      if (calendarType === "lunar") {
+        const lunar = Lunar.fromYmd(year, month, day);
+        solarDate = lunar.getSolar();
+      } else {
+        solarDate = Solar.fromYmd(year, month, day);
+      }
+    } catch (e) {
+      console.error("Date conversion error", e);
+      return null;
+    }
+
+    const sYear = solarDate.getYear();
+    const sMonth = solarDate.getMonth();
+    const sDay = solarDate.getDay();
+
+    const yearP = getYearPillar(sYear);
+    const monthP = getMonthPillar(sYear, sMonth, sDay);
+    const dayP = getDayPillar(sYear, sMonth, sDay);
     const hourP = getHourPillar(dayP.gan, hour);
 
     const dayGan = dayP.gan;
@@ -928,7 +970,34 @@ export default function BaziChart() {
       <div className="max-w-4xl mx-auto w-full space-y-6">
         {/* 输入区 */}
         <div className="rounded-xl p-5 border border-(--border-color) bg-(--card-bg)">
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
+                {t("tools.bazi_chart.calendar_type")}
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCalendarType("solar")}
+                  className={`flex-1 px-2 py-2 rounded-lg text-xs font-medium transition-colors border ${
+                    calendarType === "solar"
+                      ? "bg-blue-500 text-white border-blue-500"
+                      : "border-(--border-color) text-(--text-muted) hover:bg-(--bg-main)"
+                  }`}
+                >
+                  {t("tools.bazi_chart.solar")}
+                </button>
+                <button
+                  onClick={() => setCalendarType("lunar")}
+                  className={`flex-1 px-2 py-2 rounded-lg text-xs font-medium transition-colors border ${
+                    calendarType === "lunar"
+                      ? "bg-indigo-500 text-white border-indigo-500"
+                      : "border-(--border-color) text-(--text-muted) hover:bg-(--bg-main)"
+                  }`}
+                >
+                  {t("tools.bazi_chart.lunar")}
+                </button>
+              </div>
+            </div>
             <div>
               <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
                 {t("tools.bazi_chart.year")}
@@ -946,18 +1015,31 @@ export default function BaziChart() {
               <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
                 {t("tools.bazi_chart.month")}
               </label>
-              <select
-                value={month}
-                onChange={(e) => setMonth(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded-lg border border-(--border-color) bg-(--bg-main) text-(--text-main) text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-              >
-                {Array.from({ length: 12 }, (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1}
-                    {t("tools.bazi_chart.month_unit")}
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center gap-1">
+                {calendarType === "lunar" && (
+                  <label className="flex items-center gap-1 text-xs text-(--text-muted) cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={isLeapMonth}
+                      onChange={(e) => setIsLeapMonth(e.target.checked)}
+                      className="rounded border-(--border-color) text-indigo-500 focus:ring-indigo-500 bg-(--bg-main)"
+                    />
+                    {t("tools.bazi_chart.leap_month")}
+                  </label>
+                )}
+                <select
+                  value={month}
+                  onChange={(e) => setMonth(Number(e.target.value))}
+                  className="w-full px-3 py-2 rounded-lg border border-(--border-color) bg-(--bg-main) text-(--text-main) text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                >
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1}
+                      {t("tools.bazi_chart.month_unit")}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-(--text-muted) mb-1.5">
@@ -1065,7 +1147,6 @@ export default function BaziChart() {
               </h3>
               <FourPillarsTable
                 pillars={result.pillars}
-                dayGan={result.dayGan}
                 titles={[
                   t("tools.bazi_chart.year_pillar"),
                   t("tools.bazi_chart.month_pillar"),
@@ -1197,6 +1278,45 @@ export default function BaziChart() {
                       {t("tools.bazi_chart.ai_no_key")}
                     </span>
                   )}
+                  {/* 导出图片按钮：有 AI 消息时显示 */}
+                  {chatMessages.some((m) => m.role === "assistant" && m.content) && (
+                    <button
+                      onClick={async () => {
+                        if (!exportRef.current || exporting) return;
+                        setExporting(true);
+                        try {
+                          const dataUrl = await toPng(exportRef.current, {
+                            cacheBust: true,
+                            backgroundColor: "var(--card-bg, #1e1e2e)",
+                            pixelRatio: 2,
+                          });
+                          const a = document.createElement("a");
+                          a.href = dataUrl;
+                          a.download = `bazi-analysis-${Date.now()}.png`;
+                          a.click();
+                        } catch (err) {
+                          console.error("导出图片失败", err);
+                        } finally {
+                          setExporting(false);
+                        }
+                      }}
+                      disabled={exporting}
+                      title={t("tools.bazi_chart.export_image")}
+                      className="text-xs text-(--text-muted) hover:text-purple-500 transition-colors px-2 py-1 rounded hover:bg-(--bg-main) flex items-center gap-1 disabled:opacity-50"
+                    >
+                      {exporting ? (
+                        <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                      ) : (
+                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                      )}
+                      {t("tools.bazi_chart.export_image")}
+                    </button>
+                  )}
                   {chatMessages.length > 0 && (
                     <button
                       onClick={() => {
@@ -1212,7 +1332,8 @@ export default function BaziChart() {
                 </div>
               </div>
 
-              {/* Chat Area */}
+              {/* Chat Area - exportRef 包裹：截图时只截这部分 */}
+              <div ref={exportRef}>
               <div
                 className="p-5 space-y-4 max-h-[520px] overflow-y-auto"
                 style={{ scrollBehavior: "smooth" }}
@@ -1240,9 +1361,9 @@ export default function BaziChart() {
                             key={topic.labelKey}
                             onClick={() => handleAskQuestion(topic.prompt)}
                             disabled={chatLoading}
-                            className="px-3 py-1.5 rounded-full text-xs font-medium border border-(--border-color) text-(--text-muted) hover:bg-(--bg-main) hover:text-(--text-main) transition-colors"
+                            className="px-3 py-1.5 rounded-full text-xs font-medium border border-(--border-color) text-(--text-muted) hover:bg-(--bg-main) hover:text-(--text-main) transition-colors inline-flex items-center gap-1"
                           >
-                            {topic.icon}{" "}
+                            <topic.icon sx={{ fontSize: "0.85rem" }} />
                             {t(`tools.bazi_chart.${topic.labelKey}`)}
                           </button>
                         ))}
@@ -1259,8 +1380,9 @@ export default function BaziChart() {
                       key={i}
                       className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                     >
+                      {/* assistant 消息：relative 包裹，悬停显示复制按钮 */}
                       <div
-                        className={`max-w-[90%] ${
+                        className={`relative group max-w-[90%] ${
                           msg.role === "user"
                             ? "bg-blue-500/10 text-(--text-main) rounded-xl rounded-br-sm px-4 py-2.5 border border-blue-500/20"
                             : "bg-(--bg-main) rounded-xl rounded-bl-sm px-4 py-3 border border-(--border-color)"
@@ -1269,12 +1391,34 @@ export default function BaziChart() {
                         {msg.role === "user" ? (
                           <p className="text-sm">{msg.content}</p>
                         ) : (
-                          <div className="prose prose-sm max-w-none text-(--text-main) [&_h1]:text-lg [&_h1]:font-bold [&_h1]:mt-4 [&_h1]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h2]:mt-3 [&_h2]:mb-2 [&_h3]:text-sm [&_h3]:font-bold [&_h3]:mt-2 [&_h3]:mb-1 [&_p]:text-sm [&_p]:leading-relaxed [&_p]:mb-2 [&_ul]:text-sm [&_ul]:mb-2 [&_ol]:text-sm [&_ol]:mb-2 [&_li]:mb-1 [&_strong]:text-(--text-main)">
-                            <ReactMarkdown>{msg.content}</ReactMarkdown>
-                            {chatLoading && i === chatMessages.length - 1 && (
-                              <span className="inline-block w-1.5 h-4 bg-(--text-muted) animate-pulse rounded-sm ml-0.5 align-middle" />
+                          <>
+                            <div className="prose prose-sm max-w-none text-(--text-main) [&_h1]:text-lg [&_h1]:font-bold [&_h1]:mt-4 [&_h1]:mb-2 [&_h2]:text-base [&_h2]:font-bold [&_h2]:mt-3 [&_h2]:mb-2 [&_h3]:text-sm [&_h3]:font-bold [&_h3]:mt-2 [&_h3]:mb-1 [&_p]:text-sm [&_p]:leading-relaxed [&_p]:mb-2 [&_ul]:text-sm [&_ul]:mb-2 [&_ol]:text-sm [&_ol]:mb-2 [&_li]:mb-1 [&_strong]:text-(--text-main)">
+                              <ReactMarkdown>{msg.content}</ReactMarkdown>
+                              {chatLoading && i === chatMessages.length - 1 && (
+                                <span className="inline-block w-1.5 h-4 bg-(--text-muted) animate-pulse rounded-sm ml-0.5 align-middle" />
+                              )}
+                            </div>
+                            {/* 复制按钮：悬停时显示，位于右上角 */}
+                            {!chatLoading && msg.content && (
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await navigator.clipboard.writeText(msg.content);
+                                    setCopiedIndex(i);
+                                    setTimeout(() => setCopiedIndex(null), 2000);
+                                  } catch {
+                                    /* 降级：不处理 */
+                                  }
+                                }}
+                                title={t("tools.bazi_chart.copy_msg")}
+                                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-1.5 py-0.5 rounded text-[10px] bg-(--bg-main) border border-(--border-color) text-(--text-muted) hover:text-blue-500 hover:border-blue-500/40"
+                              >
+                                {copiedIndex === i
+                                  ? "✓ " + t("tools.bazi_chart.copy_success")
+                                  : t("tools.bazi_chart.copy_msg")}
+                              </button>
                             )}
-                          </div>
+                          </>
                         )}
                       </div>
                     </div>
@@ -1322,6 +1466,8 @@ export default function BaziChart() {
 
                 <div ref={chatEndRef} />
               </div>
+              {/* exportRef 的闭合标签 */}
+              </div>
 
               {/* Quick Topics (after first message) */}
               {chatMessages.length > 0 && (
@@ -1335,9 +1481,10 @@ export default function BaziChart() {
                         key={topic.labelKey}
                         onClick={() => handleAskQuestion(topic.prompt)}
                         disabled={chatLoading}
-                        className="px-2.5 py-1 rounded-full text-[11px] font-medium border border-(--border-color) text-(--text-muted) hover:bg-(--bg-main) hover:text-(--text-main) transition-colors disabled:opacity-50"
+                        className="px-2.5 py-1 rounded-full text-[11px] font-medium border border-(--border-color) text-(--text-muted) hover:bg-(--bg-main) hover:text-(--text-main) transition-colors disabled:opacity-50 inline-flex items-center gap-1"
                       >
-                        {topic.icon} {t(`tools.bazi_chart.${topic.labelKey}`)}
+                        <topic.icon sx={{ fontSize: "0.8rem" }} />
+                        {t(`tools.bazi_chart.${topic.labelKey}`)}
                       </button>
                     ))}
                   </div>
