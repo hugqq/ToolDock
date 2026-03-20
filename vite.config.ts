@@ -32,21 +32,25 @@ export default defineConfig(async () => ({
           // MUI data grid - heavy component
           "mui-datagrid": ["@mui/x-data-grid"],
           // CodeMirror editor - only for JSON/code editing tools
-          "codemirror": [
+          codemirror: [
             "@uiw/react-codemirror",
             "@uiw/codemirror-theme-vscode",
             "@codemirror/lang-json",
           ],
           // Charts - only for visualization tools
-          "charts": ["recharts"],
+          charts: ["recharts"],
           // Animation library
-          "animation": ["framer-motion"],
+          animation: ["framer-motion"],
           // i18n
-          "i18n": ["i18next", "react-i18next", "i18next-browser-languagedetector"],
+          i18n: [
+            "i18next",
+            "react-i18next",
+            "i18next-browser-languagedetector",
+          ],
           // QR code tools
-          "qrcode": ["qrcode", "jsqr"],
+          qrcode: ["qrcode", "jsqr"],
           // Markdown
-          "markdown": ["react-markdown"],
+          markdown: ["react-markdown"],
         },
       },
     },
@@ -56,14 +60,14 @@ export default defineConfig(async () => ({
   },
   // 2. use dynamic port, automatically find available port if occupied
   server: {
-    port: 1420,
+    port: 1543,
     strictPort: false,
     host: host || false,
     hmr: host
       ? {
           protocol: "ws",
           host,
-          port: 1421,
+          port: 1544,
         }
       : undefined,
     watch: {

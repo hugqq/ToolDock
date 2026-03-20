@@ -5,7 +5,7 @@
   "identifier": "tooldock",
   "build": {
     "beforeDevCommand": "pnpm dev",
-    "devUrl": "http://localhost:1420",
+    "devUrl": "http://localhost:1543",
     "beforeBuildCommand": "pnpm build",
     "frontendDist": "../dist"
   },
