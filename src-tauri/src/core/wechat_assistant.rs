@@ -10,7 +10,9 @@ use std::ffi::OsString;
 use std::os::windows::ffi::OsStringExt;
 #[cfg(target_os = "windows")]
 use std::ptr::null_mut;
+#[cfg(target_os = "windows")]
 use std::thread;
+#[cfg(target_os = "windows")]
 use std::time::Duration;
 #[cfg(target_os = "windows")]
 use winapi::shared::minwindef::{DWORD, MAX_PATH};
@@ -174,6 +176,7 @@ pub fn fill_wechat_input(text: &str) -> Result<(), AppError> {
 }
 
 /// 模拟按键组合
+#[cfg(target_os = "windows")]
 unsafe fn simulate_key_combination(keys: &[i32]) -> Result<(), AppError> {
     use winapi::um::winuser::{SendInput, INPUT, INPUT_KEYBOARD, KEYBDINPUT, KEYEVENTF_KEYUP};
 
@@ -221,6 +224,7 @@ unsafe fn simulate_key_combination(keys: &[i32]) -> Result<(), AppError> {
 }
 
 /// 获取剪贴板文本
+#[cfg(target_os = "windows")]
 unsafe fn get_clipboard_text() -> Result<String, AppError> {
     use winapi::um::winuser::{CloseClipboard, GetClipboardData, OpenClipboard, CF_UNICODETEXT};
 
@@ -256,6 +260,7 @@ unsafe fn get_clipboard_text() -> Result<String, AppError> {
 }
 
 /// 设置剪贴板文本
+#[cfg(target_os = "windows")]
 unsafe fn set_clipboard_text(text: &str) -> Result<(), AppError> {
     if OpenClipboard(null_mut()) == 0 {
         return Err(AppError::Internal("无法打开剪贴板".to_string()));
@@ -294,6 +299,7 @@ unsafe fn set_clipboard_text(text: &str) -> Result<(), AppError> {
 }
 
 /// 获取窗口的进程名
+#[cfg(target_os = "windows")]
 unsafe fn get_process_name(hwnd: HWND) -> Option<String> {
     let mut process_id: DWORD = 0;
     GetWindowThreadProcessId(hwnd, &mut process_id);
@@ -442,6 +448,7 @@ pub fn find_wechat_window() -> Result<WeChatWindow, AppError> {
 }
 
 /// 查找窗口的输入框控件（多种策略）
+#[cfg(target_os = "windows")]
 unsafe fn find_edit_control(parent_hwnd: HWND) -> Option<HWND> {
     use std::sync::{Arc, Mutex};
 

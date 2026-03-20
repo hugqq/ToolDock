@@ -363,7 +363,6 @@ pub async fn open_pip_window(
     .resizable(true)
     .always_on_top(config.always_on_top)
     .decorations(true)
-    .transparent(false)
     .build()
     .map_err(|e| format!("Failed to create PIP window: {}", e))?;
 
