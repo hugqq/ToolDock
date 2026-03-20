@@ -1,10 +1,11 @@
-﻿use crate::errors::{AppError, AppResult};
+use crate::errors::{AppError, AppResult};
 use crate::models::PortInfo;
 use bytes::Bytes;
 use futures_util::stream::FuturesUnordered;
 use futures_util::{stream, StreamExt};
 use rand::RngCore;
 use std::io::{BufRead, BufReader};
+#[cfg(target_os = "windows")]
 use std::os::windows::process::CommandExt;
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -12,6 +13,7 @@ use std::sync::Arc;
 use std::time::Instant;
 use sysinfo::{Pid, ProcessesToUpdate, System};
 
+#[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 /// 执行 Ping 命令并实时返回输出
@@ -19,15 +21,33 @@ pub fn run_ping<F>(target: &str, cancel_token: Arc<AtomicBool>, mut on_line: F) 
 where
     F: FnMut(String),
 {
-    // 使用 PowerShell 并强制设置输出编码为 UTF8，解决中文乱码和捕获问题
-    let script = format!(
-        "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; ping {} -t",
-        target
-    );
+    #[cfg(target_os = "windows")]
+    let mut child = {
+        let script = format!(
+            "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; ping {} -t",
+            target
+        );
+        Command::new("powershell")
+            .args([
+                "-NoProfile",
+                "-NonInteractive",
+                "-NoLogo",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-WindowStyle",
+                "Hidden",
+                "-Command",
+                &script,
+            ])
+            .creation_flags(CREATE_NO_WINDOW)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()?
+    };
 
-    let mut child = Command::new("powershell")
-        .args(["-NoProfile", "-NonInteractive", "-NoLogo", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-Command", &script])
-        .creation_flags(CREATE_NO_WINDOW)
+    #[cfg(not(target_os = "windows"))]
+    let mut child = Command::new("ping")
+        .arg(target)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()?;
@@ -62,15 +82,33 @@ pub fn run_tracert<F>(target: &str, cancel_token: Arc<AtomicBool>, mut on_line: 
 where
     F: FnMut(String),
 {
-    // 使用 PowerShell 并强制设置输出编码为 UTF8
-    let script = format!(
-        "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; tracert -d {}",
-        target
-    );
+    #[cfg(target_os = "windows")]
+    let mut child = {
+        let script = format!(
+            "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; tracert -d {}",
+            target
+        );
+        Command::new("powershell")
+            .args([
+                "-NoProfile",
+                "-NonInteractive",
+                "-NoLogo",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-WindowStyle",
+                "Hidden",
+                "-Command",
+                &script,
+            ])
+            .creation_flags(CREATE_NO_WINDOW)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()?
+    };
 
-    let mut child = Command::new("powershell")
-        .args(["-NoProfile", "-NonInteractive", "-NoLogo", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-Command", &script])
-        .creation_flags(CREATE_NO_WINDOW)
+    #[cfg(not(target_os = "windows"))]
+    let mut child = Command::new("traceroute")
+        .args(["-n", target])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()?;
@@ -106,13 +144,21 @@ pub fn get_listening_ports() -> AppResult<Vec<PortInfo>> {
     let process_info_map = get_all_processes_info();
 
     // 2. 获取所有网络连接信息
+    #[cfg(target_os = "windows")]
     let output = Command::new("netstat")
         .arg("-ano")
         .creation_flags(CREATE_NO_WINDOW)
         .output()?;
 
+    #[cfg(not(target_os = "windows"))]
+    let output = Command::new("lsof")
+        .args(["-i", "-P", "-n", "-sTCP:LISTEN"])
+        .output()?;
+
     if !output.status.success() {
-        return Err(AppError::Internal("Failed to run netstat".into()));
+        return Err(AppError::Internal(
+            "Failed to run network query command".into(),
+        ));
     }
 
     let stdout = String::from_utf8_lossy(&output.stdout);
@@ -123,6 +169,7 @@ pub fn get_listening_ports() -> AppResult<Vec<PortInfo>> {
         Vec<(String, String, String, String, String)>,
     > = std::collections::HashMap::new();
 
+    #[cfg(target_os = "windows")]
     for line in stdout.lines() {
         let parts: Vec<&str> = line.split_whitespace().collect();
         if parts.len() >= 4 && (parts[0] == "TCP" || parts[0] == "UDP") {
@@ -163,6 +210,36 @@ pub fn get_listening_ports() -> AppResult<Vec<PortInfo>> {
                     protocol,
                 ));
             }
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    for line in stdout.lines().skip(1) {
+        // lsof output: COMMAND PID USER FD TYPE DEVICE SIZE/OFF NODE NAME
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.len() >= 9 {
+            let pid = parts[1].to_string();
+            let protocol = if parts[4].contains('6') {
+                "TCP6"
+            } else {
+                "TCP"
+            }
+            .to_string();
+            let name_field = parts[8];
+            let local_addr = name_field.to_string();
+            let port = name_field.split(':').last().unwrap_or("").to_string();
+            let state = if parts.len() > 9 {
+                parts[9].trim_matches(|c| c == '(' || c == ')').to_string()
+            } else {
+                "LISTEN".to_string()
+            };
+            pid_to_conns.entry(pid).or_default().push((
+                port,
+                local_addr,
+                "".to_string(),
+                state,
+                protocol,
+            ));
         }
     }
 
@@ -262,58 +339,87 @@ pub fn kill_process(pid: &str) -> AppResult<()> {
         }
     }
 
-    // 2. 尝试使用 taskkill (备选)
-    let output = Command::new("taskkill")
-        .args(["/F", "/PID", pid])
-        .creation_flags(CREATE_NO_WINDOW)
-        .output();
+    // 2. 平台相关的进程终止命令 (备选)
+    #[cfg(target_os = "windows")]
+    {
+        let output = Command::new("taskkill")
+            .args(["/F", "/PID", pid])
+            .creation_flags(CREATE_NO_WINDOW)
+            .output();
 
-    match output {
-        Ok(out) if out.status.success() => return Ok(()),
-        Ok(out) if out.status.code() == Some(128) => return Ok(()), // 进程已不存在
-        _ => {
-            // 3. 如果 taskkill 失败，尝试使用 PowerShell (更强力，能处理更多边缘情况)
-            let script = format!("Stop-Process -Id {} -Force", pid);
-            let ps_output = Command::new("powershell")
-                .args(["-NoProfile", "-NonInteractive", "-NoLogo", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-Command", &script])
-                .creation_flags(CREATE_NO_WINDOW)
-                .output();
+        match output {
+            Ok(out) if out.status.success() => return Ok(()),
+            Ok(out) if out.status.code() == Some(128) => return Ok(()),
+            _ => {
+                let script = format!("Stop-Process -Id {} -Force", pid);
+                let ps_output = Command::new("powershell")
+                    .args([
+                        "-NoProfile",
+                        "-NonInteractive",
+                        "-NoLogo",
+                        "-ExecutionPolicy",
+                        "Bypass",
+                        "-WindowStyle",
+                        "Hidden",
+                        "-Command",
+                        &script,
+                    ])
+                    .creation_flags(CREATE_NO_WINDOW)
+                    .output();
 
-            match ps_output {
-                Ok(out) if out.status.success() => Ok(()),
-                Ok(out) => {
-                    // PowerShell 在中文环境下输出可能是 GBK，导致 UTF-8 解析乱码
-                    // 我们通过检查常见的错误特征来给出更友好的提示
-                    let stderr_raw = &out.stderr;
-                    let stderr_utf8 = String::from_utf8_lossy(stderr_raw);
-
-                    // 检查是否包含“拒绝访问”或“Access Denied”的特征
-                    // 0xbe 0xdc 0xbe 0xfc 是“拒绝访问”在某些编码下的表现
-                    if stderr_utf8.contains("AccessDenied")
-                        || stderr_utf8.contains("拒绝访问")
-                        || stderr_raw.windows(2).any(|w| w == [0xbe, 0xdc])
-                    {
-                        return Err(AppError::Internal("ACCESS_DENIED".into()));
-                    }
-
-                    if stderr_utf8.contains("Cannot find a process with the identifier")
-                        || stderr_utf8.contains("找不到标识符")
-                        || stderr_utf8.contains("找不到具有指定标识符")
-                    {
-                        Ok(())
-                    } else {
-                        Err(AppError::Internal(format!(
+                match ps_output {
+                    Ok(out) if out.status.success() => return Ok(()),
+                    Ok(out) => {
+                        let stderr_raw = &out.stderr;
+                        let stderr_utf8 = String::from_utf8_lossy(stderr_raw);
+                        if stderr_utf8.contains("AccessDenied")
+                            || stderr_utf8.contains("拒绝访问")
+                            || stderr_raw.windows(2).any(|w| w == [0xbe, 0xdc])
+                        {
+                            return Err(AppError::Internal("ACCESS_DENIED".into()));
+                        }
+                        if stderr_utf8.contains("Cannot find a process with the identifier")
+                            || stderr_utf8.contains("找不到标识符")
+                            || stderr_utf8.contains("找不到具有指定标识符")
+                        {
+                            return Ok(());
+                        }
+                        return Err(AppError::Internal(format!(
                             "Failed to kill process {}: {}",
                             pid,
                             stderr_utf8.trim()
+                        )));
+                    }
+                    Err(e) => {
+                        return Err(AppError::Internal(format!(
+                            "Failed to execute PowerShell: {}",
+                            e
                         )))
                     }
                 }
-                Err(e) => Err(AppError::Internal(format!(
-                    "Failed to execute PowerShell: {}",
-                    e
-                ))),
             }
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        let output = Command::new("kill").args(["-9", pid]).output();
+        match output {
+            Ok(out) if out.status.success() => return Ok(()),
+            Ok(out) => {
+                let stderr = String::from_utf8_lossy(&out.stderr);
+                if stderr.contains("No such process") {
+                    return Ok(());
+                } else if stderr.contains("Operation not permitted") {
+                    return Err(AppError::Internal("ACCESS_DENIED".into()));
+                }
+                return Err(AppError::Internal(format!(
+                    "Failed to kill process {}: {}",
+                    pid,
+                    stderr.trim()
+                )));
+            }
+            Err(e) => return Err(AppError::Internal(format!("Failed to execute kill: {}", e))),
         }
     }
 }

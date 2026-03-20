@@ -10,7 +10,10 @@ use aes_gcm::{
 use base64::{engine::general_purpose, Engine as _};
 use sha2::{Digest, Sha256};
 use std::env;
+
+#[cfg(target_os = "windows")]
 use winreg::enums::*;
+#[cfg(target_os = "windows")]
 use winreg::RegKey;
 
 /// 加密配置数据
@@ -62,6 +65,7 @@ pub fn decrypt_config(encrypted_data: &str, password: &str) -> Result<String, Ap
 }
 
 /// 设置是否以管理员身份启动
+#[cfg(target_os = "windows")]
 pub fn set_run_as_admin(enabled: bool) -> Result<(), AppError> {
     let exe_path = env::current_exe()
         .map_err(|e| AppError::Io(e))?
@@ -83,7 +87,15 @@ pub fn set_run_as_admin(enabled: bool) -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(not(target_os = "windows"))]
+pub fn set_run_as_admin(_enabled: bool) -> Result<(), AppError> {
+    Err(AppError::Internal(
+        "Run as admin is only supported on Windows".into(),
+    ))
+}
+
 /// 检查当前进程是否以管理员（提权）身份运行
+#[cfg(target_os = "windows")]
 pub fn is_run_as_admin() -> Result<bool, AppError> {
     use std::mem;
     use winapi::shared::minwindef::FALSE;
@@ -119,7 +131,13 @@ pub fn is_run_as_admin() -> Result<bool, AppError> {
     }
 }
 
-/// 注册全局快捷键（保存到注册表，供下次启动时使用）
+#[cfg(not(target_os = "windows"))]
+pub fn is_run_as_admin() -> Result<bool, AppError> {
+    Ok(false)
+}
+
+/// 注册全局快捷键（保存到注册表/配置文件，供下次启动时使用）
+#[cfg(target_os = "windows")]
 pub fn save_global_shortcut(shortcut: &str) -> Result<(), AppError> {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let path = r"Software\ToolDock\Settings";
@@ -136,7 +154,14 @@ pub fn save_global_shortcut(shortcut: &str) -> Result<(), AppError> {
     Ok(())
 }
 
+#[cfg(not(target_os = "windows"))]
+pub fn save_global_shortcut(_shortcut: &str) -> Result<(), AppError> {
+    // On non-Windows, global shortcut persistence is not yet implemented
+    Ok(())
+}
+
 /// 读取全局快捷键配置
+#[cfg(target_os = "windows")]
 pub fn load_global_shortcut() -> Result<String, AppError> {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let path = r"Software\ToolDock\Settings";
@@ -150,4 +175,9 @@ pub fn load_global_shortcut() -> Result<String, AppError> {
         Ok(v) => Ok(v),
         Err(_) => Ok(String::new()),
     }
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn load_global_shortcut() -> Result<String, AppError> {
+    Ok(String::new())
 }

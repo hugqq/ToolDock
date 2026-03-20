@@ -3,13 +3,24 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
+  workflow_dispatch:
 
 jobs:
-  release:
+  build:
     permissions:
       contents: write
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            args: ""
+          - platform: macos-latest
+            args: "--target aarch64-apple-darwin"
+          - platform: macos-latest
+            args: "--target x86_64-apple-darwin"
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - name: Checkout repository
@@ -23,15 +34,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: './src-tauri -> target'
+          workspaces: "./src-tauri -> target"
 
       - name: Install frontend dependencies
         run: pnpm install
@@ -43,12 +56,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: 'ToolDock ${{ github.ref_name }}'
+          releaseName: "ToolDock ${{ github.ref_name }}"
           releaseBody: |
             ## ToolDock ${{ github.ref_name }}
 
             ### 安装说明
-            - 下载 `.msi` 或 `.exe` 安装包
-            - 运行安装程序并按照提示安装
+            - **Windows**: 下载 `.msi` 或 `.exe` 安装包运行安装
+            - **macOS (Apple Silicon)**: 下载 `_aarch64.dmg`
+            - **macOS (Intel)**: 下载 `_x64.dmg`
           releaseDraft: false
           prerelease: false
+          args: ${{ matrix.args }}

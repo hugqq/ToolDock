@@ -36,5 +36,12 @@ pub async fn reveal_in_explorer(path: String) -> Result<(), crate::errors::AppEr
             .spawn()
             .map_err(|e| crate::errors::AppError::Io(e))?;
     }
+    #[cfg(target_os = "macos")]
+    {
+        Command::new("open")
+            .args(["-R", &path])
+            .spawn()
+            .map_err(|e| crate::errors::AppError::Io(e))?;
+    }
     Ok(())
 }

@@ -3,21 +3,34 @@
  * 职责：提供微信窗口捕获、消息提取、文本填充功能
  */
 use crate::errors::AppError;
+
+#[cfg(target_os = "windows")]
 use std::ffi::OsString;
+#[cfg(target_os = "windows")]
 use std::os::windows::ffi::OsStringExt;
+#[cfg(target_os = "windows")]
 use std::ptr::null_mut;
 use std::thread;
 use std::time::Duration;
+#[cfg(target_os = "windows")]
 use winapi::shared::minwindef::{DWORD, MAX_PATH};
+#[cfg(target_os = "windows")]
 use winapi::shared::windef::HWND;
+#[cfg(target_os = "windows")]
 use winapi::um::handleapi::CloseHandle;
+#[cfg(target_os = "windows")]
 use winapi::um::processthreadsapi::OpenProcess;
+#[cfg(target_os = "windows")]
 use winapi::um::psapi::GetModuleFileNameExW;
+#[cfg(target_os = "windows")]
 use winapi::um::winbase::{GlobalAlloc, GlobalFree, GlobalLock, GlobalUnlock, GMEM_MOVEABLE};
+#[cfg(target_os = "windows")]
 use winapi::um::winnt::{PROCESS_QUERY_INFORMATION, PROCESS_VM_READ};
+#[cfg(target_os = "windows")]
 use winapi::um::winuser::{
     CloseClipboard, EmptyClipboard, OpenClipboard, SetClipboardData, CF_UNICODETEXT,
 };
+#[cfg(target_os = "windows")]
 use winapi::um::winuser::{
     EnumChildWindows, EnumWindows, GetClassNameW, GetCursorPos, GetWindowTextLengthW,
     GetWindowTextW, GetWindowThreadProcessId, IsWindowVisible, SendMessageW, SetFocus,
@@ -25,6 +38,7 @@ use winapi::um::winuser::{
 };
 
 // Windows消息常量
+#[cfg(target_os = "windows")]
 const WM_SETTEXT: u32 = 0x000C;
 
 #[derive(Debug, Clone)]
@@ -34,6 +48,7 @@ pub struct WeChatWindow {
 }
 
 /// 等待用户点击并获取窗口句柄
+#[cfg(target_os = "windows")]
 pub fn wait_for_window_click(timeout_secs: u64) -> Result<WeChatWindow, AppError> {
     thread::sleep(Duration::from_millis(500)); // 给用户一点反应时间
 
@@ -99,6 +114,7 @@ pub fn wait_for_window_click(timeout_secs: u64) -> Result<WeChatWindow, AppError
 }
 
 /// 从微信窗口捕获最新消息
+#[cfg(target_os = "windows")]
 pub fn capture_wechat_message(hwnd: isize) -> Result<String, AppError> {
     if hwnd == 0 {
         return Err(AppError::Internal("无效的窗口句柄".to_string()));
@@ -129,6 +145,7 @@ pub fn capture_wechat_message(hwnd: isize) -> Result<String, AppError> {
 }
 
 /// 仅读取剪贴板内容（不激活窗口）
+#[cfg(target_os = "windows")]
 pub fn read_clipboard_silent() -> Result<String, AppError> {
     unsafe {
         let text = get_clipboard_text()?;
@@ -137,6 +154,7 @@ pub fn read_clipboard_silent() -> Result<String, AppError> {
 }
 
 /// 将文本填充到微信输入框
+#[cfg(target_os = "windows")]
 pub fn fill_wechat_input(text: &str) -> Result<(), AppError> {
     if text.is_empty() {
         return Err(AppError::Internal("填充内容为空".to_string()));
@@ -321,6 +339,7 @@ unsafe fn get_process_name(hwnd: HWND) -> Option<String> {
 }
 
 /// 查找微信窗口
+#[cfg(target_os = "windows")]
 pub fn find_wechat_window() -> Result<WeChatWindow, AppError> {
     unsafe {
         use std::sync::Mutex;
@@ -507,6 +526,7 @@ unsafe fn find_edit_control(parent_hwnd: HWND) -> Option<HWND> {
 }
 
 /// 直接填充文本到微信输入框（通过窗口句柄）
+#[cfg(target_os = "windows")]
 pub fn fill_text_to_wechat(hwnd: isize, text: &str) -> Result<(), AppError> {
     if text.is_empty() {
         return Err(AppError::Internal("填充内容为空".to_string()));
@@ -587,4 +607,47 @@ pub fn fill_text_to_wechat(hwnd: isize, text: &str) -> Result<(), AppError> {
         tracing::info!("文本填充流程完成");
         Ok(())
     }
+}
+
+// Non-Windows stubs
+#[cfg(not(target_os = "windows"))]
+pub fn wait_for_window_click(_timeout_secs: u64) -> Result<WeChatWindow, AppError> {
+    Err(AppError::Internal(
+        "WeChat assistant is only supported on Windows".into(),
+    ))
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn capture_wechat_message(_hwnd: isize) -> Result<String, AppError> {
+    Err(AppError::Internal(
+        "WeChat assistant is only supported on Windows".into(),
+    ))
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn read_clipboard_silent() -> Result<String, AppError> {
+    Err(AppError::Internal(
+        "WeChat assistant is only supported on Windows".into(),
+    ))
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn fill_wechat_input(_text: &str) -> Result<(), AppError> {
+    Err(AppError::Internal(
+        "WeChat assistant is only supported on Windows".into(),
+    ))
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn find_wechat_window() -> Result<WeChatWindow, AppError> {
+    Err(AppError::Internal(
+        "WeChat assistant is only supported on Windows".into(),
+    ))
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn fill_text_to_wechat(_hwnd: isize, _text: &str) -> Result<(), AppError> {
+    Err(AppError::Internal(
+        "WeChat assistant is only supported on Windows".into(),
+    ))
 }

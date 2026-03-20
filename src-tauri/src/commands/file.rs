@@ -241,10 +241,20 @@ pub async fn pkg_install(window: Window, path: String, command: String) -> AppRe
     #[cfg(windows)]
     use std::os::windows::process::CommandExt;
 
-    let mut cmd = Command::new("cmd");
-    cmd.args(&["/C", &command])
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
+    #[cfg(windows)]
+    let mut cmd = {
+        let mut c = Command::new("cmd");
+        c.args(&["/C", &command]);
+        c
+    };
+    #[cfg(not(windows))]
+    let mut cmd = {
+        let mut c = Command::new("sh");
+        c.args(&["-c", &command]);
+        c
+    };
+
+    cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
 
     if !path.is_empty() {
         cmd.current_dir(&path);

@@ -4,6 +4,8 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use tauri::{AppHandle, Emitter};
 use tokio::time::sleep;
+
+#[cfg(target_os = "windows")]
 use winapi::um::winuser::{
     GetAsyncKeyState, MapVirtualKeyW, SendInput, INPUT, INPUT_KEYBOARD, INPUT_MOUSE, KEYBDINPUT,
     KEYEVENTF_KEYUP, KEYEVENTF_UNICODE, MAPVK_VK_TO_VSC, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP,
@@ -56,7 +58,10 @@ impl ClickerManager {
     /// 设置热键启用状态
     pub fn set_hotkey_enabled(&self, enabled: bool) {
         self.hotkey_enabled.store(enabled, Ordering::SeqCst);
-        tracing::info!("Clicker hotkeys (F8/F9) {}", if enabled { "enabled" } else { "disabled" });
+        tracing::info!(
+            "Clicker hotkeys (F8/F9) {}",
+            if enabled { "enabled" } else { "disabled" }
+        );
     }
 
     /// 获取热键启用状态
@@ -65,109 +70,113 @@ impl ClickerManager {
     }
 
     fn start_hotkey_listener(&self) {
-        let mouse_running = self.mouse_running.clone();
-        let mouse_settings = self.mouse_settings.clone();
-        let keyboard_running = self.keyboard_running.clone();
-        let keyboard_settings = self.keyboard_settings.clone();
-        let hotkey_enabled = self.hotkey_enabled.clone();
-        let app_handle = self.app_handle.clone();
+        #[cfg(target_os = "windows")]
+        {
+            let mouse_running = self.mouse_running.clone();
+            let mouse_settings = self.mouse_settings.clone();
+            let keyboard_running = self.keyboard_running.clone();
+            let keyboard_settings = self.keyboard_settings.clone();
+            let hotkey_enabled = self.hotkey_enabled.clone();
+            let app_handle = self.app_handle.clone();
 
-        std::thread::spawn(move || {
-            let mut f8_pressed = false;
-            let mut f9_pressed = false;
-            loop {
-                // 热键未启用时跳过所有处理，避免干扰系统
-                if !hotkey_enabled.load(Ordering::SeqCst) {
-                    // 重置按键状态，防止启用时触发积压事件
-                    f8_pressed = false;
-                    f9_pressed = false;
-                    std::thread::sleep(Duration::from_millis(100));
-                    continue;
-                }
+            std::thread::spawn(move || {
+                let mut f8_pressed = false;
+                let mut f9_pressed = false;
+                loop {
+                    // 热键未启用时跳过所有处理，避免干扰系统
+                    if !hotkey_enabled.load(Ordering::SeqCst) {
+                        // 重置按键状态，防止启用时触发积压事件
+                        f8_pressed = false;
+                        f9_pressed = false;
+                        std::thread::sleep(Duration::from_millis(100));
+                        continue;
+                    }
 
-                unsafe {
-                    // F8 切换鼠标连点
-                    let state_f8 = GetAsyncKeyState(0x77); // VK_F8
-                    let is_down_f8 = (state_f8 as u16 & 0x8000) != 0;
+                    unsafe {
+                        // F8 切换鼠标连点
+                        let state_f8 = GetAsyncKeyState(0x77); // VK_F8
+                        let is_down_f8 = (state_f8 as u16 & 0x8000) != 0;
 
-                    if is_down_f8 && !f8_pressed {
-                        f8_pressed = true;
+                        if is_down_f8 && !f8_pressed {
+                            f8_pressed = true;
 
-                        let currently_running = mouse_running.load(Ordering::SeqCst);
-                        if currently_running {
-                            mouse_running.store(false, Ordering::SeqCst);
-                            let _ = app_handle.emit("clicker://mouse-status-changed", false);
-                        } else {
-                            let settings = mouse_settings.lock().unwrap();
-                            if let Some((interval, button, type_)) = *settings {
-                                mouse_running.store(true, Ordering::SeqCst);
-                                let running_clone = mouse_running.clone();
+                            let currently_running = mouse_running.load(Ordering::SeqCst);
+                            if currently_running {
+                                mouse_running.store(false, Ordering::SeqCst);
+                                let _ = app_handle.emit("clicker://mouse-status-changed", false);
+                            } else {
+                                let settings = mouse_settings.lock().unwrap();
+                                if let Some((interval, button, type_)) = *settings {
+                                    mouse_running.store(true, Ordering::SeqCst);
+                                    let running_clone = mouse_running.clone();
 
-                                tauri::async_runtime::spawn(async move {
-                                    let mut interval_timer =
-                                        tokio::time::interval(Duration::from_millis(interval));
-                                    interval_timer.set_missed_tick_behavior(
-                                        tokio::time::MissedTickBehavior::Burst,
-                                    );
+                                    tauri::async_runtime::spawn(async move {
+                                        let mut interval_timer =
+                                            tokio::time::interval(Duration::from_millis(interval));
+                                        interval_timer.set_missed_tick_behavior(
+                                            tokio::time::MissedTickBehavior::Burst,
+                                        );
 
-                                    while running_clone.load(Ordering::SeqCst) {
-                                        interval_timer.tick().await;
-                                        match type_ {
-                                            ClickType::Single => simulate_mouse_click(button),
-                                            ClickType::Double => {
-                                                simulate_mouse_click(button);
-                                                sleep(Duration::from_millis(50)).await;
-                                                simulate_mouse_click(button);
+                                        while running_clone.load(Ordering::SeqCst) {
+                                            interval_timer.tick().await;
+                                            match type_ {
+                                                ClickType::Single => simulate_mouse_click(button),
+                                                ClickType::Double => {
+                                                    simulate_mouse_click(button);
+                                                    sleep(Duration::from_millis(50)).await;
+                                                    simulate_mouse_click(button);
+                                                }
                                             }
                                         }
-                                    }
-                                });
-                                let _ = app_handle.emit("clicker://mouse-status-changed", true);
+                                    });
+                                    let _ = app_handle.emit("clicker://mouse-status-changed", true);
+                                }
                             }
+                        } else if !is_down_f8 {
+                            f8_pressed = false;
                         }
-                    } else if !is_down_f8 {
-                        f8_pressed = false;
-                    }
 
-                    // F9 切换键盘连点
-                    let state_f9 = GetAsyncKeyState(0x78); // VK_F9
-                    let is_down_f9 = (state_f9 as u16 & 0x8000) != 0;
+                        // F9 切换键盘连点
+                        let state_f9 = GetAsyncKeyState(0x78); // VK_F9
+                        let is_down_f9 = (state_f9 as u16 & 0x8000) != 0;
 
-                    if is_down_f9 && !f9_pressed {
-                        f9_pressed = true;
+                        if is_down_f9 && !f9_pressed {
+                            f9_pressed = true;
 
-                        let currently_running = keyboard_running.load(Ordering::SeqCst);
-                        if currently_running {
-                            keyboard_running.store(false, Ordering::SeqCst);
-                            let _ = app_handle.emit("clicker://keyboard-status-changed", false);
-                        } else {
-                            let settings = keyboard_settings.lock().unwrap();
-                            if let Some((interval, key_code)) = *settings {
-                                keyboard_running.store(true, Ordering::SeqCst);
-                                let running_clone = keyboard_running.clone();
+                            let currently_running = keyboard_running.load(Ordering::SeqCst);
+                            if currently_running {
+                                keyboard_running.store(false, Ordering::SeqCst);
+                                let _ = app_handle.emit("clicker://keyboard-status-changed", false);
+                            } else {
+                                let settings = keyboard_settings.lock().unwrap();
+                                if let Some((interval, key_code)) = *settings {
+                                    keyboard_running.store(true, Ordering::SeqCst);
+                                    let running_clone = keyboard_running.clone();
 
-                                tauri::async_runtime::spawn(async move {
-                                    let mut interval_timer =
-                                        tokio::time::interval(Duration::from_millis(interval));
-                                    interval_timer.set_missed_tick_behavior(
-                                        tokio::time::MissedTickBehavior::Burst,
-                                    );
+                                    tauri::async_runtime::spawn(async move {
+                                        let mut interval_timer =
+                                            tokio::time::interval(Duration::from_millis(interval));
+                                        interval_timer.set_missed_tick_behavior(
+                                            tokio::time::MissedTickBehavior::Burst,
+                                        );
 
-                                    while running_clone.load(Ordering::SeqCst) {
-                                        interval_timer.tick().await;
-                                        simulate_key_press(key_code);
-                                    }
-                                });
-                                let _ = app_handle.emit("clicker://keyboard-status-changed", true);
+                                        while running_clone.load(Ordering::SeqCst) {
+                                            interval_timer.tick().await;
+                                            simulate_key_press(key_code);
+                                        }
+                                    });
+                                    let _ =
+                                        app_handle.emit("clicker://keyboard-status-changed", true);
+                                }
                             }
+                        } else if !is_down_f9 {
+                            f9_pressed = false;
                         }
-                    } else if !is_down_f9 {
-                        f9_pressed = false;
                     }
+                    std::thread::sleep(Duration::from_millis(100));
                 }
-                std::thread::sleep(Duration::from_millis(100));
-            }
-        });
+            });
+        } // cfg(windows) end
     }
 
     pub fn start_mouse_clicker(
@@ -253,6 +262,7 @@ impl ClickerManager {
     }
 }
 
+#[cfg(target_os = "windows")]
 fn simulate_mouse_click(button: MouseButton) {
     let (down_flag, up_flag) = match button {
         MouseButton::Left => (MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP),
@@ -277,6 +287,12 @@ fn simulate_mouse_click(button: MouseButton) {
     }
 }
 
+#[cfg(not(target_os = "windows"))]
+fn simulate_mouse_click(_button: MouseButton) {
+    // Not supported on this platform
+}
+
+#[cfg(target_os = "windows")]
 fn simulate_key_press(vk: u16) {
     unsafe {
         let mut inputs: [INPUT; 2] = std::mem::zeroed();
@@ -299,17 +315,31 @@ fn simulate_key_press(vk: u16) {
     }
 }
 
-/// Simulate typing text using Unicode input
-pub fn simulate_text_input(text: &str, delay_ms: u64) -> Result<(), String> {
-    for ch in text.chars() {
-        simulate_unicode_char(ch);
-        if delay_ms > 0 {
-            std::thread::sleep(Duration::from_millis(delay_ms));
-        }
-    }
-    Ok(())
+#[cfg(not(target_os = "windows"))]
+fn simulate_key_press(_vk: u16) {
+    // Not supported on this platform
 }
 
+/// Simulate typing text using Unicode input
+pub fn simulate_text_input(text: &str, delay_ms: u64) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        for ch in text.chars() {
+            simulate_unicode_char(ch);
+            if delay_ms > 0 {
+                std::thread::sleep(Duration::from_millis(delay_ms));
+            }
+        }
+        Ok(())
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        let _ = (text, delay_ms);
+        Err("Text input simulation is only supported on Windows".to_string())
+    }
+}
+
+#[cfg(target_os = "windows")]
 fn simulate_unicode_char(ch: char) {
     unsafe {
         let mut inputs: [INPUT; 2] = std::mem::zeroed();

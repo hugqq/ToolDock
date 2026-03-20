@@ -5,6 +5,8 @@ use hmac::{Hmac, Mac};
 use screenshots::Screen;
 use serde_json::Value;
 use sha2::{Digest, Sha256};
+
+#[cfg(target_os = "windows")]
 use windows::{
     Graphics::Imaging::{BitmapAlphaMode, BitmapPixelFormat, SoftwareBitmap},
     Media::Ocr::OcrEngine,
@@ -13,6 +15,7 @@ use windows::{
 
 type HmacSha256 = Hmac<Sha256>;
 
+#[cfg(target_os = "windows")]
 pub async fn run_ocr(
     x: Option<i32>,
     y: Option<i32>,
@@ -78,6 +81,7 @@ pub async fn run_ocr(
 }
 
 /// Windows OCR - 返回详细结果(文字+坐标+原图)
+#[cfg(target_os = "windows")]
 pub async fn run_ocr_with_boxes(
     x: Option<i32>,
     y: Option<i32>,
@@ -183,6 +187,32 @@ pub async fn run_ocr_with_boxes(
         height: img_height,
         text_boxes,
     })
+}
+
+#[cfg(not(target_os = "windows"))]
+pub async fn run_ocr(
+    _x: Option<i32>,
+    _y: Option<i32>,
+    _width: Option<u32>,
+    _height: Option<u32>,
+) -> std::result::Result<String, String> {
+    Err(
+        "Windows OCR is only available on Windows. Please use Tencent or Baidu OCR engine."
+            .to_string(),
+    )
+}
+
+#[cfg(not(target_os = "windows"))]
+pub async fn run_ocr_with_boxes(
+    _x: Option<i32>,
+    _y: Option<i32>,
+    _width: Option<u32>,
+    _height: Option<u32>,
+) -> std::result::Result<OcrDetailResult, String> {
+    Err(
+        "Windows OCR is only available on Windows. Please use Tencent or Baidu OCR engine."
+            .to_string(),
+    )
 }
 
 pub async fn run_tencent_ocr(

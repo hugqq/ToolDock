@@ -3,15 +3,22 @@
  * @brief Hosts 文件读写与备份核心逻辑
  */
 
-use std::fs;
-use std::path::{Path, PathBuf};
 use crate::errors::AppResult;
 use chrono::Local;
+use std::fs;
+use std::path::{Path, PathBuf};
 
 /// 获取系统 Hosts 文件路径
 pub fn get_hosts_path() -> PathBuf {
-    let system_root = std::env::var("SystemRoot").unwrap_or_else(|_| "C:\\Windows".to_string());
-    Path::new(&system_root).join("System32\\drivers\\etc\\hosts")
+    #[cfg(target_os = "windows")]
+    {
+        let system_root = std::env::var("SystemRoot").unwrap_or_else(|_| "C:\\Windows".to_string());
+        Path::new(&system_root).join("System32\\drivers\\etc\\hosts")
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        PathBuf::from("/etc/hosts")
+    }
 }
 
 /// 读取 Hosts 文件内容
@@ -43,16 +50,18 @@ pub fn create_backup(backup_dir: &Path) -> AppResult<String> {
     if !backup_dir.exists() {
         fs::create_dir_all(backup_dir)?;
     }
-    
+
     let hosts_path = get_hosts_path();
     if !hosts_path.exists() {
-        return Err(crate::errors::AppError::Internal("Hosts file not found".into()));
+        return Err(crate::errors::AppError::Internal(
+            "Hosts file not found".into(),
+        ));
     }
 
     let timestamp = Local::now().format("%Y%m%d_%H%M%S").to_string();
     let backup_filename = format!("hosts_{}.bak", timestamp);
     let backup_path = backup_dir.join(&backup_filename);
-    
+
     fs::copy(hosts_path, backup_path)?;
     Ok(backup_filename)
 }
@@ -62,7 +71,7 @@ pub fn list_backups(backup_dir: &Path) -> AppResult<Vec<String>> {
     if !backup_dir.exists() {
         return Ok(vec![]);
     }
-    
+
     let mut backups = vec![];
     for entry in fs::read_dir(backup_dir)? {
         let entry = entry?;
@@ -83,9 +92,11 @@ pub fn list_backups(backup_dir: &Path) -> AppResult<Vec<String>> {
 pub fn restore_backup(backup_dir: &Path, filename: &str) -> AppResult<()> {
     let backup_path = backup_dir.join(filename);
     if !backup_path.exists() {
-        return Err(crate::errors::AppError::Internal("Backup file not found".into()));
+        return Err(crate::errors::AppError::Internal(
+            "Backup file not found".into(),
+        ));
     }
-    
+
     let hosts_path = get_hosts_path();
     // 尝试移除只读属性
     if let Ok(metadata) = fs::metadata(&hosts_path) {

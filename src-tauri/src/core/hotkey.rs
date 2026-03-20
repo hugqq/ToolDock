@@ -6,6 +6,8 @@ use crate::errors::AppError;
 use std::sync::mpsc::{channel, Sender};
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter, Manager};
+
+#[cfg(target_os = "windows")]
 use winapi::um::winuser::{
     RegisterHotKey, UnregisterHotKey, MOD_ALT, MOD_CONTROL, MOD_SHIFT, MOD_WIN,
 };
@@ -58,10 +60,10 @@ impl HotkeyManager {
 
         for part in &parts[..parts.len() - 1] {
             match *part {
-                "Ctrl" => modifiers |= MOD_CONTROL as u32,
-                "Shift" => modifiers |= MOD_SHIFT as u32,
-                "Alt" => modifiers |= MOD_ALT as u32,
-                "Meta" | "Win" => modifiers |= MOD_WIN as u32,
+                "Ctrl" => modifiers |= 0x0002,         // MOD_CONTROL
+                "Shift" => modifiers |= 0x0004,        // MOD_SHIFT
+                "Alt" => modifiers |= 0x0001,          // MOD_ALT
+                "Meta" | "Win" => modifiers |= 0x0008, // MOD_WIN
                 _ => {}
             }
         }
@@ -175,6 +177,7 @@ impl HotkeyManager {
     }
 
     /// 启动 Windows 消息循环监听热键
+    #[cfg(target_os = "windows")]
     fn hotkey_thread_loop(app_handle: AppHandle, rx: std::sync::mpsc::Receiver<HotkeyCommand>) {
         use std::sync::mpsc::TryRecvError;
         use winapi::um::winuser::{
@@ -245,5 +248,17 @@ impl HotkeyManager {
     /// 获取当前注册的快捷键
     pub fn get_current(&self) -> String {
         self.current_shortcut.lock().unwrap().clone()
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    fn hotkey_thread_loop(_app_handle: AppHandle, rx: std::sync::mpsc::Receiver<HotkeyCommand>) {
+        use std::sync::mpsc::TryRecvError;
+        loop {
+            match rx.try_recv() {
+                Ok(HotkeyCommand::Stop) | Err(TryRecvError::Disconnected) => break,
+                _ => {}
+            }
+            std::thread::sleep(std::time::Duration::from_millis(100));
+        }
     }
 }

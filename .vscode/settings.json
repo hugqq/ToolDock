@@ -4,5 +4,11 @@
   "i18n-ally.keystyle": "nested",
   "i18n-ally.sourceLanguage": "zh-CN",
   "i18n-ally.displayLanguage": "zh-CN",
-  "chatgpt.openOnStartup": false
+  "chatgpt.openOnStartup": false,
+  "chat.tools.terminal.autoApprove": {
+    "/^\\$content = \\[System\\.IO\\.File\\]::ReadAllText\\(\"c:\\\\Users\\\\33047\\\\Desktop\\\\project\\\\ToolDock\\\\src-tauri\\\\src\\\\core\\\\network\\.rs\"\\)\n# Find line numbers\n\\$lineNum = 0\n\\$content\\.Split\\(\"`n\"\\) \\| ForEach-Object \\{ \\$lineNum\\+\\+; if \\(\\$_ -match \"尝试使用系统命令\"\\) \\{ \"Found at line \\$lineNum\" \\} \\}\n\\$lineNum = 0\n\\$content\\.Split\\(\"`n\"\\) \\| ForEach-Object \\{ \\$lineNum\\+\\+; if \\(\\$_ -match \"执行网速测试\"\\) \\{ \"Speed test at line \\$lineNum\" \\} \\}$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
+  }
 }
