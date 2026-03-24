@@ -1,4 +1,4 @@
-﻿/// 剪贴板核心逻辑实现
+/// 剪贴板核心逻辑实现
 /// 负责监听剪贴板变化、持久化历史记录以及图片存储
 
 use std::fs;
@@ -217,71 +217,68 @@ pub fn start_listening(app_handle: AppHandle, manager: Arc<ClipboardManager>) {
         let mut last_image_hash = Vec::new();
 
         loop {
-            if manager.is_enabled() {
-                let clipboard = app_handle.clipboard();
-                
-                // 检查文本
-                match clipboard.read_text() {
-                    Ok(text) => {
-                        if !text.is_empty() && text != last_text {
-                            let (prefix, suffix) = manager.get_config();
-                            let mut final_text = text.clone();
-                            let mut modified = false;
+            if !manager.is_enabled() {
+                // disabled 时低频休眠，只等待启用
+                std::thread::sleep(std::time::Duration::from_millis(2000));
+                continue;
+            }
 
-                            if !prefix.is_empty() && !final_text.starts_with(&prefix) {
-                                final_text = format!("{}{}", prefix, final_text);
-                                modified = true;
-                            }
-                            if !suffix.is_empty() && !final_text.ends_with(&suffix) {
-                                final_text = format!("{}{}", final_text, suffix);
-                                modified = true;
-                            }
+            let clipboard = app_handle.clipboard();
 
-                            if modified {
-                                let _ = clipboard.write_text(final_text.clone());
-                                last_text = final_text;
-                            } else {
-                                last_text = text.clone();
-                            }
+            // 检查文本
+            match clipboard.read_text() {
+                Ok(text) => {
+                    if !text.is_empty() && text != last_text {
+                        let (prefix, suffix) = manager.get_config();
+                        let mut final_text = text.clone();
+                        let mut modified = false;
 
-                            if let Err(e) = manager.add_text(text) {
-                                tracing::error!("Failed to add text to history: {}", e);
+                        if !prefix.is_empty() && !final_text.starts_with(&prefix) {
+                            final_text = format!("{}{}", prefix, final_text);
+                            modified = true;
+                        }
+                        if !suffix.is_empty() && !final_text.ends_with(&suffix) {
+                            final_text = format!("{}{}", final_text, suffix);
+                            modified = true;
+                        }
+
+                        if modified {
+                            let _ = clipboard.write_text(final_text.clone());
+                            last_text = final_text;
+                        } else {
+                            last_text = text.clone();
+                        }
+
+                        if let Err(e) = manager.add_text(text) {
+                            tracing::error!("Failed to add text to history: {}", e);
+                        } else {
+                            app_handle.emit("clipboard://changed", ()).ok();
+                        }
+                    }
+                }
+                Err(_) => {}
+            }
+
+            // 检查图片
+            match clipboard.read_image() {
+                Ok(image) => {
+                    let width = image.width();
+                    let height = image.height();
+                    let rgba = image.rgba();
+
+                    if !rgba.is_empty() {
+                        let hash = rgba[..rgba.len().min(1024)].to_vec();
+                        if hash != last_image_hash {
+                            last_image_hash = hash;
+                            if let Err(e) = manager.add_image(rgba.to_vec(), width, height) {
+                                tracing::error!("Failed to add image to history: {}", e);
                             } else {
                                 app_handle.emit("clipboard://changed", ()).ok();
                             }
                         }
                     }
-                    Err(_) => {} // 忽略文本读取错误
                 }
-
-                // 检查图片
-                match clipboard.read_image() {
-                    Ok(image) => {
-                        let width = image.width();
-                        let height = image.height();
-                        let rgba = image.rgba();
-                        
-                        // 简单的哈希检查，避免重复保存
-                        if !rgba.is_empty() {
-                            let hash = rgba[..rgba.len().min(1024)].to_vec(); 
-                            if hash != last_image_hash {
-                                last_image_hash = hash;
-                                if let Err(e) = manager.add_image(rgba.to_vec(), width, height) {
-                                    tracing::error!("Failed to add image to history: {}", e);
-                                } else {
-                                    app_handle.emit("clipboard://changed", ()).ok();
-                                }
-                            }
-                        }
-                    }
-                    Err(e) => {
-                        let err_msg = e.to_string();
-                        // 只有在不是 "No image in clipboard" 的错误时才记录，且避免重复记录相同错误
-                        if !err_msg.contains("no image") && !err_msg.contains("empty") && !err_msg.contains("No item") {
-                            // tracing::warn!("Clipboard read_image error: {}", e);
-                        }
-                    }
-                }
+                Err(_) => {}
             }
 
             std::thread::sleep(std::time::Duration::from_millis(1000));

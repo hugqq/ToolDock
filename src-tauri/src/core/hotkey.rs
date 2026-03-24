@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 全局快捷键核心逻辑
  * 职责：使用 Windows API 注册和监听全局热键
  */
@@ -239,8 +239,7 @@ impl HotkeyManager {
                     DispatchMessageW(&msg);
                 }
 
-                // 避免 CPU 占用过高
-                std::thread::sleep(std::time::Duration::from_millis(10));
+                std::thread::sleep(std::time::Duration::from_millis(50));
             }
         }
     }
@@ -252,13 +251,11 @@ impl HotkeyManager {
 
     #[cfg(not(target_os = "windows"))]
     fn hotkey_thread_loop(_app_handle: AppHandle, rx: std::sync::mpsc::Receiver<HotkeyCommand>) {
-        use std::sync::mpsc::TryRecvError;
-        loop {
-            match rx.try_recv() {
-                Ok(HotkeyCommand::Stop) | Err(TryRecvError::Disconnected) => break,
-                _ => {}
+        // macOS/Linux: no native hotkey loop needed, just block on channel until Stop
+        for cmd in rx.iter() {
+            if matches!(cmd, HotkeyCommand::Stop) {
+                break;
             }
-            std::thread::sleep(std::time::Duration::from_millis(100));
         }
     }
 }

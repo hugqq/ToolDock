@@ -38,30 +38,31 @@ pub struct ClickerManager {
 
 impl ClickerManager {
     pub fn new(app_handle: AppHandle) -> Self {
-        let manager = Self {
+        Self {
             mouse_running: Arc::new(AtomicBool::new(false)),
             keyboard_running: Arc::new(AtomicBool::new(false)),
-            // 默认关闭热键，必须用户手动在前端开启
             hotkey_enabled: Arc::new(AtomicBool::new(false)),
             mouse_settings: Arc::new(Mutex::new(Some((
                 100,
                 MouseButton::Left,
                 ClickType::Single,
             )))),
-            keyboard_settings: Arc::new(Mutex::new(Some((100, 0x20)))), // Default Space
+            keyboard_settings: Arc::new(Mutex::new(Some((100, 0x20)))),
             app_handle,
-        };
-        manager.start_hotkey_listener();
-        manager
+        }
+        // Note: hotkey listener NOT started at init, started on-demand via set_hotkey_enabled
     }
 
-    /// 设置热键启用状态
+    /// 设置热键启用状态，首次启用时启动监听线程
     pub fn set_hotkey_enabled(&self, enabled: bool) {
-        self.hotkey_enabled.store(enabled, Ordering::SeqCst);
+        let was_enabled = self.hotkey_enabled.swap(enabled, Ordering::SeqCst);
         tracing::info!(
             "Clicker hotkeys (F8/F9) {}",
             if enabled { "enabled" } else { "disabled" }
         );
+        if enabled && !was_enabled {
+            self.start_hotkey_listener();
+        }
     }
 
     /// 获取热键启用状态
@@ -83,13 +84,10 @@ impl ClickerManager {
                 let mut f8_pressed = false;
                 let mut f9_pressed = false;
                 loop {
-                    // 热键未启用时跳过所有处理，避免干扰系统
+                    // 热键被禁用后退出线程（下次启用会重新 spawn）
                     if !hotkey_enabled.load(Ordering::SeqCst) {
-                        // 重置按键状态，防止启用时触发积压事件
-                        f8_pressed = false;
-                        f9_pressed = false;
-                        std::thread::sleep(Duration::from_millis(100));
-                        continue;
+                        tracing::info!("Clicker hotkey thread exiting (disabled)");
+                        break;
                     }
 
                     unsafe {

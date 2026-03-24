@@ -55,7 +55,7 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
 
       <footer className="h-10 px-4 sm:px-6 flex items-center justify-between border-t border-(--border-color) bg-(--card-bg) text-xs text-(--text-muted) shadow-[0_-1px_3px_rgba(0,0,0,0.02)]">
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0" />
+          <div className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
           <span className="truncate">{displayStatus}</span>
         </div>
         {progress !== undefined && (

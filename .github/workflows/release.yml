@@ -17,9 +17,7 @@ jobs:
           - platform: windows-latest
             args: ""
           - platform: macos-latest
-            args: "--target aarch64-apple-darwin"
-          - platform: macos-latest
-            args: "--target x86_64-apple-darwin"
+            args: "--target universal-apple-darwin"
     runs-on: ${{ matrix.platform }}
 
     steps:
@@ -40,6 +38,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
 
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
@@ -62,8 +61,7 @@ jobs:
 
             ### 安装说明
             - **Windows**: 下载 `.msi` 或 `.exe` 安装包运行安装
-            - **macOS (Apple Silicon)**: 下载 `_aarch64.dmg`
-            - **macOS (Intel)**: 下载 `_x64.dmg`
+            - **macOS**: 下载 `_universal.dmg`（同时支持 Apple Silicon 和 Intel）
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
