@@ -1,11 +1,11 @@
-﻿/**
+/**
  * 设置命令接口
  * 职责：暴露配置导出、导入及管理员模式设置给前端
  */
 use crate::core::hotkey::HotkeyManager;
 use crate::core::settings;
 use crate::models::ApiResponse;
-use tauri::State;
+use tauri::{Manager, State};
 
 #[tauri::command]
 pub async fn export_config(data: String, password: Option<String>) -> ApiResponse<String> {
@@ -111,4 +111,25 @@ pub async fn get_global_shortcut() -> ApiResponse<String> {
         Ok(val) => ApiResponse::ok(val),
         Err(e) => ApiResponse::error("GET_SHORTCUT_FAILED", e.to_string()),
     }
+}
+
+#[tauri::command]
+pub async fn set_silent_start(app: tauri::AppHandle, enabled: bool) -> ApiResponse<()> {
+    let data_dir = app
+        .path()
+        .app_data_dir()
+        .unwrap_or_else(|_| std::path::PathBuf::from("data"));
+    match settings::save_silent_start(&data_dir, enabled) {
+        Ok(_) => ApiResponse::ok(()),
+        Err(e) => ApiResponse::error("SET_SILENT_START_FAILED", e.to_string()),
+    }
+}
+
+#[tauri::command]
+pub async fn get_silent_start(app: tauri::AppHandle) -> ApiResponse<bool> {
+    let data_dir = app
+        .path()
+        .app_data_dir()
+        .unwrap_or_else(|_| std::path::PathBuf::from("data"));
+    ApiResponse::ok(settings::load_silent_start(&data_dir))
 }

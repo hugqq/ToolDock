@@ -79,6 +79,7 @@ interface SettingsState {
   wechatSystemPrompt: string;
   globalShortcut: string;
   closeBehavior: "minimize" | "exit";
+  silentStart: boolean;
   homeViewMode: HomeViewMode;
   favoriteTools: string[];
   pinnedTools: string[];
@@ -110,6 +111,7 @@ interface SettingsState {
   setOcrConfig: (config: OcrSettings) => void;
   setRunAsAdmin: (enabled: boolean) => void;
   setCloseBehavior: (behavior: "minimize" | "exit") => void;
+  setSilentStart: (enabled: boolean) => void;
   setClipboardEnabled: (enabled: boolean) => void;
   setClipboardPrefix: (prefix: string) => void;
   setClipboardSuffix: (suffix: string) => void;
@@ -149,6 +151,7 @@ export const useSettingsStore = create<SettingsState>()(
       },
       runAsAdmin: false,
       closeBehavior: "minimize",
+      silentStart: true,
       homeViewMode: "grouped",
       clipboardEnabled: false,
       clipboardPrefix: "",
@@ -221,6 +224,7 @@ export const useSettingsStore = create<SettingsState>()(
       setOcrConfig: (config) => set({ ocr: config }),
       setRunAsAdmin: (enabled) => set({ runAsAdmin: enabled }),
       setCloseBehavior: (behavior) => set({ closeBehavior: behavior }),
+      setSilentStart: (enabled) => set({ silentStart: enabled }),
       setClipboardEnabled: (enabled) => set({ clipboardEnabled: enabled }),
       setClipboardPrefix: (prefix) => set({ clipboardPrefix: prefix }),
       setClipboardSuffix: (suffix) => set({ clipboardSuffix: suffix }),

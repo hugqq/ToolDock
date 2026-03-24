@@ -63,8 +63,8 @@ use commands::renamer::{
 };
 use commands::reveal_in_explorer;
 use commands::settings::{
-    export_config, get_global_shortcut, import_config, is_run_as_admin, set_global_shortcut,
-    set_run_as_admin, test_ai_connection,
+    export_config, get_global_shortcut, get_silent_start, import_config, is_run_as_admin,
+    set_global_shortcut, set_run_as_admin, set_silent_start, test_ai_connection,
 };
 use commands::timestamp::{
     batch_convert_timestamps, convert_timestamp, get_current_datetime, get_current_timestamp,
@@ -183,10 +183,22 @@ pub fn run() {
                 .icon(app.default_window_icon().unwrap().clone())
                 .build(app)?;
 
-            // 如果是通过自启动启动的，隐藏主窗口（静默启动）
-            if std::env::args().any(|arg| arg == "--autostart") {
-                if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.hide();
+            // 窗口默认 visible:false，根据启动方式决定是否显示
+            let is_autostart = std::env::args().any(|arg| arg == "--autostart");
+            if let Some(window) = app.get_webview_window("main") {
+                if is_autostart {
+                    let data_dir = app
+                        .path()
+                        .app_data_dir()
+                        .unwrap_or_else(|_| std::path::PathBuf::from("data"));
+                    let silent = crate::core::settings::load_silent_start(&data_dir);
+                    if !silent {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
+                } else {
+                    let _ = window.show();
+                    let _ = window.set_focus();
                 }
             }
 
@@ -288,6 +300,8 @@ pub fn run() {
             test_ai_connection,
             get_global_shortcut,
             set_global_shortcut,
+            set_silent_start,
+            get_silent_start,
             reveal_in_explorer,
             convert_images,
             convert_timestamp,

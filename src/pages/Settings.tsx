@@ -126,6 +126,8 @@ const Settings: React.FC = () => {
     setGlobalShortcut,
     closeBehavior,
     setCloseBehavior,
+    silentStart,
+    setSilentStart,
   } = useSettingsStore();
 
   const [saved, setSaved] = React.useState(false);
@@ -141,13 +143,15 @@ const Settings: React.FC = () => {
   const [importPassword, setImportPassword] = React.useState("");
 
   React.useEffect(() => {
-    // 检查开机自启状态
     invoke<boolean>("plugin:autostart|is_enabled")
       .then((yes) => setAutoStart(yes))
       .catch(() => {});
 
-    // 同步关闭行为配置到后端
     invoke("set_close_behavior", { behavior: closeBehavior }).catch(() => {});
+
+    invokeWrapper<boolean>("get_silent_start").then((res) => {
+      if (res.ok) setSilentStart(res.data);
+    });
 
     // 同步管理员启动状态
     invokeWrapper<boolean>("is_run_as_admin").then((res) => {
@@ -214,8 +218,7 @@ const Settings: React.FC = () => {
     setTempShortcut("");
   };
 
-  const toggleAutoStart = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
+  const toggleAutoStart = async (checked: boolean) => {
     try {
       if (checked) {
         await invoke("plugin:autostart|enable");
@@ -229,9 +232,15 @@ const Settings: React.FC = () => {
     }
   };
 
-  const handleSetCloseBehavior = async (val: "minimize" | "exit") => {
-    setCloseBehavior(val);
-    await invoke("set_close_behavior", { behavior: val });
+  const handleToggleCloseToTray = async (checked: boolean) => {
+    const behavior = checked ? "minimize" : "exit";
+    setCloseBehavior(behavior);
+    await invoke("set_close_behavior", { behavior });
+  };
+
+  const handleToggleSilentStart = async (checked: boolean) => {
+    setSilentStart(checked);
+    await invokeWrapper("set_silent_start", { enabled: checked });
   };
 
   const handleTestAi = async (providerId: string) => {
@@ -439,64 +448,62 @@ const Settings: React.FC = () => {
 
   // ============ 渲染分类内容 ============
 
-  const renderGeneralSettings = () => (
-    <div className="space-y-6">
-      {/* 开机自启 */}
-      <div className="flex items-start gap-4 p-4 rounded-xl bg-(--bg-main)/50 hover:bg-(--bg-main)/80 transition-colors">
-        <div className="flex items-center h-5">
-          <input
-            id="auto-start"
-            type="checkbox"
-            className="w-5 h-5 text-blue-600 border-(--border-color) rounded focus:ring-blue-500 bg-(--bg-main) cursor-pointer"
-            checked={autoStart}
-            onChange={toggleAutoStart}
-          />
-        </div>
-        <div className="flex flex-col">
-          <label
-            htmlFor="auto-start"
-            className="text-sm font-medium text-(--text-main) cursor-pointer"
-          >
-            {t("tools.settings.auto_start")}
-          </label>
-          <p className="text-xs text-(--text-muted) mt-1">
-            {t("tools.settings.auto_start_desc")}
-          </p>
-        </div>
+  const ToggleSwitch = ({
+    checked,
+    onChange,
+    label,
+    description,
+  }: {
+    checked: boolean;
+    onChange: (checked: boolean) => void;
+    label: string;
+    description: string;
+  }) => (
+    <div className="flex items-center justify-between p-4 rounded-xl bg-(--bg-main)/50 hover:bg-(--bg-main)/80 transition-colors">
+      <div className="flex flex-col">
+        <span className="text-sm font-medium text-(--text-main)">{label}</span>
+        <span className="text-xs text-(--text-muted) mt-0.5">
+          {description}
+        </span>
       </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none ${
+          checked ? "bg-blue-600" : "bg-gray-300 dark:bg-gray-600"
+        }`}
+      >
+        <span
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out mt-0.5 ${
+            checked ? "translate-x-[22px]" : "translate-x-0.5"
+          }`}
+        />
+      </button>
+    </div>
+  );
 
-      {/* 关闭行为 */}
-      <div className="space-y-3 p-4 rounded-xl bg-(--bg-main)/50">
-        <label className="text-sm font-medium text-(--text-main)">
-          {t("tools.settings.close_behavior")}
-        </label>
-        <div className="flex gap-4">
-          <label className="flex items-center gap-3 cursor-pointer px-4 py-3 rounded-lg border border-(--border-color) hover:border-blue-400 transition-colors flex-1">
-            <input
-              type="radio"
-              name="close-behavior"
-              className="w-4 h-4 text-blue-600 border-(--border-color) focus:ring-blue-500 bg-(--bg-main)"
-              checked={closeBehavior === "minimize"}
-              onChange={() => handleSetCloseBehavior("minimize")}
-            />
-            <span className="text-sm text-(--text-main)">
-              {t("tools.settings.close_minimize")}
-            </span>
-          </label>
-          <label className="flex items-center gap-3 cursor-pointer px-4 py-3 rounded-lg border border-(--border-color) hover:border-blue-400 transition-colors flex-1">
-            <input
-              type="radio"
-              name="close-behavior"
-              className="w-4 h-4 text-blue-600 border-(--border-color) focus:ring-blue-500 bg-(--bg-main)"
-              checked={closeBehavior === "exit"}
-              onChange={() => handleSetCloseBehavior("exit")}
-            />
-            <span className="text-sm text-(--text-main)">
-              {t("tools.settings.close_exit")}
-            </span>
-          </label>
-        </div>
-      </div>
+  const renderGeneralSettings = () => (
+    <div className="space-y-2">
+      <ToggleSwitch
+        checked={closeBehavior === "minimize"}
+        onChange={handleToggleCloseToTray}
+        label={t("tools.settings.close_to_tray")}
+        description={t("tools.settings.close_to_tray_desc")}
+      />
+      <ToggleSwitch
+        checked={autoStart}
+        onChange={toggleAutoStart}
+        label={t("tools.settings.auto_start")}
+        description={t("tools.settings.auto_start_desc")}
+      />
+      <ToggleSwitch
+        checked={silentStart}
+        onChange={handleToggleSilentStart}
+        label={t("tools.settings.silent_start")}
+        description={t("tools.settings.silent_start_desc")}
+      />
     </div>
   );
 

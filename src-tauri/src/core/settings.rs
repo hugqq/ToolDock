@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 设置核心逻辑
  * 职责：处理配置文件的加密导出、导入以及系统级设置（如管理员启动）
  */
@@ -158,6 +158,29 @@ pub fn save_global_shortcut(shortcut: &str) -> Result<(), AppError> {
 pub fn save_global_shortcut(_shortcut: &str) -> Result<(), AppError> {
     // On non-Windows, global shortcut persistence is not yet implemented
     Ok(())
+}
+
+/// 保存静默启动配置到 app data 目录
+pub fn save_silent_start(data_dir: &std::path::Path, enabled: bool) -> Result<(), AppError> {
+    std::fs::create_dir_all(data_dir).map_err(AppError::Io)?;
+    let path = data_dir.join("startup-config.json");
+    let config = serde_json::json!({ "silentStart": enabled });
+    std::fs::write(&path, config.to_string()).map_err(AppError::Io)?;
+    Ok(())
+}
+
+/// 读取静默启动配置
+pub fn load_silent_start(data_dir: &std::path::Path) -> bool {
+    let path = data_dir.join("startup-config.json");
+    if let Ok(data) = std::fs::read_to_string(&path) {
+        if let Ok(json) = serde_json::from_str::<serde_json::Value>(&data) {
+            return json
+                .get("silentStart")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(true);
+        }
+    }
+    true
 }
 
 /// 读取全局快捷键配置
