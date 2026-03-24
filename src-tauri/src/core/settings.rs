@@ -72,6 +72,17 @@ pub fn set_run_as_admin(enabled: bool) -> Result<(), AppError> {
         .to_string_lossy()
         .to_string();
 
+    // 开发环境（tauri dev / cargo run）不应给 debug/release 产物写 RUNASADMIN，
+    // 否则会导致后续调试启动出现 os error 740。
+    let exe_path_lower = exe_path.to_lowercase();
+    let is_dev_binary =
+        exe_path_lower.contains("\\target\\debug\\") || exe_path_lower.contains("\\target\\release\\");
+    if is_dev_binary {
+        return Err(AppError::Internal(
+            "开发环境不支持设置管理员启动，请在已安装版本中使用该功能".into(),
+        ));
+    }
+
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let path = r"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers";
 
