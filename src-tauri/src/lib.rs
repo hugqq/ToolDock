@@ -51,11 +51,6 @@ use commands::nginx::{
 };
 use commands::notepad::{load_notepad_data, save_notepad_data, save_notepad_image, NotepadDbState};
 use commands::ocr::{run_ocr, run_ocr_detailed};
-use commands::pip_player::{
-    clear_bilibili_cookie, close_pip_window, extract_and_save_cookies, get_bilibili_cookie,
-    has_bilibili_cookie, open_bilibili_login_window, open_pip_window, resolve_bilibili_short_url,
-    save_bilibili_cookie,
-};
 use commands::port_scanner::{start_port_scan, stop_port_scan};
 use commands::renamer::{
     clear_rename_history, execute_batch_rename, get_rename_history, preview_batch_rename,
@@ -73,7 +68,6 @@ use commands::translator::{check_translator_key, translate_text};
 use commands::unit_converter::{convert_units, get_exchange_rates};
 use commands::variable_naming::generate_variable_names;
 use commands::web_server::{get_web_server_status, start_web_server, stop_web_server};
-use commands::weread::execute_weread_script;
 use core::clicker::ClickerManager;
 use core::clipboard::{start_listening, ClipboardManager};
 use core::hotkey::HotkeyManager;
@@ -327,16 +321,6 @@ pub fn run() {
             save_notepad_data,
             save_notepad_image,
             unregister_global_hotkey,
-            open_pip_window,
-            close_pip_window,
-            save_bilibili_cookie,
-            get_bilibili_cookie,
-            has_bilibili_cookie,
-            clear_bilibili_cookie,
-            open_bilibili_login_window,
-            extract_and_save_cookies,
-            resolve_bilibili_short_url,
-            execute_weread_script,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

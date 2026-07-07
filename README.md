@@ -21,7 +21,7 @@ Built with Tauri v2 + React 19 + MUI v7
 
 - Material-like UI using MUI v7 (light/dark themes)
 - High-performance native-feel using Tauri v2
-- 33+ handy tools across Files, System, Network, Dev and Entertainment
+- 29+ handy tools across Files, System, Network, Dev and Entertainment
 - Built-in localization (i18n) with English & Chinese
 - Granular permission model; sensitive actions require confirmation
 - Small footprint and optimized memory usage
@@ -132,8 +132,6 @@ pnpm tauri dev
 
 ### Entertainment
 
-- Picture-in-Picture Player — floating video player
-- Reading helper — book management & notes export
 - Games (2048 / Othello) — quick casual games with AI
 
 ---

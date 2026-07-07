@@ -10,11 +10,11 @@ import {
 test("builds a five-field cron expression by default", () => {
   const states = createDefaultCronFieldStates();
 
-  const expression = buildCronExpression(states, false);
+  const expression = buildCronExpression(states, 5);
 
   assert.equal(expression, "* * * * ?");
   assert.equal(expression.split(/\s+/).length, 5);
-  assert.deepEqual(getCronTabs(false), [
+  assert.deepEqual(getCronTabs(5), [
     "minutes",
     "hours",
     "days",
@@ -26,11 +26,11 @@ test("builds a five-field cron expression by default", () => {
 test("builds a six-field cron expression when seconds are enabled", () => {
   const states = createDefaultCronFieldStates();
 
-  const expression = buildCronExpression(states, true);
+  const expression = buildCronExpression(states, 6);
 
   assert.equal(expression, "0 * * * * ?");
   assert.equal(expression.split(/\s+/).length, 6);
-  assert.deepEqual(getCronTabs(true), [
+  assert.deepEqual(getCronTabs(6), [
     "seconds",
     "minutes",
     "hours",
@@ -40,12 +40,30 @@ test("builds a six-field cron expression when seconds are enabled", () => {
   ]);
 });
 
-test("parses field count from five-field and six-field expressions", () => {
+test("builds a seven-field cron expression when year is enabled", () => {
+  const states = createDefaultCronFieldStates();
+
+  const expression = buildCronExpression(states, 7);
+
+  assert.equal(expression, "0 * * * * ? *");
+  assert.equal(expression.split(/\s+/).length, 7);
+  assert.deepEqual(getCronTabs(7), [
+    "seconds",
+    "minutes",
+    "hours",
+    "days",
+    "months",
+    "weeks",
+    "years",
+  ]);
+});
+
+test("parses field count from five-field, six-field, and seven-field expressions", () => {
   const five = parseCronExpression("* * * * ?");
   const six = parseCronExpression("0 * * * * ?");
   const seven = parseCronExpression("0 * * * * ? *");
 
-  assert.equal(five?.includeSeconds, false);
-  assert.equal(six?.includeSeconds, true);
-  assert.equal(seven, null);
+  assert.equal(five?.fieldCount, 5);
+  assert.equal(six?.fieldCount, 6);
+  assert.equal(seven?.fieldCount, 7);
 });

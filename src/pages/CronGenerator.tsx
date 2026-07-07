@@ -22,96 +22,35 @@ import { toast } from "react-hot-toast";
 import { useSettingsStore } from "../stores/useSettingsStore";
 import { invokeWrapper } from "../api";
 import { Select } from "../components/mui";
-
-type FieldType =
-  | "seconds"
-  | "minutes"
-  | "hours"
-  | "days"
-  | "months"
-  | "weeks"
-  | "years";
-
-interface FieldState {
-  type: "any" | "range" | "step" | "specific";
-  rangeStart: number;
-  rangeEnd: number;
-  stepStart: number;
-  stepValue: number;
-  specificValues: number[];
-}
-
-const DEFAULT_FIELD_STATE: FieldState = {
-  type: "any",
-  rangeStart: 0,
-  rangeEnd: 59,
-  stepStart: 0,
-  stepValue: 1,
-  specificValues: [],
-};
-
-const FIELD_CONFIGS: Record<
-  FieldType,
-  { min: number; max: number; label: string }
-> = {
-  seconds: { min: 0, max: 59, label: "秒" },
-  minutes: { min: 0, max: 59, label: "分" },
-  hours: { min: 0, max: 23, label: "时" },
-  days: { min: 1, max: 31, label: "日" },
-  months: { min: 1, max: 12, label: "月" },
-  weeks: { min: 0, max: 6, label: "周" },
-  years: { min: 2024, max: 2099, label: "年" },
-};
+import {
+  buildCronExpression,
+  createDefaultCronFieldStates,
+  CRON_FIELD_CONFIGS,
+  getCronTabs,
+  parseCronExpression,
+  type CronFieldCount,
+  type CronFieldState,
+  type CronFieldType,
+} from "../lib/cronExpression";
 
 const CronGenerator: React.FC = () => {
   const { t } = useTranslation();
   const { ai } = useSettingsStore();
-  const [expression, setExpression] = useState("0 * * * * *");
+  const [expression, setExpression] = useState("* * * * ?");
   const [nextRuns, setNextRuns] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<FieldType>("seconds");
+  const [fieldCount, setFieldCount] = useState<CronFieldCount>(5);
+  const [activeTab, setActiveTab] = useState<CronFieldType>("minutes");
   const [aiInput, setAiInput] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<string>(
     ai?.activeProvider || "deepseek"
   );
 
-  const [fieldStates, setFieldStates] = useState<Record<FieldType, FieldState>>(
-    {
-      seconds: { ...DEFAULT_FIELD_STATE, specificValues: [0] },
-      minutes: { ...DEFAULT_FIELD_STATE },
-      hours: { ...DEFAULT_FIELD_STATE },
-      days: {
-        ...DEFAULT_FIELD_STATE,
-        rangeStart: 1,
-        rangeEnd: 31,
-        stepStart: 1,
-      },
-      months: {
-        ...DEFAULT_FIELD_STATE,
-        rangeStart: 1,
-        rangeEnd: 12,
-        stepStart: 1,
-      },
-      weeks: { ...DEFAULT_FIELD_STATE, type: "any" },
-      years: {
-        ...DEFAULT_FIELD_STATE,
-        type: "any",
-        rangeStart: 2024,
-        rangeEnd: 2099,
-        stepStart: 2024,
-      },
-    }
-  );
+  const [fieldStates, setFieldStates] = useState<
+    Record<CronFieldType, CronFieldState>
+  >(createDefaultCronFieldStates);
 
-  const tabs: FieldType[] = [
-    "seconds",
-    "minutes",
-    "hours",
-    "days",
-    "months",
-    "weeks",
-    "years",
-  ];
+  const tabs = getCronTabs(fieldCount);
 
   const aiProviders = Array.isArray(ai?.providers) ? ai!.providers : [];
 
@@ -136,51 +75,15 @@ const CronGenerator: React.FC = () => {
     }
   };
 
-  const generateExpression = () => {
-    const parts = tabs.map((tab) => {
-      const state = fieldStates[tab];
-
-      // 特殊处理：日和周的互斥逻辑 (Quartz 风格)
-      // 如果指定了周，则日必须为 ?
-      if (tab === "days" && fieldStates.weeks.type !== "any") {
-        return "?";
-      }
-      // 如果指定了日，则周必须为 ?
-      if (tab === "weeks" && fieldStates.days.type !== "any") {
-        return "?";
-      }
-      // 如果两者都是 any，通常周设为 ?
-      if (
-        tab === "weeks" &&
-        fieldStates.days.type === "any" &&
-        state.type === "any"
-      ) {
-        return "?";
-      }
-
-      switch (state.type) {
-        case "any":
-          return "*";
-        case "range":
-          return `${state.rangeStart}-${state.rangeEnd}`;
-        case "step":
-          return `${state.stepStart}/${state.stepValue}`;
-        case "specific":
-          return state.specificValues.length > 0
-            ? state.specificValues.sort((a, b) => a - b).join(",")
-            : "*";
-        default:
-          return "*";
-      }
-    });
-
-    let expr = parts.join(" ");
-    setExpression(expr);
-  };
+  useEffect(() => {
+    setExpression(buildCronExpression(fieldStates, fieldCount));
+  }, [fieldStates, fieldCount]);
 
   useEffect(() => {
-    generateExpression();
-  }, [fieldStates]);
+    if (!tabs.includes(activeTab)) {
+      setActiveTab(tabs[0]);
+    }
+  }, [activeTab, tabs]);
 
   useEffect(() => {
     fetchNextRuns(expression);
@@ -193,75 +96,14 @@ const CronGenerator: React.FC = () => {
 
   // 将 Cron 表达式字符串反解析为字段状态
   const parseExpressionToStates = (expr: string) => {
-    const parts = expr.trim().split(/\s+/);
-    if (parts.length < 6) return;
+    const parsed = parseCronExpression(expr);
+    if (!parsed) {
+      toast.error(t("tools.cron_generator.invalid_expression"));
+      return;
+    }
 
-    setFieldStates((prev) => {
-      const newStates = { ...prev };
-
-      tabs.forEach((tab, index) => {
-        const part = parts[index];
-        if (part === undefined) {
-          if (tab === "years") {
-            newStates[tab] = { ...DEFAULT_FIELD_STATE, type: "any" };
-          }
-          return;
-        }
-
-        const config = FIELD_CONFIGS[tab];
-        let state: FieldState = {
-          ...DEFAULT_FIELD_STATE,
-          rangeStart: config.min,
-          rangeEnd: config.max,
-          stepStart: config.min,
-          stepValue: 1,
-        };
-
-        if (part === "*" || part === "?") {
-          state.type = "any";
-        } else if (part.includes("-")) {
-          const [start, end] = part.split("-").map(Number);
-          state.type = "range";
-          state.rangeStart = Math.max(
-            config.min,
-            Math.min(config.max, isNaN(start) ? config.min : start)
-          );
-          state.rangeEnd = Math.max(
-            config.min,
-            Math.min(config.max, isNaN(end) ? config.max : end)
-          );
-        } else if (part.includes("/")) {
-          const [start, step] = part.split("/").map(Number);
-          state.type = "step";
-          state.stepStart = Math.max(
-            config.min,
-            Math.min(config.max, isNaN(start) ? config.min : start)
-          );
-          state.stepValue = Math.max(
-            1,
-            Math.min(config.max, isNaN(step) ? 1 : step)
-          );
-        } else if (part.includes(",")) {
-          state.type = "specific";
-          state.specificValues = part
-            .split(",")
-            .map(Number)
-            .filter((v) => !isNaN(v))
-            .map((v) => Math.max(config.min, Math.min(config.max, v)));
-        } else if (!isNaN(Number(part))) {
-          state.type = "specific";
-          state.specificValues = [
-            Math.max(config.min, Math.min(config.max, Number(part))),
-          ];
-        } else {
-          state.type = "any";
-        }
-
-        newStates[tab] = state;
-      });
-
-      return newStates;
-    });
+    setFieldCount(parsed.fieldCount);
+    setFieldStates(parsed.states);
   };
 
   const handleAiGenerate = async () => {
@@ -294,16 +136,19 @@ const CronGenerator: React.FC = () => {
     }
   };
 
-  const updateField = (field: FieldType, updates: Partial<FieldState>) => {
+  const updateField = (
+    field: CronFieldType,
+    updates: Partial<CronFieldState>
+  ) => {
     setFieldStates((prev) => ({
       ...prev,
       [field]: { ...prev[field], ...updates },
     }));
   };
 
-  const renderFieldEditor = (field: FieldType) => {
+  const renderFieldEditor = (field: CronFieldType) => {
     const state = fieldStates[field];
-    const config = FIELD_CONFIGS[field];
+    const config = CRON_FIELD_CONFIGS[field];
 
     return (
       <div className="space-y-6">
@@ -548,6 +393,42 @@ const CronGenerator: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Editor Card */}
           <div className="lg:col-span-2 flex flex-col bg-(--card-bg) rounded-2xl border border-(--border-color) overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-(--border-color) bg-(--bg-main)/30 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-semibold text-(--text-main)">
+                  {t("tools.cron_generator.field_count")}
+                </div>
+                <div className="text-xs text-(--text-muted) mt-1">
+                  {t("tools.cron_generator.field_count_hint")}
+                </div>
+              </div>
+              <div className="inline-flex p-1 rounded-xl bg-(--bg-main) border border-(--border-color)">
+                <Button
+                  variant={fieldCount === 5 ? "contained" : "text"}
+                  size="small"
+                  onClick={() => setFieldCount(5)}
+                  className="rounded-lg !px-4"
+                >
+                  {t("tools.cron_generator.five_fields")}
+                </Button>
+                <Button
+                  variant={fieldCount === 6 ? "contained" : "text"}
+                  size="small"
+                  onClick={() => setFieldCount(6)}
+                  className="rounded-lg !px-4"
+                >
+                  {t("tools.cron_generator.six_fields")}
+                </Button>
+                <Button
+                  variant={fieldCount === 7 ? "contained" : "text"}
+                  size="small"
+                  onClick={() => setFieldCount(7)}
+                  className="rounded-lg !px-4"
+                >
+                  {t("tools.cron_generator.seven_fields")}
+                </Button>
+              </div>
+            </div>
             <div className="flex bg-(--bg-main)/30 border-b border-(--border-color) overflow-x-auto no-scrollbar">
               {tabs.map((tab) => (
                 <Button
@@ -654,10 +535,10 @@ const CronGenerator: React.FC = () => {
               </h4>
               <div className="space-y-3">
                 <p className="text-xs text-(--text-muted) leading-relaxed">
-                  Cron 表达式由 6 或 7 个字段组成：
+                  Cron 表达式由 5、6 或 7 个字段组成：
                   <br />
                   <span className="font-mono text-blue-500/80">
-                    秒 分 时 日 月 周 [年]
+                    分 时 日 月 周 / 秒 分 时 日 月 周 / 秒 分 时 日 月 周 年
                   </span>
                 </p>
                 <div className="space-y-2">

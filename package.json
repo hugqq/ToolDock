@@ -27,13 +27,11 @@
     "@uiw/codemirror-theme-vscode": "^4.25.4",
     "@uiw/react-codemirror": "^4.25.4",
     "framer-motion": "^12.24.8",
-    "html-to-image": "^1.11.13",
     "i18next": "^25.7.3",
     "i18next-browser-languagedetector": "^8.2.0",
     "jsqr": "^1.4.0",
     "jszip": "^3.10.1",
     "lucide-react": "^0.562.0",
-    "lunar-typescript": "^1.8.6",
     "pdfjs-dist": "^5.5.207",
     "qrcode": "^1.5.4",
     "react": "^19.1.0",
@@ -42,7 +40,6 @@
     "react-i18next": "^16.5.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.11.0",
-    "recharts": "^3.6.0",
     "zustand": "^5.0.9"
   },
   "devDependencies": {

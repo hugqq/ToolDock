@@ -18,13 +18,15 @@ use serde_json::json;
 /// # 返回
 /// * `Result<Vec<String>, String>` - 成功返回时间字符串列表，失败返回错误信息
 pub fn get_next_runs(expression: &str, count: usize) -> Result<Vec<String>, String> {
-    // cron 库要求 6 或 7 个字段
-    // 如果用户输入的是 5 个字段（标准 crontab），我们自动在前面补上 "0 " (秒)
+    // 产品侧支持 5、6 或 7 个字段；cron 库解析时需要秒字段。
+    // 如果用户输入的是 5 个字段（标准 crontab），自动在前面补上 "0 "。
     let mut final_expr = expression.to_string();
     let fields_count = expression.split_whitespace().count();
     
     if fields_count == 5 {
         final_expr = format!("0 {}", expression);
+    } else if fields_count != 6 && fields_count != 7 {
+        return Err("Cron expression must contain 5, 6, or 7 fields".to_string());
     }
 
     let schedule = Schedule::from_str(&final_expr).map_err(|e| e.to_string())?;
@@ -67,16 +69,20 @@ pub async fn generate_with_ai(
 
     let system_prompt = r#"你是一个专业的系统管理员，擅长编写 Cron 表达式。
 请根据用户描述的需求，生成一个标准的 Cron 表达式。
-注意：表达式必须包含 6 或 7 个字段，顺序严格为：秒 分 时 日 月 周 [年]。
+注意：表达式必须包含 5、6 或 7 个字段。
+- 5 个字段顺序为：分 时 日 月 周
+- 6 个字段顺序为：秒 分 时 日 月 周
+- 7 个字段顺序为：秒 分 时 日 月 周 年
+- 默认使用最常见的 5 个字段。只有用户明确要求秒级精度时使用 6 个字段，明确要求年份限制时使用 7 个字段。
 
 字段限制：
-- 秒 (0-59)
+- 秒 (0-59，6/7 字段时使用)
 - 分 (0-59)
 - 时 (0-23)
 - 日 (1-31)
 - 月 (1-12)
 - 周 (0-6 或 SUN-SAT，? 表示不指定)
-- 年 (可选)
+- 年 (可选，仅 7 字段时使用)
 
 重要规则：
 1. 如果用户要求“每分钟”，秒字段应该是 0 而不是 *。
@@ -143,4 +149,30 @@ pub async fn generate_with_ai(
         .ok_or_else(|| AppError::Internal("Missing expression in AI response".to_string()))?;
 
     Ok(expr.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::get_next_runs;
+
+    #[test]
+    fn accepts_five_field_cron_expression() {
+        let runs = get_next_runs("*/5 * * * *", 1).unwrap();
+
+        assert_eq!(runs.len(), 1);
+    }
+
+    #[test]
+    fn accepts_six_field_cron_expression() {
+        let runs = get_next_runs("0 */5 * * * ?", 1).unwrap();
+
+        assert_eq!(runs.len(), 1);
+    }
+
+    #[test]
+    fn accepts_seven_field_cron_expression() {
+        let runs = get_next_runs("0 */5 * * * ? *", 1).unwrap();
+
+        assert_eq!(runs.len(), 1);
+    }
 }

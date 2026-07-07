@@ -45,15 +45,9 @@ const IpLookup = lazy(() => import("./pages/IpLookup"));
 const Clicker = lazy(() => import("./pages/Clicker"));
 const SimpleWebServer = lazy(() => import("./pages/SimpleWebServer"));
 const PortScanner = lazy(() => import("./pages/PortScanner"));
-const PipPlayer = lazy(() => import("./pages/PipPlayer"));
-const PipWindow = lazy(() => import("./pages/PipWindow"));
-const BilibiliLogin = lazy(() => import("./pages/BilibiliLogin"));
-const WeReadBook = lazy(() => import("./pages/WeReadBook"));
 const Othello = lazy(() => import("./pages/Othello"));
 const Game2048 = lazy(() => import("./pages/Game2048"));
 const NotePad = lazy(() => import("./pages/NotePad"));
-const BaziChart = lazy(() => import("./pages/BaziChart"));
-const ZodiacHoroscope = lazy(() => import("./pages/ZodiacHoroscope"));
 const PdfToImage = lazy(() => import("./pages/PdfToImage"));
 
 // Loading fallback component
@@ -70,8 +64,6 @@ const STANDALONE_ROUTES: Record<string, React.LazyExoticComponent<React.Componen
   "/magnifier": Magnifier,
   "/floating-widget": FloatingWidget,
   "/screenshot-selector": ScreenshotSelector,
-  "/pip-window": PipWindow,
-  "/bilibili-login": BilibiliLogin,
 };
 
 function AppContent() {
@@ -177,12 +169,8 @@ function AppContent() {
                 element={<SimpleWebServer />}
               />
               <Route path="/tools/port-scanner" element={<PortScanner />} />
-              <Route path="/tools/pip-player" element={<PipPlayer />} />
-              <Route path="/tools/weread-book" element={<WeReadBook />} />
               <Route path="/tools/2048" element={<Game2048 />} />
               <Route path="/tools/notepad" element={<NotePad />} />
-              <Route path="/tools/bazi-chart" element={<BaziChart />} />
-              <Route path="/tools/zodiac" element={<ZodiacHoroscope />} />
               <Route path="/tools/pdf-to-image" element={<PdfToImage />} />
               <Route path="/othello" element={<Othello />} />
               <Route path="/settings" element={<Settings />} />

@@ -14,7 +14,6 @@ pub mod network;
 pub mod nginx;
 pub mod notepad;
 pub mod ocr;
-pub mod pip_player;
 pub mod port_scanner;
 pub mod renamer;
 pub mod settings;
@@ -23,7 +22,6 @@ pub mod translator;
 pub mod unit_converter;
 pub mod variable_naming;
 pub mod web_server;
-pub mod weread;
 
 #[tauri::command]
 pub async fn reveal_in_explorer(path: String) -> Result<(), crate::errors::AppError> {

@@ -26,6 +26,7 @@ import {
   User,
   Disc,
   Send,
+  Copy,
 } from "lucide-react";
 import { useSettingsStore } from "../stores/useSettingsStore";
 import { useTranslation } from "react-i18next";
@@ -52,6 +53,15 @@ interface ChatMessage {
   content: string;
   timestamp: number;
 }
+
+const OTHELLO_SERVER_SCRIPT_URL =
+  "https://raw.githubusercontent.com/hugqq/ToolDock/refs/heads/main/scripts/othello-server.sh";
+const OTHELLO_SERVER_INSTALL_COMMAND = `mkdir -p ~/tooldock-othello
+cd ~/tooldock-othello
+curl -fsSL ${OTHELLO_SERVER_SCRIPT_URL} -o othello-server.sh
+chmod +x othello-server.sh
+./othello-server.sh install
+./othello-server.sh start`;
 
 // --- Logic ---
 const DIRECTIONS = [
@@ -1507,16 +1517,87 @@ const Othello: React.FC = () => {
       <Dialog open={settingsOpen} onClose={() => setSettingsOpen(false)}>
         <DialogTitle>{t("tools.othello.server_config")}</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label={t("tools.othello.server_url")}
-            fullWidth
-            variant="outlined"
-            value={inputUrl}
-            onChange={(e) => setInputUrl(e.target.value)}
-            helperText="Example: ws://localhost:3030 or ws://192.168.1.5:3030"
-          />
+          <Stack spacing={2} sx={{ pt: 1, minWidth: { sm: 520 } }}>
+            <TextField
+              autoFocus
+              label={t("tools.othello.server_url")}
+              fullWidth
+              variant="outlined"
+              value={inputUrl}
+              onChange={(e) => setInputUrl(e.target.value)}
+              helperText="Example: ws://localhost:3030 or ws://192.168.1.5:3030"
+            />
+
+            <Box
+              sx={{
+                p: 1.5,
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 1,
+                bgcolor: "action.hover",
+              }}
+            >
+              <Typography variant="subtitle2" gutterBottom>
+                {t("tools.othello.server_deploy_script")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {t("tools.othello.server_deploy_script_desc")}
+              </Typography>
+              <Box
+                component="pre"
+                sx={{
+                  m: 0,
+                  mb: 1,
+                  p: 1.25,
+                  bgcolor: "background.paper",
+                  border: 1,
+                  borderColor: "divider",
+                  borderRadius: 1,
+                  color: "text.primary",
+                  fontFamily: "monospace",
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                  overflowX: "auto",
+                  whiteSpace: "pre-wrap",
+                }}
+              >
+                {OTHELLO_SERVER_INSTALL_COMMAND}
+              </Box>
+              <Stack direction="row" spacing={1} sx={{ mb: 1 }} flexWrap="wrap">
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<Copy size={16} />}
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      OTHELLO_SERVER_INSTALL_COMMAND
+                    );
+                    setSnackMsg(t("tools.othello.install_command_copied"));
+                  }}
+                >
+                  {t("tools.othello.copy_install_command")}
+                </Button>
+              </Stack>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {t("tools.othello.server_url_after_install")}
+              </Typography>
+              <Typography
+                component="a"
+                href={OTHELLO_SERVER_SCRIPT_URL}
+                target="_blank"
+                rel="noreferrer"
+                variant="body2"
+                sx={{
+                  color: "primary.main",
+                  textDecoration: "none",
+                  overflowWrap: "anywhere",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
+                {OTHELLO_SERVER_SCRIPT_URL}
+              </Typography>
+            </Box>
+          </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setSettingsOpen(false)}>Cancel</Button>

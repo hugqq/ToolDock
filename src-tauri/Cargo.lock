@@ -6105,11 +6105,8 @@ dependencies = [
  "usvg",
  "uuid",
  "walkdir",
- "webview2-com",
- "webview2-com-sys",
  "winapi",
  "windows 0.61.3",
- "windows-core 0.61.2",
  "winreg 0.55.0",
 ]
 

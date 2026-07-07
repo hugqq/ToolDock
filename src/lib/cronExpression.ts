@@ -4,7 +4,10 @@ export type CronFieldType =
   | "hours"
   | "days"
   | "months"
-  | "weeks";
+  | "weeks"
+  | "years";
+
+export type CronFieldCount = 5 | 6 | 7;
 
 export interface CronFieldState {
   type: "any" | "range" | "step" | "specific";
@@ -34,12 +37,27 @@ export const CRON_FIELD_CONFIGS: Record<
   days: { min: 1, max: 31, label: "日" },
   months: { min: 1, max: 12, label: "月" },
   weeks: { min: 0, max: 6, label: "周" },
+  years: { min: 2024, max: 2099, label: "年" },
 };
 
-export const getCronTabs = (includeSeconds: boolean): CronFieldType[] =>
-  includeSeconds
-    ? ["seconds", "minutes", "hours", "days", "months", "weeks"]
-    : ["minutes", "hours", "days", "months", "weeks"];
+export const getCronTabs = (fieldCount: CronFieldCount): CronFieldType[] => {
+  switch (fieldCount) {
+    case 5:
+      return ["minutes", "hours", "days", "months", "weeks"];
+    case 6:
+      return ["seconds", "minutes", "hours", "days", "months", "weeks"];
+    case 7:
+      return [
+        "seconds",
+        "minutes",
+        "hours",
+        "days",
+        "months",
+        "weeks",
+        "years",
+      ];
+  }
+};
 
 export const createDefaultCronFieldStates = (): Record<
   CronFieldType,
@@ -61,6 +79,13 @@ export const createDefaultCronFieldStates = (): Record<
     stepStart: 1,
   },
   weeks: { ...DEFAULT_CRON_FIELD_STATE, type: "any" },
+  years: {
+    ...DEFAULT_CRON_FIELD_STATE,
+    type: "any",
+    rangeStart: 2024,
+    rangeEnd: 2099,
+    stepStart: 2024,
+  },
 });
 
 const formatField = (
@@ -97,8 +122,8 @@ const formatField = (
 
 export const buildCronExpression = (
   states: Record<CronFieldType, CronFieldState>,
-  includeSeconds: boolean
-) => getCronTabs(includeSeconds).map((field) => formatField(field, states)).join(" ");
+  fieldCount: CronFieldCount
+) => getCronTabs(fieldCount).map((field) => formatField(field, states)).join(" ");
 
 const parseFieldPart = (field: CronFieldType, part: string): CronFieldState => {
   const config = CRON_FIELD_CONFIGS[field];
@@ -155,20 +180,20 @@ const parseFieldPart = (field: CronFieldType, part: string): CronFieldState => {
 
 export const parseCronExpression = (
   expression: string
-): { includeSeconds: boolean; states: Record<CronFieldType, CronFieldState> } | null => {
+): { fieldCount: CronFieldCount; states: Record<CronFieldType, CronFieldState> } | null => {
   const parts = expression.trim().split(/\s+/).filter(Boolean);
 
-  if (parts.length !== 5 && parts.length !== 6) {
+  if (parts.length !== 5 && parts.length !== 6 && parts.length !== 7) {
     return null;
   }
 
-  const includeSeconds = parts.length === 6;
+  const fieldCount = parts.length as CronFieldCount;
   const states = createDefaultCronFieldStates();
-  const tabs = getCronTabs(includeSeconds);
+  const tabs = getCronTabs(fieldCount);
 
   tabs.forEach((field, index) => {
     states[field] = parseFieldPart(field, parts[index]);
   });
 
-  return { includeSeconds, states };
+  return { fieldCount, states };
 };

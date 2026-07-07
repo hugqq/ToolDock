@@ -5,8 +5,7 @@
   "windows": [
     "main",
     "floating_widget",
-    "screenshot-selector",
-    "weread"
+    "screenshot-selector"
   ],
   "permissions": [
     "core:default",
@@ -38,12 +37,6 @@
         },
         {
           "url": "https://console.cloud.tencent.com/cam/capi"
-        },
-        {
-          "url": "https://weread.qq.com"
-        },
-        {
-          "url": "https://weread.qq.com/*"
         },
         {
           "url": "https://tauri.app/"
