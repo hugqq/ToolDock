@@ -1,121 +1,90 @@
-; ToolDock Custom NSIS Installer Hooks
-; Tauri v2 NSIS installer customization
+; ToolDock custom NSIS installer hooks.
+; Close the running app before copying or removing files so overwrite updates can continue.
 
 !include "LogicLib.nsh"
 
-; Pre-install hook - runs BEFORE files are copied
 !macro NSIS_HOOK_PREINSTALL
-  ; Check if ToolDock is running
-  nsExec::ExecToStack 'tasklist /FI "IMAGENAME eq tooldock.exe" /NH'
-  Pop $0
-  Pop $1
+  Call CloseToolDockBeforeFileOperation
 
-  StrCpy $2 $1 12
-  ${If} $2 != "INFO: No ta"
-    ; Process is running - ask user
-    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "检测到 ToolDock 正在运行。$\n$\n点击 确定 将自动关闭程序并继续安装。$\n点击 取消 退出安装程序。" IDOK DoKill
-    Quit
-
-    DoKill:
-      ; Force kill the process
-      nsExec::ExecToLog 'taskkill /F /IM "tooldock.exe"'
-      nsExec::ExecToLog 'taskkill /F /IM "ToolDock.exe"'
-      Sleep 2000
-  ${EndIf}
-
-  ; Clean up old cache and log files
+  ; Clean up old cache and log files.
   RMDir /r "$LOCALAPPDATA\tooldock\cache"
   RMDir /r "$LOCALAPPDATA\tooldock\logs"
 !macroend
 
-; Post-install hook - runs after files are copied
 !macro NSIS_HOOK_POSTINSTALL
-  ; Nothing needed here for now
+  ; Nothing needed here for now.
 !macroend
 
-; Uninstall callback
-!macro customUninstall
-  ; Check if running during uninstall
-  nsExec::ExecToStack 'tasklist /FI "IMAGENAME eq ToolDock.exe" /NH'
-  Pop $0
-  Pop $1
+!macro NSIS_HOOK_PREUNINSTALL
+  Call CloseToolDockBeforeFileOperation
+!macroend
 
-  StrCpy $2 $1 12
-  ${If} $2 != "INFO: No ta"
-    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "ToolDock 正在运行。$\n$\n必须先关闭程序才能卸载。$\n点击 确定 将自动关闭。" IDOK DoUninstallClose
-    Quit
-
-    DoUninstallClose:
-      DetailPrint "正在关闭 ToolDock..."
-      nsExec::ExecToLog 'taskkill /F /IM "ToolDock.exe"'
-      nsExec::ExecToLog 'taskkill /F /IM "tooldock.exe"'
-      Sleep 2000
-  ${EndIf}
-
-  ; Remove application data
+!macro NSIS_HOOK_POSTUNINSTALL
+  ; Remove application data after files are removed.
   DetailPrint "正在删除应用数据..."
   RMDir /r "$LOCALAPPDATA\tooldock"
   RMDir /r "$APPDATA\tooldock"
 !macroend
 
-; Function to check and close ToolDock
-Function CheckAndCloseToolDock
-  ; Check for both possible process names (ToolDock.exe and tooldock.exe)
-  StrCpy $3 "0" ; Flag to track if process found
+Function IsToolDockRunning
+  StrCpy $3 "0"
 
-  ; Check ToolDock.exe
-  nsExec::ExecToStack 'tasklist /FI "IMAGENAME eq ToolDock.exe" /NH'
+  nsExec::ExecToStack 'cmd /C tasklist /FI "IMAGENAME eq ToolDock.exe" /NH | find /I "ToolDock.exe" >NUL'
   Pop $0
   Pop $1
-  StrCpy $2 $1 12
-  ${If} $2 != "INFO: No ta"
+  ${If} $0 == 0
     StrCpy $3 "1"
   ${EndIf}
 
-  ; Check tooldock.exe (lowercase)
-  nsExec::ExecToStack 'tasklist /FI "IMAGENAME eq tooldock.exe" /NH'
+  nsExec::ExecToStack 'cmd /C tasklist /FI "IMAGENAME eq tooldock.exe" /NH | find /I "tooldock.exe" >NUL'
   Pop $0
   Pop $1
-  StrCpy $2 $1 12
-  ${If} $2 != "INFO: No ta"
+  ${If} $0 == 0
     StrCpy $3 "1"
   ${EndIf}
+FunctionEnd
 
-  ${If} $3 == "1"
-    ; Process is running - ask user
-    MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "检测到 ToolDock 正在运行。$\n$\n点击 确定 将自动关闭程序并继续安装。$\n点击 取消 手动关闭后再安装。" /SD IDOK IDOK DoClose
-    ; User clicked Cancel
-    MessageBox MB_OK "安装已取消。请关闭 ToolDock 后重新运行安装程序。"
-    Quit
+Function WaitForToolDockExit
+  StrCpy $4 0
 
-    DoClose:
-      ; Force close both possible process names
-      nsExec::ExecToLog 'taskkill /F /IM "ToolDock.exe" 2>nul'
-      nsExec::ExecToLog 'taskkill /F /IM "tooldock.exe" 2>nul'
-      Sleep 2000
+  ${Do}
+    Call IsToolDockRunning
+    ${If} $3 == "0"
+      Return
+    ${EndIf}
 
-      ; Verify both are closed
-      StrCpy $3 "0"
+    Sleep 500
+    IntOp $4 $4 + 1
+  ${LoopUntil} $4 >= 10
+FunctionEnd
 
-      nsExec::ExecToStack 'tasklist /FI "IMAGENAME eq ToolDock.exe" /NH'
-      Pop $0
-      Pop $1
-      StrCpy $2 $1 12
-      ${If} $2 != "INFO: No ta"
-        StrCpy $3 "1"
-      ${EndIf}
-
-      nsExec::ExecToStack 'tasklist /FI "IMAGENAME eq tooldock.exe" /NH'
-      Pop $0
-      Pop $1
-      StrCpy $2 $1 12
-      ${If} $2 != "INFO: No ta"
-        StrCpy $3 "1"
-      ${EndIf}
-
-      ${If} $3 == "1"
-        MessageBox MB_OK|MB_ICONSTOP "无法关闭 ToolDock 进程。请手动关闭后重试。"
-        Quit
-      ${EndIf}
+Function CloseToolDockBeforeFileOperation
+  Call IsToolDockRunning
+  ${If} $3 == "0"
+    Return
   ${EndIf}
+
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "检测到 ToolDock 正在运行。$\n$\n点击 确定 将自动关闭程序并继续安装。$\n点击 取消 退出安装程序。" IDOK DoClose
+  Quit
+
+  DoClose:
+    DetailPrint "正在关闭 ToolDock..."
+
+    ; Try a normal close first, then force-close any remaining tray/background process.
+    nsExec::ExecToLog 'cmd /C taskkill /T /IM "ToolDock.exe" >NUL 2>NUL'
+    nsExec::ExecToLog 'cmd /C taskkill /T /IM "tooldock.exe" >NUL 2>NUL'
+    Call WaitForToolDockExit
+
+    Call IsToolDockRunning
+    ${If} $3 == "1"
+      nsExec::ExecToLog 'cmd /C taskkill /F /T /IM "ToolDock.exe" >NUL 2>NUL'
+      nsExec::ExecToLog 'cmd /C taskkill /F /T /IM "tooldock.exe" >NUL 2>NUL'
+      Call WaitForToolDockExit
+    ${EndIf}
+
+    Call IsToolDockRunning
+    ${If} $3 == "1"
+      MessageBox MB_OK|MB_ICONSTOP "无法关闭 ToolDock 进程。请手动退出 ToolDock，或以管理员身份重新运行安装程序。"
+      Quit
+    ${EndIf}
 FunctionEnd

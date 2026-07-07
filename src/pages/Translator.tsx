@@ -62,7 +62,6 @@ const Translator: React.FC = () => {
   const currentApiKey = React.useMemo(() => {
     if (engine === "google") return translator.googleKey;
     if (engine === "deepl") return translator.deeplKey;
-    if (engine === "deeplx") return translator.deeplxKey;
     if (engine === "baidu") return translator.baiduKey;
     if (engine === "youdao") return translator.youdaoKey;
     if (engine === "tencent") return translator.tencentKey;
@@ -76,7 +75,6 @@ const Translator: React.FC = () => {
       const keyMap: Record<string, string> = {
         google: translator.googleKey,
         deepl: translator.deeplKey,
-        deeplx: translator.deeplxKey,
         baidu: translator.baiduKey,
         youdao: translator.youdaoKey,
         tencent: translator.tencentKey,
@@ -107,7 +105,6 @@ const Translator: React.FC = () => {
     // 校验必填项
     const needsKey = [
       "deepl",
-      "deeplx",
       "baidu",
       "youdao",
       "tencent",
@@ -360,7 +357,6 @@ const Translator: React.FC = () => {
                   "tencent",
                   "volcengine",
                   "deepl",
-                  "deeplx",
                 ].map((e) => {
                   const available = isEngineAvailable(e);
                   return (
@@ -721,7 +717,6 @@ const Translator: React.FC = () => {
                     !input.trim() ||
                     ([
                       "deepl",
-                      "deeplx",
                       "baidu",
                       "youdao",
                       "tencent",

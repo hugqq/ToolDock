@@ -136,6 +136,72 @@ export function Home({ activeCategory, setActiveCategory, searchText, setSearchT
     </div>
   );
 
+  const renderToolGridView = () => (
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
+      <AnimatePresence mode="popLayout">
+        {filteredTools.map((tool) => {
+          const isFavorited = favoriteTools.includes(tool.id);
+          const isPinned = pinnedTools.includes(tool.id);
+
+          return (
+            <motion.div
+              key={tool.id}
+              layout
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.15 }}
+              className="group relative flex flex-col items-center gap-2 p-4 bg-(--card-bg) border border-(--border-color) rounded-xl hover:border-primary hover:shadow-lg hover:shadow-primary/5 cursor-pointer transition-all"
+              onClick={() => handleToolClick(tool.route)}
+            >
+              <div
+                className="flex items-center justify-center w-10 h-10 rounded-xl transition-transform group-hover:scale-110"
+                style={{
+                  backgroundColor: `${tool.color}15`,
+                  color: tool.color,
+                }}
+              >
+                <tool.icon size={22} />
+              </div>
+              <span className="text-sm text-(--text-main) font-medium text-center truncate w-full">
+                {t(tool.nameKey)}
+              </span>
+
+              <div className="absolute top-1.5 right-1.5 flex gap-0.5">
+                <button
+                  className={`p-1 rounded transition-all ${
+                    isPinned
+                      ? "text-orange-500 opacity-100"
+                      : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:text-orange-500"
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    togglePin(tool.id);
+                  }}
+                >
+                  <Pin size={12} fill={isPinned ? "currentColor" : "none"} />
+                </button>
+                <button
+                  className={`p-1 rounded transition-all ${
+                    isFavorited
+                      ? "text-yellow-500 opacity-100"
+                      : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:text-yellow-500"
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(tool.id);
+                  }}
+                >
+                  <Star size={12} fill={isFavorited ? "currentColor" : "none"} />
+                </button>
+              </div>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
+    </div>
+  );
+
   // 列表视图
   const renderListView = () => (
     <div className="flex flex-col gap-1">
@@ -344,39 +410,44 @@ export function Home({ activeCategory, setActiveCategory, searchText, setSearchT
             )}
           </div>
 
-          {/* 视图切换 */}
-          <div className="flex items-center gap-1 p-1 bg-(--hover-bg) rounded-lg">
-            <Tooltip content={t("home.listView")}>
-              <button
-                className={`p-1.5 rounded-md transition-all ${
-                  homeViewMode === "list"
-                    ? "bg-(--card-bg) text-primary shadow-sm"
-                    : "text-(--text-muted) hover:text-(--text-main)"
-                }`}
-                onClick={() => setHomeViewMode("list")}
-              >
-                <List size={18} />
-              </button>
-            </Tooltip>
-            <Tooltip content={t("home.groupedView")}>
-              <button
-                className={`p-1.5 rounded-md transition-all ${
-                  homeViewMode === "grouped"
-                    ? "bg-(--card-bg) text-primary shadow-sm"
-                    : "text-(--text-muted) hover:text-(--text-main)"
-                }`}
-                onClick={() => setHomeViewMode("grouped")}
-              >
-                <LayoutGrid size={18} />
-              </button>
-            </Tooltip>
-          </div>
+          {activeCategory !== CATEGORY.FAVORITES && (
+            <div className="flex items-center gap-1 p-1 bg-(--hover-bg) rounded-lg">
+              <Tooltip content={t("home.listView")}>
+                <button
+                  className={`p-1.5 rounded-md transition-all ${
+                    homeViewMode === "list"
+                      ? "bg-(--card-bg) text-primary shadow-sm"
+                      : "text-(--text-muted) hover:text-(--text-main)"
+                  }`}
+                  onClick={() => setHomeViewMode("list")}
+                >
+                  <List size={18} />
+                </button>
+              </Tooltip>
+              <Tooltip content={t("home.groupedView")}>
+                <button
+                  className={`p-1.5 rounded-md transition-all ${
+                    homeViewMode === "grouped"
+                      ? "bg-(--card-bg) text-primary shadow-sm"
+                      : "text-(--text-muted) hover:text-(--text-main)"
+                  }`}
+                  onClick={() => setHomeViewMode("grouped")}
+                >
+                  <LayoutGrid size={18} />
+                </button>
+              </Tooltip>
+            </div>
+          )}
         </div>
       </div>
 
       {/* 工具列表 */}
       {filteredTools.length > 0 ? (
-        homeViewMode === "list" ? renderListView() : renderGroupedView()
+        activeCategory === CATEGORY.FAVORITES
+          ? renderToolGridView()
+          : activeCategory === CATEGORY.ALL
+            ? homeViewMode === "list" ? renderListView() : renderGroupedView()
+            : homeViewMode === "list" ? renderListView() : renderToolGridView()
       ) : (
         <div className="flex flex-col items-center justify-center py-20 text-(--text-muted)">
           <Info size={48} className="mb-4 opacity-20" />

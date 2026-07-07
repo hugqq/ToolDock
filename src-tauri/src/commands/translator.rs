@@ -7,7 +7,7 @@ use crate::core::translator::TranslationEngine;
 /// - text: 要翻译的文本
 /// - target: 目标语言（例如 "zh-CN" 或 "en"）
 /// - source: 可选源语言（例如 "en"），为空则由服务自动检测
-/// - engine: 翻译引擎 ("google", "deepl", "deeplx")
+/// - engine: 翻译引擎 ("google", "deepl", "baidu", "youdao", "tencent", "volcengine")
 /// - api_key: 可选的 API Key
 #[tauri::command]
 pub async fn translate_text(
@@ -26,7 +26,6 @@ pub async fn translate_text(
 
     let engine_type = match engine.as_deref() {
         Some("deepl") => TranslationEngine::DeepL,
-        Some("deeplx") => TranslationEngine::DeepLX,
         Some("baidu") => TranslationEngine::Baidu,
         Some("youdao") => TranslationEngine::Youdao,
         Some("tencent") => TranslationEngine::Tencent,
@@ -68,7 +67,6 @@ pub async fn check_translator_key(engine: String, api_key: String) -> AppResult<
 
     let engine_type = match engine.as_str() {
         "deepl" => TranslationEngine::DeepL,
-        "deeplx" => TranslationEngine::DeepLX,
         "baidu" => TranslationEngine::Baidu,
         "youdao" => TranslationEngine::Youdao,
         "tencent" => TranslationEngine::Tencent,

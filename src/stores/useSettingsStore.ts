@@ -12,7 +12,6 @@ interface TranslatorSettings {
   tencentKey: string;
   volcengineKey: string;
   deeplKey: string;
-  deeplxKey: string;
 }
 
 export interface AiProviderSettings {
@@ -93,8 +92,7 @@ interface SettingsState {
       | "baidu"
       | "tencent"
       | "volcengine"
-      | "deepl"
-      | "deeplx",
+      | "deepl",
     key: string
   ) => void;
   setAiActiveProvider: (id: string) => void;
@@ -131,7 +129,6 @@ export const useSettingsStore = create<SettingsState>()(
         tencentKey: "",
         volcengineKey: "",
         deeplKey: "",
-        deeplxKey: "",
       },
       ai: {
         activeProvider: "deepseek",
@@ -238,7 +235,7 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: "tooldock-settings",
-      version: 6,
+      version: 7,
       migrate: (persistedState: any, _version: number) => {
         let state = persistedState;
 
@@ -275,6 +272,13 @@ export const useSettingsStore = create<SettingsState>()(
         }
         if (state.ocr && state.ocr.baiduApiKey === undefined) {
           state = { ...state, ocr: { ...state.ocr, baiduApiKey: "", baiduSecretKey: "" } };
+        }
+
+        // version 6 -> 7: 移除 DeepLX 翻译配置
+        if (state.translator?.deeplxKey !== undefined) {
+          const translator = { ...state.translator };
+          delete translator.deeplxKey;
+          state = { ...state, translator };
         }
 
         // 补全 wechatSystemPrompt

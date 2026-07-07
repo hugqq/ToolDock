@@ -16,7 +16,6 @@ type HmacSha256 = Hmac<Sha256>;
 pub enum TranslationEngine {
     Google,
     DeepL,
-    DeepLX,
     Baidu,
     Youdao,
     Tencent,
@@ -42,7 +41,6 @@ pub async fn translate_text(
     match engine {
         TranslationEngine::Google => translate_google(text, target, source, api_key).await,
         TranslationEngine::DeepL => translate_deepl(text, target, source, api_key).await,
-        TranslationEngine::DeepLX => translate_deeplx(text, target, source, api_key).await,
         TranslationEngine::Baidu => translate_baidu(text, target, source, api_key).await,
         TranslationEngine::Youdao => translate_youdao(text, target, source, api_key).await,
         TranslationEngine::Tencent => translate_tencent(text, target, source, api_key).await,
@@ -88,23 +86,6 @@ pub async fn check_api_key(engine: TranslationEngine, api_key: &str) -> AppResul
             } else {
                 let err = resp.text().await.unwrap_or_default();
                 Err(crate::errors::AppError::Internal(format!("DeepL Key Invalid: {}", err)))
-            }
-        }
-        TranslationEngine::DeepLX => {
-            let url = format!("https://api.deeplx.org/{}/translate", api_key.trim());
-            let body = serde_json::json!({
-                "text": "Hi",
-                "source_lang": "en",
-                "target_lang": "zh",
-            });
-            let resp = client.post(url).json(&body).send().await.map_err(|e| {
-                crate::errors::AppError::Internal(format!("Network error: {}", e))
-            })?;
-            if resp.status().is_success() {
-                Ok(())
-            } else {
-                let err = resp.text().await.unwrap_or_default();
-                Err(crate::errors::AppError::Internal(format!("DeepLX Key Invalid: {}", err)))
             }
         }
         TranslationEngine::Baidu => {
@@ -508,61 +489,6 @@ fn hmac_sha256(key: &[u8], data: &[u8]) -> Vec<u8> {
     mac.update(data);
     mac.finalize().into_bytes().to_vec()
 }
-async fn translate_deeplx(
-    text: &str,
-    target: &str,
-    source: Option<&str>,
-    api_key: Option<&str>,
-) -> AppResult<TranslationResult> {
-    let key = api_key.unwrap_or("").trim();
-    let url = format!("https://api.deeplx.org/{}/translate", key);
-
-    let client = get_client()?;
-    
-    // 语言代码映射
-    let target_lower = target.to_lowercase();
-    let target_lang = match target_lower.as_str() {
-        "zh-cn" => "zh",
-        other => other,
-    };
-    let source_val = source.unwrap_or("auto").to_lowercase();
-    let source_lang = match source_val.as_str() {
-        "zh-cn" => "zh",
-        other => other,
-    };
-
-    let body = serde_json::json!({
-        "text": text,
-        "source_lang": source_lang,
-        "target_lang": target_lang,
-    });
-
-    let resp = client
-        .post(url)
-        .json(&body)
-        .send()
-        .await
-        .map_err(|e| crate::errors::AppError::Internal(format!("DeepLX request failed: {}", e)))?;
-
-    if !resp.status().is_success() {
-        let txt = resp.text().await.unwrap_or_default();
-        return Err(crate::errors::AppError::Internal(format!("DeepLX API error: {}", txt)));
-    }
-
-    let json: serde_json::Value = resp.json().await.map_err(|e| crate::errors::AppError::Internal(format!("DeepLX parse failed: {}", e)))?;
-    
-    if json["code"].as_i64().unwrap_or(0) != 200 {
-        return Err(crate::errors::AppError::Internal(format!("DeepLX error: {}", json["message"])));
-    }
-
-    let translated_text = json["data"].as_str().unwrap_or_default().to_string();
-
-    Ok(TranslationResult {
-        translated_text,
-        detected_source_language: None, // DeepLX standard response usually doesn't return detected lang in simple data field
-    })
-}
-
 async fn translate_baidu(
     text: &str,
     target: &str,

@@ -95,7 +95,53 @@ const CATEGORIES: CategoryConfig[] = [
   },
 ];
 
+type TranslatorEngine =
+  | "google"
+  | "youdao"
+  | "baidu"
+  | "tencent"
+  | "volcengine"
+  | "deepl";
 
+interface TranslatorCredentialFields {
+  firstPlaceholderKey: string;
+  secondPlaceholderKey: string;
+}
+
+const TRANSLATOR_CREDENTIAL_FIELDS: Partial<
+  Record<TranslatorEngine, TranslatorCredentialFields>
+> = {
+  youdao: {
+    firstPlaceholderKey: "tools.translator.youdao_app_key_placeholder",
+    secondPlaceholderKey: "tools.translator.youdao_secret_placeholder",
+  },
+  baidu: {
+    firstPlaceholderKey: "tools.translator.baidu_app_id_placeholder",
+    secondPlaceholderKey: "tools.translator.baidu_secret_placeholder",
+  },
+  tencent: {
+    firstPlaceholderKey: "tools.translator.tencent_secret_id_placeholder",
+    secondPlaceholderKey: "tools.translator.tencent_secret_key_placeholder",
+  },
+  volcengine: {
+    firstPlaceholderKey: "tools.translator.volcengine_access_key_placeholder",
+    secondPlaceholderKey: "tools.translator.volcengine_secret_key_placeholder",
+  },
+};
+
+const splitTranslatorCredential = (value: string): [string, string] => {
+  const separatorIndex = value.indexOf(":");
+  if (separatorIndex === -1) return [value, ""];
+  return [
+    value.slice(0, separatorIndex),
+    value.slice(separatorIndex + 1),
+  ];
+};
+
+const joinTranslatorCredential = (first: string, second: string) => {
+  if (!first && !second) return "";
+  return `${first}:${second}`;
+};
 
 const Settings: React.FC = () => {
   const { t } = useTranslation();
@@ -224,6 +270,8 @@ const Settings: React.FC = () => {
         await invoke("plugin:autostart|enable");
       } else {
         await invoke("plugin:autostart|disable");
+        setSilentStart(false);
+        await invokeWrapper("set_silent_start", { enabled: false });
       }
       setAutoStart(checked);
       toast.success(t("common.success"));
@@ -239,8 +287,23 @@ const Settings: React.FC = () => {
   };
 
   const handleToggleSilentStart = async (checked: boolean) => {
-    setSilentStart(checked);
-    await invokeWrapper("set_silent_start", { enabled: checked });
+    try {
+      if (checked) {
+        await invoke("plugin:autostart|enable");
+        setAutoStart(true);
+      }
+
+      const res = await invokeWrapper("set_silent_start", { enabled: checked });
+      if (!res.ok) {
+        toast.error(t("common.error"));
+        return;
+      }
+
+      setSilentStart(checked);
+      toast.success(t("common.success"));
+    } catch {
+      toast.error(t("common.error"));
+    }
   };
 
   const handleTestAi = async (providerId: string) => {
@@ -301,8 +364,16 @@ const Settings: React.FC = () => {
 
   const handleExport = async () => {
     try {
+      const translatorConfig = {
+        googleKey: translator.googleKey,
+        youdaoKey: translator.youdaoKey,
+        baiduKey: translator.baiduKey,
+        tencentKey: translator.tencentKey,
+        volcengineKey: translator.volcengineKey,
+        deeplKey: translator.deeplKey,
+      };
       const configData = JSON.stringify({
-        translator,
+        translator: translatorConfig,
         ai,
         ocr,
         runAsAdmin,
@@ -380,9 +451,19 @@ const Settings: React.FC = () => {
                 | "baidu"
                 | "tencent"
                 | "volcengine"
-                | "deepl"
-                | "deeplx";
-              setTranslatorKey(engine, value as string);
+                | "deepl";
+              if (
+                [
+                  "google",
+                  "youdao",
+                  "baidu",
+                  "tencent",
+                  "volcengine",
+                  "deepl",
+                ].includes(engine)
+              ) {
+                setTranslatorKey(engine, value as string);
+              }
             });
           }
           if (imported.ai) {
@@ -499,7 +580,7 @@ const Settings: React.FC = () => {
         description={t("tools.settings.auto_start_desc")}
       />
       <ToggleSwitch
-        checked={silentStart}
+        checked={autoStart && silentStart}
         onChange={handleToggleSilentStart}
         label={t("tools.settings.silent_start")}
         description={t("tools.settings.silent_start_desc")}
@@ -862,53 +943,46 @@ const Settings: React.FC = () => {
   const renderTranslatorSettings = () => {
     const translatorConfigs = [
       {
-        key: "google",
+        key: "google" as const,
         label: "Google Cloud Translation API Key",
         url: "https://console.cloud.google.com/apis/credentials",
         placeholderKey: "tools.translator.google_key_placeholder",
         descKey: "tools.translator.google_key_desc",
       },
       {
-        key: "youdao",
-        label: "Youdao Translate (AppKey:Secret)",
+        key: "youdao" as const,
+        label: "Youdao Translate",
         url: "https://ai.youdao.com/console/#/",
         placeholderKey: "tools.translator.youdao_key_placeholder",
         descKey: "tools.translator.youdao_key_desc",
       },
       {
-        key: "baidu",
-        label: "Baidu Translate (AppID:Secret)",
+        key: "baidu" as const,
+        label: "Baidu Translate",
         url: "https://fanyi-api.baidu.com/manage/developer",
         placeholderKey: "tools.translator.baidu_key_placeholder",
         descKey: "tools.translator.baidu_key_desc",
       },
       {
-        key: "tencent",
-        label: "Tencent Translate (SecretId:SecretKey)",
+        key: "tencent" as const,
+        label: "Tencent Translate",
         url: "https://console.cloud.tencent.com/cam/capi",
         placeholderKey: "tools.translator.tencent_key_placeholder",
         descKey: "tools.translator.tencent_key_desc",
       },
       {
-        key: "volcengine",
-        label: "Volcengine Translate (AccessKey:SecretKey)",
+        key: "volcengine" as const,
+        label: "Volcengine Translate",
         url: "https://console.volcengine.com/iam/keymanage/",
         placeholderKey: "tools.translator.volcengine_key_placeholder",
         descKey: "tools.translator.volcengine_key_desc",
       },
       {
-        key: "deepl",
+        key: "deepl" as const,
         label: "DeepL API Key",
         url: "https://www.deepl.com/en/your-account/keys",
         placeholderKey: "tools.translator.deepl_key_placeholder",
         descKey: "tools.translator.deepl_key_desc",
-      },
-      {
-        key: "deeplx",
-        label: "DeepLX API Key",
-        url: "https://api.deeplx.org/",
-        placeholderKey: "tools.translator.deeplx_key_placeholder",
-        descKey: "tools.translator.deeplx_key_desc",
       },
     ];
 
@@ -917,10 +991,27 @@ const Settings: React.FC = () => {
         {translatorConfigs.map((config) => {
           const valueKey = `${config.key}Key` as keyof typeof translator;
           const value = translator[valueKey] as string;
-          const isTencentInvalid =
+          const credentialFields = TRANSLATOR_CREDENTIAL_FIELDS[config.key];
+          const [credentialFirst, credentialSecond] =
+            splitTranslatorCredential(value);
+          const isTencentInvalid = Boolean(
             config.key === "tencent" &&
-            value &&
-            value.split(":")[0]?.length < 30;
+              credentialFirst &&
+              credentialFirst.length < 30
+          );
+          const updateCredentialField = (
+            part: "first" | "second",
+            nextValue: string
+          ) => {
+            const nextFirst =
+              part === "first" ? nextValue.trim() : credentialFirst;
+            const nextSecond =
+              part === "second" ? nextValue.trim() : credentialSecond;
+            setTranslatorKey(
+              config.key,
+              joinTranslatorCredential(nextFirst, nextSecond)
+            );
+          };
 
           return (
             <div
@@ -940,33 +1031,44 @@ const Settings: React.FC = () => {
                   {t("tools.translator.get_key")} <ExternalLink size={12} />
                 </Button>
               </div>
-              <Input
-                type="password"
-                className={`text-sm ${isTencentInvalid ? "border-red-500" : ""}`}
-                placeholder={t(config.placeholderKey)}
-                value={value}
-                onChange={(e) =>
-                  setTranslatorKey(
-                    config.key as
-                      | "google"
-                      | "youdao"
-                      | "baidu"
-                      | "tencent"
-                      | "volcengine"
-                      | "deepl"
-                      | "deeplx",
-                    config.key === "tencent" || config.key === "volcengine"
-                      ? e.target.value.trim()
-                      : e.target.value
-                  )
-                }
-              />
+              {credentialFields ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Input
+                    type="password"
+                    className={`text-sm ${
+                      isTencentInvalid ? "border-red-500" : ""
+                    }`}
+                    placeholder={t(credentialFields.firstPlaceholderKey)}
+                    value={credentialFirst}
+                    onChange={(e) =>
+                      updateCredentialField("first", e.target.value)
+                    }
+                  />
+                  <Input
+                    type="password"
+                    className="text-sm"
+                    placeholder={t(credentialFields.secondPlaceholderKey)}
+                    value={credentialSecond}
+                    onChange={(e) =>
+                      updateCredentialField("second", e.target.value)
+                    }
+                  />
+                </div>
+              ) : (
+                <Input
+                  type="password"
+                  className="text-sm"
+                  placeholder={t(config.placeholderKey)}
+                  value={value}
+                  onChange={(e) => setTranslatorKey(config.key, e.target.value)}
+                />
+              )}
               <p className="text-xs text-(--text-muted)">{t(config.descKey)}</p>
               {isTencentInvalid && (
                 <p className="text-xs text-red-600 dark:text-red-400 flex items-start gap-1 animate-pulse">
                   <span className="mt-0.5">❌</span>
                   <span>
-                    SecretId 长度不足！当前 {value.split(":")[0]?.length}{" "}
+                    SecretId 长度不足！当前 {credentialFirst.length}{" "}
                     字符，应为 36-40 字符
                   </span>
                 </p>
