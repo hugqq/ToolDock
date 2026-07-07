@@ -434,43 +434,43 @@ const BatchRenamer: React.FC = () => {
     <ToolLayout title={t("tools.batch_renamer.name")}>
       <div className="space-y-6">
         {/* 使用说明卡片 */}
-        <div className="p-6 rounded-2xl border border-green-500/20 bg-green-500/5">
+        <div className="p-6 rounded-2xl border border-blue-500/20 bg-blue-500/5">
           <div className="flex items-center gap-2 mb-4">
-            <Info className="w-5 h-5 text-green-600" />
-            <div className="text-lg font-bold text-green-700">
+            <Info className="w-5 h-5 text-blue-600" />
+            <div className="text-lg font-bold text-blue-700">
               {t("tools.batch_renamer.instructions.title")}
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <div className="text-sm font-semibold text-green-700">
+              <div className="text-sm font-semibold text-blue-700">
                 {t("tools.batch_renamer.instructions.step1_title")}
               </div>
-              <div className="text-xs text-green-600/80 leading-relaxed">
+              <div className="text-xs text-blue-600/80 leading-relaxed">
                 {t("tools.batch_renamer.instructions.step1_desc")}
               </div>
             </div>
             <div className="space-y-2">
-              <div className="text-sm font-semibold text-green-700">
+              <div className="text-sm font-semibold text-blue-700">
                 {t("tools.batch_renamer.instructions.step2_title")}
               </div>
-              <div className="text-xs text-green-600/80 leading-relaxed">
+              <div className="text-xs text-blue-600/80 leading-relaxed">
                 {t("tools.batch_renamer.instructions.step2_desc")}
               </div>
             </div>
             <div className="space-y-2">
-              <div className="text-sm font-semibold text-green-700">
+              <div className="text-sm font-semibold text-blue-700">
                 {t("tools.batch_renamer.instructions.step3_title")}
               </div>
-              <div className="text-xs text-green-600/80 leading-relaxed">
+              <div className="text-xs text-blue-600/80 leading-relaxed">
                 {t("tools.batch_renamer.instructions.step3_desc")}
               </div>
             </div>
             <div className="space-y-2">
-              <div className="text-sm font-semibold text-green-700">
+              <div className="text-sm font-semibold text-blue-700">
                 {t("tools.batch_renamer.instructions.step4_title")}
               </div>
-              <div className="text-xs text-green-600/80 leading-relaxed">
+              <div className="text-xs text-blue-600/80 leading-relaxed">
                 {t("tools.batch_renamer.instructions.step4_desc")}
               </div>
             </div>

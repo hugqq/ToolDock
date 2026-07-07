@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
-  Menu,
-  ChevronRight as ChevronRightIcon,
   LayoutGrid,
   Languages,
   Sun,
@@ -20,18 +18,15 @@ import { CATEGORY } from "../constants";
 import logo from "../assets/logo.svg";
 
 interface SidebarProps {
-  isCollapsed: boolean;
-  setIsCollapsed: (collapsed: boolean) => void;
   activeCategory: string;
   setActiveCategory: (category: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  isCollapsed,
-  setIsCollapsed,
   activeCategory,
   setActiveCategory,
 }) => {
+  const isCollapsed = true;
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -78,15 +73,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </span>
           )}
         </div>
-        {!isCollapsed && (
-          <button
-            className="p-2 rounded-md hover:bg-sidebar-hover transition-all duration-200 shrink-0"
-            onClick={() => setIsCollapsed(true)}
-            title={t("common.collapse")}
-          >
-            <Menu size={20} />
-          </button>
-        )}
       </div>
 
       <nav
@@ -162,15 +148,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           isCollapsed ? "p-2" : "p-4"
         }`}
       >
-        {isCollapsed && (
-          <button
-            className="flex items-center justify-center p-2 rounded-lg hover:bg-sidebar-hover text-sidebar-muted hover:text-sidebar-text transition-colors mb-2"
-            onClick={() => setIsCollapsed(false)}
-            title={t("common.expand")}
-          >
-            <ChevronRightIcon size={20} />
-          </button>
-        )}
         <div className="flex flex-col gap-1">
           <button
             className={`flex items-center transition-all duration-200 overflow-hidden ${

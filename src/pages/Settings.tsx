@@ -21,13 +21,15 @@ import {
   Camera,
   Keyboard,
   Settings2,
+  RefreshCw,
   Languages,
   FolderInput,
   PlusCircle,
   X,
   XCircle,
 } from "lucide-react";
-import { openPath } from "@tauri-apps/plugin-opener";
+import { getVersion } from "@tauri-apps/api/app";
+import { openPath, openUrl } from "@tauri-apps/plugin-opener";
 import { invoke } from "@tauri-apps/api/core";
 import { save, open } from "@tauri-apps/plugin-dialog";
 import { writeTextFile, readTextFile } from "@tauri-apps/plugin-fs";
@@ -52,6 +54,43 @@ interface CategoryConfig {
   icon: React.ElementType;
   labelKey: string;
 }
+
+interface GitHubRelease {
+  tag_name?: string;
+  name?: string;
+  html_url?: string;
+}
+
+type UpdateStatus = "idle" | "latest" | "available" | "error";
+
+const RELEASES_URL = "https://github.com/hugqq/ToolDock/releases";
+const LATEST_RELEASE_API = "https://api.github.com/repos/hugqq/ToolDock/releases/latest";
+const FALLBACK_VERSION = "1.0.0";
+
+const normalizeVersion = (version: string) =>
+  version
+    .trim()
+    .replace(/^v/i, "")
+    .split(/[+-]/)[0]
+    .split(".")
+    .map((part) => Number.parseInt(part, 10))
+    .map((part) => (Number.isFinite(part) ? part : 0));
+
+const isNewerVersion = (latest: string, current: string) => {
+  const latestParts = normalizeVersion(latest);
+  const currentParts = normalizeVersion(current);
+  const length = Math.max(latestParts.length, currentParts.length);
+
+  for (let i = 0; i < length; i += 1) {
+    const latestPart = latestParts[i] ?? 0;
+    const currentPart = currentParts[i] ?? 0;
+
+    if (latestPart > currentPart) return true;
+    if (latestPart < currentPart) return false;
+  }
+
+  return false;
+};
 
 const CATEGORIES: CategoryConfig[] = [
   {
@@ -182,6 +221,10 @@ const Settings: React.FC = () => {
   const [testingAi, setTestingAi] = React.useState<string | null>(null);
   const [recording, setRecording] = React.useState(false);
   const [tempShortcut, setTempShortcut] = React.useState("");
+  const [currentVersion, setCurrentVersion] = React.useState(FALLBACK_VERSION);
+  const [isCheckingUpdate, setIsCheckingUpdate] = React.useState(false);
+  const [updateStatus, setUpdateStatus] = React.useState<UpdateStatus>("idle");
+  const [latestRelease, setLatestRelease] = React.useState<GitHubRelease | null>(null);
   const [activeCategory, setActiveCategory] =
     React.useState<SettingsCategory>("general");
   // 导出导入相关状态
@@ -214,6 +257,10 @@ const Settings: React.FC = () => {
         setTempShortcut(res.data);
       }
     });
+
+    getVersion()
+      .then(setCurrentVersion)
+      .catch(() => setCurrentVersion(FALLBACK_VERSION));
   }, []);
 
   // AI 服务商列表（带防御性默认值）
@@ -304,6 +351,50 @@ const Settings: React.FC = () => {
       toast.success(t("common.success"));
     } catch {
       toast.error(t("common.error"));
+    }
+  };
+
+  const handleCheckUpdate = async () => {
+    setIsCheckingUpdate(true);
+    setUpdateStatus("idle");
+
+    try {
+      const response = await fetch(LATEST_RELEASE_API, {
+        headers: { Accept: "application/vnd.github+json" },
+      });
+
+      if (!response.ok) {
+        throw new Error(`GitHub release request failed: ${response.status}`);
+      }
+
+      const release = (await response.json()) as GitHubRelease;
+      const latestVersion = release.tag_name || release.name;
+
+      if (!latestVersion) {
+        throw new Error("GitHub release response missing version");
+      }
+
+      setLatestRelease({
+        ...release,
+        html_url: release.html_url || RELEASES_URL,
+      });
+
+      if (isNewerVersion(latestVersion, currentVersion)) {
+        setUpdateStatus("available");
+        toast.success(
+          t("tools.settings.update_available", { version: latestVersion })
+        );
+      } else {
+        setUpdateStatus("latest");
+        toast.success(t("tools.settings.update_latest"));
+      }
+    } catch (error) {
+      console.error("Failed to check updates:", error);
+      setLatestRelease(null);
+      setUpdateStatus("error");
+      toast.error(t("tools.settings.update_failed"));
+    } finally {
+      setIsCheckingUpdate(false);
     }
   };
 
@@ -586,6 +677,90 @@ const Settings: React.FC = () => {
         label={t("tools.settings.silent_start")}
         description={t("tools.settings.silent_start_desc")}
       />
+      <div className="flex flex-col gap-3 rounded-xl bg-(--bg-main)/50 p-4 transition-colors hover:bg-(--bg-main)/80">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-(--text-main)">
+              {t("tools.settings.check_update")}
+            </span>
+            <span className="mt-0.5 text-xs text-(--text-muted)">
+              {t("tools.settings.current_version", {
+                version: currentVersion,
+              })}
+            </span>
+          </div>
+          <Button
+            variant="outlined"
+            onClick={handleCheckUpdate}
+            disabled={isCheckingUpdate}
+            className="flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium"
+          >
+            <RefreshCw
+              size={16}
+              className={isCheckingUpdate ? "animate-spin" : ""}
+            />
+            {isCheckingUpdate
+              ? t("tools.settings.checking_update")
+              : t("tools.settings.check_update")}
+          </Button>
+        </div>
+        {updateStatus !== "idle" && (
+          <div className="rounded-lg border border-(--border-color) bg-(--card-bg) p-3">
+            {updateStatus === "available" && latestRelease && (
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-(--text-main)">
+                    {t("tools.settings.update_available", {
+                      version: latestRelease.tag_name || latestRelease.name,
+                    })}
+                  </p>
+                  <p className="mt-1 text-xs text-(--text-muted)">
+                    {t("tools.settings.current_version", {
+                      version: currentVersion,
+                    })}
+                  </p>
+                </div>
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    openUrl(latestRelease.html_url || RELEASES_URL).catch(() =>
+                      toast.error(t("common.error"))
+                    )
+                  }
+                  className="flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium"
+                >
+                  {t("tools.settings.open_release")}
+                  <ExternalLink size={14} />
+                </Button>
+              </div>
+            )}
+            {updateStatus === "latest" && (
+              <p className="text-sm font-medium text-(--text-main)">
+                {t("tools.settings.update_latest")}
+              </p>
+            )}
+            {updateStatus === "error" && (
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm font-medium text-(--text-main)">
+                  {t("tools.settings.update_failed")}
+                </p>
+                <Button
+                  variant="outlined"
+                  onClick={() =>
+                    openUrl(RELEASES_URL).catch(() =>
+                      toast.error(t("common.error"))
+                    )
+                  }
+                  className="flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium"
+                >
+                  {t("tools.settings.open_release")}
+                  <ExternalLink size={14} />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 

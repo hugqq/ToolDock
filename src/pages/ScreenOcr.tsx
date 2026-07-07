@@ -186,10 +186,7 @@ const ScreenOcr: React.FC = () => {
   };
 
   return (
-    <ToolLayout
-      title={t("tools.ocr.name")}
-      description={t("tools.ocr.description")}
-    >
+    <ToolLayout title={t("tools.ocr.name")}>
       <div className="flex-1 flex flex-col min-h-0 gap-4">
         {/* 操作栏 */}
         <div className="flex items-center justify-between p-4 rounded-2xl border border-(--border-color) bg-(--card-bg) shadow-sm">

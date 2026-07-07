@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 interface ToolLayoutProps {
   title: string;
   children: React.ReactNode;
-  description?: string;
   status?: string;
   progress?: number;
   onCancel?: () => void;
@@ -15,7 +14,6 @@ interface ToolLayoutProps {
 
 export const ToolLayout: React.FC<ToolLayoutProps> = ({
   title,
-  description,
   children,
   status,
   progress,
@@ -39,11 +37,6 @@ export const ToolLayout: React.FC<ToolLayoutProps> = ({
           </button>
           <div>
             <h2 className="text-lg font-bold text-(--text-main)">{title}</h2>
-            {description && (
-              <p className="text-sm text-(--text-muted) mt-0.5">
-                {description}
-              </p>
-            )}
           </div>
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}

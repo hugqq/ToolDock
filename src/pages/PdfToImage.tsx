@@ -254,13 +254,7 @@ export default function PdfToImage() {
   }, [progress]);
 
   return (
-    <ToolLayout
-      title={t("pdf_to_image.name", "PDF 转图片")}
-      description={t(
-        "pdf_to_image.description",
-        "将 PDF 文档的每一页转换为高清图片，支持批量导出"
-      )}
-    >
+    <ToolLayout title={t("pdf_to_image.name", "PDF 转图片")}>
       <Box sx={{ maxWidth: 1200, mx: "auto", pb: 4 }}>
         {!pdfDocument ? (
           /* Step 1: File Selection Area */

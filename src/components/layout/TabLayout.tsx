@@ -7,7 +7,7 @@
  * - tabs: TabItem[] 标签页配置数组
  * - instructions?: Step[] 使用说明步骤数组（可选）
  * - instructionsTitle?: string 使用说明标题（可选）
- * - instructionsColor?: 'blue'|'green'|'purple'|'orange'|'red' 使用说明颜色（可选）
+ * - instructionsColor?: 兼容旧配置，使用说明统一显示为蓝色
  * - activeTab: number 当前激活的标签页索引
  * - onTabChange: (index: number) => void 标签页切换回调
  *
@@ -96,7 +96,6 @@ export const TabLayout: React.FC<TabLayoutProps> = ({
           >
             <InstructionsCard
               title={currentTab.instructionsTitle || "使用说明"}
-              color={currentTab.instructionsColor || "blue"}
               icon={Lightbulb}
               steps={currentTab.instructions!}
             />

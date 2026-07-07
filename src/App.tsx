@@ -67,7 +67,6 @@ const STANDALONE_ROUTES: Record<string, React.LazyExoticComponent<React.Componen
 };
 
 function AppContent() {
-  const [isCollapsed, setIsCollapsed] = useState(true);
   const [activeCategory, setActiveCategory] = useState<CategoryType>(CATEGORY.ALL);
   const [searchText, setSearchText] = useState("");
   const location = useLocation();
@@ -114,15 +113,13 @@ function AppContent() {
   }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden">
-      <Sidebar
-        isCollapsed={isCollapsed}
-        setIsCollapsed={setIsCollapsed}
-        activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
-      />
-      <div className="flex-1 flex flex-col min-w-0">
-        <TitleBar />
+    <div className="flex h-screen w-screen flex-col overflow-hidden">
+      <TitleBar />
+      <div className="flex flex-1 min-h-0">
+        <Sidebar
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+        />
         <main className="flex-1 flex flex-col min-w-0 bg-(--bg-main) relative overflow-hidden">
           <Suspense fallback={<PageLoader />}>
             <Routes>

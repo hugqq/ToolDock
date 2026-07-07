@@ -6,7 +6,7 @@
  * 属性说明：
  * - title: 卡片标题（必填）
  * - steps: Step[] 数组，每个Step包含 title（步骤标题）和 description（步骤描述）（必填）
- * - color?: 卡片主题色，可选值：'blue'|'green'|'purple'|'orange'|'red'（默认'blue'）
+ * - color?: 兼容旧调用，使用说明统一显示为蓝色
  * - icon?: 自定义图标组件，来自lucide-react（默认Info图标）
  *
  * 使用示例：
@@ -39,52 +39,21 @@ interface InstructionsCardProps {
   columns?: 1 | 2 | 3 | 4;
 }
 
-const colorClasses = {
-  blue: {
-    border: "border-blue-500/20",
-    bg: "bg-blue-500/5",
-    iconText: "text-blue-600",
-    titleText: "text-blue-700",
-    descText: "text-blue-600/80",
-  },
-  green: {
-    border: "border-green-500/20",
-    bg: "bg-green-500/5",
-    iconText: "text-green-600",
-    titleText: "text-green-700",
-    descText: "text-green-600/80",
-  },
-  purple: {
-    border: "border-purple-500/20",
-    bg: "bg-purple-500/5",
-    iconText: "text-purple-600",
-    titleText: "text-purple-700",
-    descText: "text-purple-600/80",
-  },
-  orange: {
-    border: "border-orange-500/20",
-    bg: "bg-orange-500/5",
-    iconText: "text-orange-600",
-    titleText: "text-orange-700",
-    descText: "text-orange-600/80",
-  },
-  red: {
-    border: "border-red-500/20",
-    bg: "bg-red-500/5",
-    iconText: "text-red-600",
-    titleText: "text-red-700",
-    descText: "text-red-600/80",
-  },
+const instructionColors = {
+  border: "border-blue-500/20",
+  bg: "bg-blue-500/5",
+  iconText: "text-blue-600",
+  titleText: "text-blue-700",
+  descText: "text-blue-600/80",
 };
 
 export const InstructionsCard: React.FC<InstructionsCardProps> = ({
   title,
   steps,
-  color = "blue",
   icon: Icon = Info,
   columns = 4,
 }) => {
-  const colors = colorClasses[color];
+  const colors = instructionColors;
 
   const gridColsClass = {
     1: "lg:grid-cols-1",

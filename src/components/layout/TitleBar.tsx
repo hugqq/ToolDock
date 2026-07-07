@@ -51,14 +51,11 @@ export function TitleBar() {
             data-tauri-drag-region
             className="h-8 flex items-center justify-between px-4 bg-(--bg-main) border-b border-(--border-color) select-none"
         >
-            {/* 应用标题 */}
+            {/* 拖拽区域 */}
             <div
                 data-tauri-drag-region
-                className="flex-1 text-[13px] font-semibold tracking-wide text-(--text-main)"
-                style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif' }}
-            >
-                <span data-tauri-drag-region>ToolDock</span>
-            </div>
+                className="flex-1"
+            />
 
             {/* 窗口控制按钮 */}
             <div className="flex items-center gap-0">
