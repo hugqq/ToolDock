@@ -25,6 +25,7 @@ import {
   Wifi,
   User,
   Disc,
+  Send,
 } from "lucide-react";
 import { useSettingsStore } from "../stores/useSettingsStore";
 import { useTranslation } from "react-i18next";
@@ -899,7 +900,7 @@ const Othello: React.FC = () => {
               onClick={handleSend}
               sx={{ minWidth: 40, px: 0 }}
             >
-              ➤
+              <Send size={16} />
             </Button>
           </Stack>
         </CardContent>

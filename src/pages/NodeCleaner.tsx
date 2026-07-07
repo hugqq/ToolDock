@@ -12,6 +12,7 @@ import {
   Download,
   FolderOpen,
   Info,
+  Lightbulb,
   Play,
   Plus,
   RefreshCw,
@@ -650,7 +651,7 @@ const NodeCleaner: React.FC = () => {
                       {t("tools.node_cleaner.total_size", { size: "" })}
                     </span>
                     <span className="text-lg font-bold text-emerald-500">
-                      💡 Rimraf 级极速删除
+                      Rimraf 级极速删除
                     </span>
                   </div>
                 </div>
@@ -1139,8 +1140,9 @@ const NodeCleaner: React.FC = () => {
                   value={viteExtraArgs}
                   onChange={(e) => setViteExtraArgs(e.target.value)}
                 />
-                <p className="mt-2 text-xs text-(--text-muted)">
-                  💡 {t("tools.node_cleaner.vite.extra_args_tip")}
+                <p className="mt-2 text-xs text-(--text-muted) flex items-center gap-1">
+                  <Lightbulb size={14} />
+                  <span>{t("tools.node_cleaner.vite.extra_args_tip")}</span>
                 </p>
               </div>
 

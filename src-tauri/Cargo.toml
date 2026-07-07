@@ -41,7 +41,6 @@ rayon = "1.11.0"
 uuid = { version = "1.19.0", features = ["v4"] }
 screenshots = "0.8.10"
 device_query = "4.0.1"
-sysinfo = "0.37.2"
 scopeguard = "1.2.0"
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
@@ -82,4 +81,3 @@ windows = { version = "0.61.3", features = [
     "Win32_Graphics_Gdi",
     "Win32_UI_WindowsAndMessaging",
 ] }
-

@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
-import { InstructionsCard } from "../components/shared/InstructionsCard";
 
 // --- Types ---
 type Grid = number[][];
@@ -674,30 +673,6 @@ export default function Game2048() {
             </AnimatePresence>
           </Paper>
 
-          {/* Instructions */}
-          <Box sx={{ width: "100%", maxWidth: 600 }}>
-            <InstructionsCard
-              steps={[
-                {
-                  title: t("tools.game2048.instructions.step1_title"),
-                  description: t("tools.game2048.instructions.step1_desc"),
-                },
-                {
-                  title: t("tools.game2048.instructions.step2_title"),
-                  description: t("tools.game2048.instructions.step2_desc"),
-                },
-                {
-                  title: t("tools.game2048.instructions.step3_title"),
-                  description: t("tools.game2048.instructions.step3_desc"),
-                },
-                {
-                  title: t("tools.game2048.instructions.step4_title"),
-                  description: t("tools.game2048.instructions.step4_desc"),
-                },
-              ]}
-              title={t("tools.game2048.instructions.title")}
-            />
-          </Box>
         </Stack>
       </Container>
 

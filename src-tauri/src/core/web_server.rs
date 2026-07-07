@@ -272,8 +272,6 @@ async fn serve_directory_listing(
         li { margin: 5px 0; }
         a { text-decoration: none; color: #0066cc; }
         a:hover { text-decoration: underline; }
-        .dir::before { content: "📁 "; }
-        .file::before { content: "📄 "; }
     </style>
 </head>
 <body>

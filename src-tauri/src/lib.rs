@@ -43,7 +43,7 @@ use commands::ip_lookup::{
     batch_query_ips, check_ip_is_private, get_ip_special_info, parse_ip_range, query_ip_info,
     validate_ip_address,
 };
-use commands::network::{get_listening_ports, kill_process, start_network_task, stop_network_task};
+use commands::network::{start_network_task, stop_network_task};
 use commands::nginx::{
     create_nginx_backup, delete_nginx_backup, is_nginx_running, list_nginx_backups,
     read_nginx_config, restore_nginx_backup, scan_nginx_configs, start_nginx, stop_nginx,
@@ -73,10 +73,6 @@ use commands::translator::{check_translator_key, translate_text};
 use commands::unit_converter::{convert_units, get_exchange_rates};
 use commands::variable_naming::generate_variable_names;
 use commands::web_server::{get_web_server_status, start_web_server, stop_web_server};
-use commands::wechat_assistant::{
-    capture_wechat_message, fill_wechat_reply, find_wechat_window, read_clipboard_silent,
-    wait_for_wechat_window,
-};
 use commands::weread::execute_weread_script;
 use core::clicker::ClickerManager;
 use core::clipboard::{start_listening, ClipboardManager};
@@ -249,8 +245,6 @@ pub fn run() {
             pkg_install,
             pick_screen_color,
             get_mouse_pixel_color,
-            get_listening_ports,
-            kill_process,
             start_network_task,
             stop_network_task,
             flush_dns,
@@ -323,11 +317,6 @@ pub fn run() {
             send_text_input,
             set_clicker_hotkey_enabled,
             get_clicker_hotkey_enabled,
-            wait_for_wechat_window,
-            capture_wechat_message,
-            fill_wechat_reply,
-            find_wechat_window,
-            read_clipboard_silent,
             start_web_server,
             stop_web_server,
             get_web_server_status,

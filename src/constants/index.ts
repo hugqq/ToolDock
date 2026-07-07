@@ -15,10 +15,6 @@ export type CategoryType = (typeof CATEGORY)[keyof typeof CATEGORY] | string;
 export const TIMING = {
   /** JSON 格式化防抖延迟 */
   DEBOUNCE_MS: 300,
-  /** 进程列表刷新延迟 */
-  REFRESH_DELAY_MS: 500,
-  /** 默认自动刷新间隔 */
-  DEFAULT_REFRESH_INTERVAL_MS: 60000,
   /** 命令超时时间 */
   COMMAND_TIMEOUT_MS: 30000,
 } as const;
@@ -33,14 +29,3 @@ export const UI = {
   TOAST_DURATION_MS: 3000,
 } as const;
 
-// ========== 刷新间隔选项 ==========
-export const REFRESH_INTERVALS = [
-  { value: 10000, labelKey: "tools.process_manager.refresh_10s" },
-  { value: 30000, labelKey: "tools.process_manager.refresh_30s" },
-  { value: 60000, labelKey: "tools.process_manager.refresh_60s" },
-  { value: 0, labelKey: "tools.process_manager.refresh_off" },
-] as const;
-
-// ========== 协议过滤选项 ==========
-export const PROTOCOL_FILTERS = ["ALL", "TCP", "UDP"] as const;
-export type ProtocolFilter = (typeof PROTOCOL_FILTERS)[number];

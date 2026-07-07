@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧰 ToolDock
+# ToolDock
 
 **A polished native-like Windows utilities toolbox**
 
@@ -17,19 +17,19 @@ Built with Tauri v2 + React 19 + MUI v7
 
 ---
 
-## ✨ Highlights
+## Highlights
 
-- 🎨 Material-like UI using MUI v7 (light/dark themes)
-- ⚡ High-performance native-feel using Tauri v2
-- 🛠 33+ handy tools across Files, System, Network, Dev and Entertainment
-- 🌍 Built-in localization (i18n) with English & Chinese
-- 🔒 Granular permission model; sensitive actions require confirmation
-- 📦 Small footprint and optimized memory usage
-- 🎯 Strong type-safety across frontend (TypeScript) and backend (Rust)
+- Material-like UI using MUI v7 (light/dark themes)
+- High-performance native-feel using Tauri v2
+- 33+ handy tools across Files, System, Network, Dev and Entertainment
+- Built-in localization (i18n) with English & Chinese
+- Granular permission model; sensitive actions require confirmation
+- Small footprint and optimized memory usage
+- Strong type-safety across frontend (TypeScript) and backend (Rust)
 
 ---
 
-## 📦 Quickstart
+## Quickstart
 
 ### Requirements
 
@@ -85,7 +85,7 @@ pnpm tauri dev
 
 ---
 
-## 🛠 Tools Overview
+## Tools Overview
 
 (Short summary; full list available inside the app)
 
@@ -115,7 +115,6 @@ pnpm tauri dev
 - Port Scanner — TCP/UDP port scanning
 - IP Lookup — IP geolocation and info
 - Simple Web Server — quick static file hosting
-- Process Manager — inspect & manage running processes
 
 ### Dev Tools
 
@@ -133,14 +132,13 @@ pnpm tauri dev
 
 ### Entertainment
 
-- WeChat AI Assistant — chat & analysis utilities
 - Picture-in-Picture Player — floating video player
 - Reading helper — book management & notes export
 - Games (2048 / Othello) — quick casual games with AI
 
 ---
 
-## 📖 Usage Guide
+## Usage Guide
 
 For detailed usage and examples, see the full guide: `docs/USAGE_en.md`.
 
@@ -163,7 +161,7 @@ Tauri will prompt permission dialogs when a tool first requires a capability.
 
 ---
 
-## 🔧 Development & Contributing
+## Development & Contributing
 
 ### Project layout
 
@@ -211,7 +209,7 @@ pnpm tauri dev
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome. Please follow the commit conventions and open issues with reproduction steps and logs.
 
@@ -221,19 +219,19 @@ See `AGENTS.md` for architecture and coding guidelines.
 
 ---
 
-## 📄 License
+## License
 
 MIT License — see `LICENSE`.
 
 ---
 
-## 🙏 Thanks
+## Thanks
 
 Thanks to Tauri, MUI, Lucide and all contributors.
 
 ---
 
-## 📧 Contact
+## Contact
 
 - Issues: https://github.com/yourusername/ToolDock/issues
 - Discussions: https://github.com/yourusername/ToolDock/discussions
@@ -243,6 +241,6 @@ Thanks to Tauri, MUI, Lucide and all contributors.
 <div align="center">
 **If this project helps you, please give it a ⭐ on GitHub!**
 
-Made with ❤️ by the ToolDock Team
+Made by the ToolDock Team
 
 </div>

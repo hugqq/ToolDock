@@ -6,7 +6,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Copy, RefreshCw, Trash2, ArrowLeftRight } from "lucide-react";
+import { Copy, RefreshCw, Trash2, ArrowLeftRight, Lightbulb } from "lucide-react";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import {
   Button,
@@ -596,7 +596,7 @@ export default function Base64Encoder() {
                   borderRadius: 1,
                 }}
               >
-                <span style={{ fontSize: "1.2rem" }}>💡</span>
+                <Lightbulb size={18} style={{ flexShrink: 0 }} />
                 <Box sx={{ fontSize: "0.875rem", color: "text.secondary" }}>
                   {getDescription()}
                 </Box>

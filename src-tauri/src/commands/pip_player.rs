@@ -403,7 +403,7 @@ pub async fn open_pip_window(
                             // 确保按钮可见且可点击
                             if (pipButton.offsetParent !== null) {
                                 pipButton.click();
-                                console.log('✅ 画中画按钮已点击');
+                                console.log('画中画按钮已点击');
                                 return true;
                             } else {
                                 console.log('按钮存在但不可见，继续等待...');

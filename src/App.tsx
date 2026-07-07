@@ -22,7 +22,6 @@ const FolderSize = lazy(() => import("./pages/FolderSize"));
 const JsonFormat = lazy(() => import("./pages/JsonFormat"));
 const NodeCleaner = lazy(() => import("./pages/NodeCleaner"));
 const ColorPicker = lazy(() => import("./pages/ColorPicker"));
-const ProcessManager = lazy(() => import("./pages/ProcessManager"));
 const DnsTool = lazy(() => import("./pages/DnsTool"));
 const NginxEditor = lazy(() => import("./pages/NginxEditor"));
 const ClipboardManager = lazy(() => import("./pages/ClipboardManager"));
@@ -44,7 +43,6 @@ const ScreenshotSelector = lazy(() => import("./pages/ScreenshotSelector"));
 const TimestampConverter = lazy(() => import("./pages/TimestampConverter"));
 const IpLookup = lazy(() => import("./pages/IpLookup"));
 const Clicker = lazy(() => import("./pages/Clicker"));
-const WeChatAssistant = lazy(() => import("./pages/WeChatAssistant"));
 const SimpleWebServer = lazy(() => import("./pages/SimpleWebServer"));
 const PortScanner = lazy(() => import("./pages/PortScanner"));
 const PipPlayer = lazy(() => import("./pages/PipPlayer"));
@@ -151,7 +149,6 @@ function AppContent() {
               <Route path="/tools/json-format" element={<JsonFormat />} />
               <Route path="/tools/node-cleaner" element={<NodeCleaner />} />
               <Route path="/tools/color-picker" element={<ColorPicker />} />
-              <Route path="/tools/process-manager" element={<ProcessManager />} />
               <Route path="/tools/dns-tool" element={<DnsTool />} />
               <Route path="/tools/nginx-editor" element={<NginxEditor />} />
               <Route
@@ -175,7 +172,6 @@ function AppContent() {
               />
               <Route path="/tools/ip-lookup" element={<IpLookup />} />
               <Route path="/tools/clicker" element={<Clicker />} />
-              <Route path="/tools/wechat-assistant" element={<WeChatAssistant />} />
               <Route
                 path="/tools/simple-web-server"
                 element={<SimpleWebServer />}
@@ -207,6 +203,10 @@ function App() {
         </Router>
         <Toaster
           position="top-right"
+          containerStyle={{
+            top: "48px",
+            right: "24px",
+          }}
           toastOptions={{
             className:
               "bg-(--card-bg) text-(--text-main) border border-(--border-color)",

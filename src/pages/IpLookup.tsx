@@ -99,24 +99,6 @@ const IpLookup: React.FC = () => {
     }
   };
 
-  const getCountryFlag = (country: string): string => {
-    const flags: Record<string, string> = {
-      中国: "🇨🇳",
-      美国: "🇺🇸",
-      日本: "🇯🇵",
-      英国: "🇬🇧",
-      德国: "🇩🇪",
-      法国: "🇫🇷",
-      俄罗斯: "🇷🇺",
-      Russia: "🇷🇺",
-      韩国: "🇰🇷",
-      "South Korea": "🇰🇷",
-      加拿大: "🇨🇦",
-      Canada: "🇨🇦",
-    };
-    return flags[country] || "🌍";
-  };
-
   return (
     <ToolLayout title={t("tools.ip_lookup.name")}>
       <div className="max-w-5xl mx-auto w-full space-y-6 pb-10">
@@ -192,8 +174,9 @@ const IpLookup: React.FC = () => {
                   <p className="text-xs text-(--text-muted)">
                     {t("tools.ip_lookup.country")}
                   </p>
-                  <p className="text-lg font-bold text-(--text-main)">
-                    {getCountryFlag(queryResult.country)} {queryResult.country}
+                  <p className="text-lg font-bold text-(--text-main) flex items-center gap-2">
+                    <Globe size={18} />
+                    {queryResult.country}
                   </p>
                 </div>
                 <div className="bg-(--bg-main) p-4 rounded-lg">

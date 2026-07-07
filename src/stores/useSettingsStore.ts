@@ -75,7 +75,6 @@ interface SettingsState {
   clipboardPrefix: string;
   clipboardSuffix: string;
   nginxPath: string;
-  wechatSystemPrompt: string;
   globalShortcut: string;
   closeBehavior: "minimize" | "exit";
   silentStart: boolean;
@@ -114,7 +113,6 @@ interface SettingsState {
   setClipboardPrefix: (prefix: string) => void;
   setClipboardSuffix: (suffix: string) => void;
   setNginxPath: (path: string) => void;
-  setWechatSystemPrompt: (prompt: string) => void;
   setOthelloConfig: (config: Partial<OthelloSettings>) => void;
   setGlobalShortcut: (shortcut: string) => void;
 }
@@ -154,8 +152,6 @@ export const useSettingsStore = create<SettingsState>()(
       clipboardPrefix: "",
       clipboardSuffix: "",
       nginxPath: "",
-      wechatSystemPrompt:
-        "你是一个友好且专业的助手，请根据收到的消息生成合适的回复。回复要简洁、自然、有礼貌。",
       globalShortcut: "",
       favoriteTools: [],
       pinnedTools: [],
@@ -226,7 +222,6 @@ export const useSettingsStore = create<SettingsState>()(
       setClipboardPrefix: (prefix) => set({ clipboardPrefix: prefix }),
       setClipboardSuffix: (suffix) => set({ clipboardSuffix: suffix }),
       setNginxPath: (path) => set({ nginxPath: path }),
-      setWechatSystemPrompt: (prompt) => set({ wechatSystemPrompt: prompt }),
       setOthelloConfig: (config) =>
         set((state) => ({
           othello: { ...state.othello, ...config },
@@ -279,14 +274,6 @@ export const useSettingsStore = create<SettingsState>()(
           const translator = { ...state.translator };
           delete translator.deeplxKey;
           state = { ...state, translator };
-        }
-
-        // 补全 wechatSystemPrompt
-        if (!state.wechatSystemPrompt) {
-          state = {
-            ...state,
-            wechatSystemPrompt: "你是一个友好且专业的助手，请根据收到的消息生成合适的回复。回复要简洁、自然、有礼貌。",
-          };
         }
 
         // version 5 → 6: providers 从 object 迁移到 array

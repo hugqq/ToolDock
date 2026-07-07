@@ -33,7 +33,6 @@ import {
 // ========== 星座数据 ==========
 interface ZodiacSign {
   id: string;
-  symbol: string;
   element: string;
   dateRange: string;
   rulingPlanet: string;
@@ -45,18 +44,18 @@ interface ZodiacSign {
 }
 
 const ZODIAC_SIGNS: ZodiacSign[] = [
-  { id: "aries",       symbol: "♈", element: "fire",  dateRange: "3/21 - 4/19",   rulingPlanet: "mars",    color: "#e53935", startMonth: 3,  startDay: 21, endMonth: 4,  endDay: 19 },
-  { id: "taurus",      symbol: "♉", element: "earth", dateRange: "4/20 - 5/20",   rulingPlanet: "venus",   color: "#43a047", startMonth: 4,  startDay: 20, endMonth: 5,  endDay: 20 },
-  { id: "gemini",      symbol: "♊", element: "air",   dateRange: "5/21 - 6/21",   rulingPlanet: "mercury", color: "#f9a825", startMonth: 5,  startDay: 21, endMonth: 6,  endDay: 21 },
-  { id: "cancer",      symbol: "♋", element: "water", dateRange: "6/22 - 7/22",   rulingPlanet: "moon",    color: "#64b5f6", startMonth: 6,  startDay: 22, endMonth: 7,  endDay: 22 },
-  { id: "leo",         symbol: "♌", element: "fire",  dateRange: "7/23 - 8/22",   rulingPlanet: "sun",     color: "#ff9800", startMonth: 7,  startDay: 23, endMonth: 8,  endDay: 22 },
-  { id: "virgo",       symbol: "♍", element: "earth", dateRange: "8/23 - 9/22",   rulingPlanet: "mercury", color: "#8d6e63", startMonth: 8,  startDay: 23, endMonth: 9,  endDay: 22 },
-  { id: "libra",       symbol: "♎", element: "air",   dateRange: "9/23 - 10/23",  rulingPlanet: "venus",   color: "#ec407a", startMonth: 9,  startDay: 23, endMonth: 10, endDay: 23 },
-  { id: "scorpio",     symbol: "♏", element: "water", dateRange: "10/24 - 11/22", rulingPlanet: "pluto",   color: "#7b1fa2", startMonth: 10, startDay: 24, endMonth: 11, endDay: 22 },
-  { id: "sagittarius", symbol: "♐", element: "fire",  dateRange: "11/23 - 12/21", rulingPlanet: "jupiter", color: "#5c6bc0", startMonth: 11, startDay: 23, endMonth: 12, endDay: 21 },
-  { id: "capricorn",   symbol: "♑", element: "earth", dateRange: "12/22 - 1/19",  rulingPlanet: "saturn",  color: "#546e7a", startMonth: 12, startDay: 22, endMonth: 1,  endDay: 19 },
-  { id: "aquarius",    symbol: "♒", element: "air",   dateRange: "1/20 - 2/18",   rulingPlanet: "uranus",  color: "#00bcd4", startMonth: 1,  startDay: 20, endMonth: 2,  endDay: 18 },
-  { id: "pisces",      symbol: "♓", element: "water", dateRange: "2/19 - 3/20",   rulingPlanet: "neptune", color: "#26a69a", startMonth: 2,  startDay: 19, endMonth: 3,  endDay: 20 },
+  { id: "aries",       element: "fire",  dateRange: "3/21 - 4/19",   rulingPlanet: "mars",    color: "#e53935", startMonth: 3,  startDay: 21, endMonth: 4,  endDay: 19 },
+  { id: "taurus",      element: "earth", dateRange: "4/20 - 5/20",   rulingPlanet: "venus",   color: "#43a047", startMonth: 4,  startDay: 20, endMonth: 5,  endDay: 20 },
+  { id: "gemini",      element: "air",   dateRange: "5/21 - 6/21",   rulingPlanet: "mercury", color: "#f9a825", startMonth: 5,  startDay: 21, endMonth: 6,  endDay: 21 },
+  { id: "cancer",      element: "water", dateRange: "6/22 - 7/22",   rulingPlanet: "moon",    color: "#64b5f6", startMonth: 6,  startDay: 22, endMonth: 7,  endDay: 22 },
+  { id: "leo",         element: "fire",  dateRange: "7/23 - 8/22",   rulingPlanet: "sun",     color: "#ff9800", startMonth: 7,  startDay: 23, endMonth: 8,  endDay: 22 },
+  { id: "virgo",       element: "earth", dateRange: "8/23 - 9/22",   rulingPlanet: "mercury", color: "#8d6e63", startMonth: 8,  startDay: 23, endMonth: 9,  endDay: 22 },
+  { id: "libra",       element: "air",   dateRange: "9/23 - 10/23",  rulingPlanet: "venus",   color: "#ec407a", startMonth: 9,  startDay: 23, endMonth: 10, endDay: 23 },
+  { id: "scorpio",     element: "water", dateRange: "10/24 - 11/22", rulingPlanet: "pluto",   color: "#7b1fa2", startMonth: 10, startDay: 24, endMonth: 11, endDay: 22 },
+  { id: "sagittarius", element: "fire",  dateRange: "11/23 - 12/21", rulingPlanet: "jupiter", color: "#5c6bc0", startMonth: 11, startDay: 23, endMonth: 12, endDay: 21 },
+  { id: "capricorn",   element: "earth", dateRange: "12/22 - 1/19",  rulingPlanet: "saturn",  color: "#546e7a", startMonth: 12, startDay: 22, endMonth: 1,  endDay: 19 },
+  { id: "aquarius",    element: "air",   dateRange: "1/20 - 2/18",   rulingPlanet: "uranus",  color: "#00bcd4", startMonth: 1,  startDay: 20, endMonth: 2,  endDay: 18 },
+  { id: "pisces",      element: "water", dateRange: "2/19 - 3/20",   rulingPlanet: "neptune", color: "#26a69a", startMonth: 2,  startDay: 19, endMonth: 3,  endDay: 20 },
 ];
 
 const ELEMENT_COLORS: Record<string, string> = {
@@ -303,7 +302,7 @@ export default function ZodiacHoroscope() {
 
     return isZh
       ? `星座：${signName}（${sign.dateRange}）\n四象属性：${element} | 守护星：${planet}\n日期：${datePart}\n今日运势评分：${scoreStr} | 趋势：${trendStr}\n幸运信息：${luckyStr} | ${matchStr}\n今日提示：${t(`tools.zodiac.tips.${sign.id}_${fortune.tipIndex}`)}`
-      : `Sign: ${signName} (${sign.dateRange})\nElement: ${element} | Ruling Planet: ${planet}\nDate: ${datePart}\nFortune: Overall ${fortune.overall}★ Love ${fortune.love}★ Career ${fortune.career}★ Wealth ${fortune.wealth}★ | Trend: ${trendStr}\nLucky: Number ${fortune.luckyNumber} / ${t(`tools.zodiac.colors.${fortune.luckyColor}`)} / ${t(`tools.zodiac.directions.${fortune.luckyDirection}`)} | Best Match: ${t(`tools.zodiac.signs.${matchSign.id}`)}\nTip: ${t(`tools.zodiac.tips.${sign.id}_${fortune.tipIndex}`)}`;
+      : `Sign: ${signName} (${sign.dateRange})\nElement: ${element} | Ruling Planet: ${planet}\nDate: ${datePart}\nFortune: Overall ${fortune.overall}/5 Love ${fortune.love}/5 Career ${fortune.career}/5 Wealth ${fortune.wealth}/5 | Trend: ${trendStr}\nLucky: Number ${fortune.luckyNumber} / ${t(`tools.zodiac.colors.${fortune.luckyColor}`)} / ${t(`tools.zodiac.directions.${fortune.luckyDirection}`)} | Best Match: ${t(`tools.zodiac.signs.${matchSign.id}`)}\nTip: ${t(`tools.zodiac.tips.${sign.id}_${fortune.tipIndex}`)}`;
   }, [sign, selectedDate, fortune, matchSign, t, i18n.language]);
 
   const handleStartAnalysis = useCallback(async () => {
@@ -411,7 +410,7 @@ export default function ZodiacHoroscope() {
                     : undefined
                 }
               >
-                <span className="text-xl leading-none">{s.symbol}</span>
+                <Sparkles size={18} style={{ color: s.color }} />
                 <span
                   className="text-[9px] font-semibold"
                   style={{ color: selectedSign === i ? s.color : undefined }}
@@ -430,10 +429,10 @@ export default function ZodiacHoroscope() {
             <div className="flex items-center gap-6">
               {/* 星座符号 */}
               <div
-                className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl shrink-0 bg-(--bg-main) border border-(--border-color)"
+                className="w-20 h-20 rounded-2xl flex items-center justify-center shrink-0 bg-(--bg-main) border border-(--border-color)"
                 style={{ color: sign.color }}
               >
-                {sign.symbol}
+                <Sparkles size={42} />
               </div>
 
               <div className="flex-1 min-w-0">
@@ -523,7 +522,7 @@ export default function ZodiacHoroscope() {
                 },
                 {
                   label: t("tools.zodiac.best_match"),
-                  value: `${matchSign.symbol} ${t(`tools.zodiac.signs.${matchSign.id}`)}`,
+                  value: t(`tools.zodiac.signs.${matchSign.id}`),
                   icon: <Heart size={20} className="text-red-500" />,
                 },
               ].map((item, idx) => (

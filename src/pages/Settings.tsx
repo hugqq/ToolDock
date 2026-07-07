@@ -25,6 +25,7 @@ import {
   FolderInput,
   PlusCircle,
   X,
+  XCircle,
 } from "lucide-react";
 import { openPath } from "@tauri-apps/plugin-opener";
 import { invoke } from "@tauri-apps/api/core";
@@ -1066,7 +1067,7 @@ const Settings: React.FC = () => {
               <p className="text-xs text-(--text-muted)">{t(config.descKey)}</p>
               {isTencentInvalid && (
                 <p className="text-xs text-red-600 dark:text-red-400 flex items-start gap-1 animate-pulse">
-                  <span className="mt-0.5">❌</span>
+                  <XCircle size={14} className="mt-0.5 shrink-0" />
                   <span>
                     SecretId 长度不足！当前 {credentialFirst.length}{" "}
                     字符，应为 36-40 字符

@@ -6,19 +6,6 @@ pub mod variable_naming;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct PortInfo {
-    pub pid: String,
-    pub process_name: String,
-    pub description: String,
-    pub path: String,
-    pub port: String,
-    pub local_addr: String,
-    pub foreign_addr: String,
-    pub state: String,
-    pub protocol: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PkgManagerStatus {
     pub npm: bool,
     pub pnpm: bool,

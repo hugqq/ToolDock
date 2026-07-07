@@ -9,6 +9,10 @@ import {
   Volume2,
   History,
   Bell,
+  Coffee,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { Task, PomodoroSettings, PomodoroSession } from "../../types/notepad";
 
@@ -232,8 +236,13 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
                 key={session.id}
                 className="flex items-center justify-between px-2 py-1 bg-(--bg-secondary) rounded text-xs"
               >
-                <span className="text-(--text-main) truncate max-w-[120px]">
-                  {session.taskTitle || (session.mode === "work" ? "🍅" : "☕")}
+                <span className="text-(--text-main) truncate max-w-[120px] flex items-center gap-1">
+                  {session.taskTitle ||
+                    (session.mode === "work" ? (
+                      <Timer size={14} />
+                    ) : (
+                      <Coffee size={14} />
+                    ))}
                 </span>
                 <span className="text-(--text-secondary)">
                   {new Date(session.completedAt).toLocaleTimeString([], {
@@ -254,7 +263,7 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
             通知权限:
           </span>
           <span
-            className={`text-xs font-medium ${
+            className={`text-xs font-medium flex items-center gap-1 ${
               notificationPermission === "granted"
                 ? "text-green-500"
                 : notificationPermission === "denied"
@@ -262,13 +271,27 @@ export const PomodoroTimer: React.FC<PomodoroTimerProps> = ({
                 : "text-yellow-500"
             }`}
           >
-            {notificationPermission === "granted"
-              ? "✔ 已开启"
-              : notificationPermission === "denied"
-              ? "✖ 已拒绝"
-              : notificationPermission === "error"
-              ? "⚠ 错误"
-              : "⚠ 未设置"}
+            {notificationPermission === "granted" ? (
+              <>
+                <CheckCircle2 size={12} />
+                已开启
+              </>
+            ) : notificationPermission === "denied" ? (
+              <>
+                <XCircle size={12} />
+                已拒绝
+              </>
+            ) : notificationPermission === "error" ? (
+              <>
+                <AlertTriangle size={12} />
+                错误
+              </>
+            ) : (
+              <>
+                <AlertTriangle size={12} />
+                未设置
+              </>
+            )}
           </span>
         </div>
         <button

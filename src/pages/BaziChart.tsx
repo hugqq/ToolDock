@@ -1414,7 +1414,7 @@ export default function BaziChart() {
                                 className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-1.5 py-0.5 rounded text-[10px] bg-(--bg-main) border border-(--border-color) text-(--text-muted) hover:text-blue-500 hover:border-blue-500/40"
                               >
                                 {copiedIndex === i
-                                  ? "✓ " + t("tools.bazi_chart.copy_success")
+                                  ? t("tools.bazi_chart.copy_success")
                                   : t("tools.bazi_chart.copy_msg")}
                               </button>
                             )}

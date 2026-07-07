@@ -23,7 +23,6 @@ pub mod translator;
 pub mod unit_converter;
 pub mod variable_naming;
 pub mod web_server;
-pub mod wechat_assistant;
 pub mod weread;
 
 #[tauri::command]

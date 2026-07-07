@@ -34,6 +34,7 @@ import {
   ContentCopy,
   Send,
   Bolt as BoltIcon,
+  LightbulbOutlined,
 } from "@mui/icons-material";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -727,10 +728,20 @@ const Clicker: React.FC = () => {
 
                   <Typography
                     variant="caption"
-                    sx={{ color: "text.secondary", textAlign: "center" }}
+                    sx={{
+                      color: "text.secondary",
+                      textAlign: "center",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 0.5,
+                    }}
                   >
-                    💡 点击"发送文本"后，会在 500ms
-                    后开始输入，请提前切换到目标窗口
+                    <LightbulbOutlined fontSize="inherit" />
+                    <span>
+                      点击"发送文本"后，会在 500ms
+                      后开始输入，请提前切换到目标窗口
+                    </span>
                   </Typography>
                 </Stack>
               )}

@@ -40,14 +40,13 @@ interface NetworkTaskPayload {
 }
 
 const PUBLIC_DNS = [
-  { name: "AliDNS", servers: ["223.5.5.5", "223.6.6.6"], icon: "🇨🇳" },
-  { name: "DNSPod", servers: ["119.29.29.29", "182.254.116.116"], icon: "🇨🇳" },
-  { name: "Google DNS", servers: ["8.8.8.8", "8.8.4.4"], icon: "🇺🇸" },
-  { name: "Cloudflare", servers: ["1.1.1.1", "1.0.0.1"], icon: "🇺🇸" },
+  { name: "AliDNS", servers: ["223.5.5.5", "223.6.6.6"] },
+  { name: "DNSPod", servers: ["119.29.29.29", "182.254.116.116"] },
+  { name: "Google DNS", servers: ["8.8.8.8", "8.8.4.4"] },
+  { name: "Cloudflare", servers: ["1.1.1.1", "1.0.0.1"] },
   {
     name: "OpenDNS",
     servers: ["208.67.222.222", "208.67.220.220"],
-    icon: "🇺🇸",
   },
 ];
 
@@ -347,7 +346,7 @@ export default function DnsTool() {
                   <span className="font-bold text-(--text-main)">
                     {dns.name}
                   </span>
-                  <span className="text-lg">{dns.icon}</span>
+                  <Globe size={18} className="text-(--text-muted)" />
                 </div>
                 <div className="flex flex-col gap-1 w-full">
                   {dns.servers.map((s) => (

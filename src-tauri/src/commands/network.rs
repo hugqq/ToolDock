@@ -1,4 +1,4 @@
-﻿use crate::models::{PortInfo, ApiResponse};
+use crate::models::ApiResponse;
 use crate::core::network;
 use crate::AppState;
 use tauri::{State, Emitter, AppHandle, Manager};
@@ -16,22 +16,6 @@ pub struct NetworkTaskPayload {
     pub downloaded_bytes: Option<u64>,
     pub upload_speed_mbps: Option<f64>,
     pub uploaded_bytes: Option<u64>,
-}
-
-#[tauri::command]
-pub async fn get_listening_ports() -> ApiResponse<Vec<PortInfo>> {
-    match network::get_listening_ports() {
-        Ok(ports) => ApiResponse::ok(ports),
-        Err(e) => ApiResponse::error("GET_PORTS_FAILED", e.to_string()),
-    }
-}
-
-#[tauri::command]
-pub async fn kill_process(pid: String) -> ApiResponse<()> {
-    match network::kill_process(&pid) {
-        Ok(_) => ApiResponse::ok(()),
-        Err(e) => ApiResponse::error("KILL_PROCESS_FAILED", e.to_string()),
-    }
 }
 
 #[tauri::command]
