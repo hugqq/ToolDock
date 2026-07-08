@@ -37,8 +37,6 @@ export default defineConfig(async () => ({
             "@uiw/codemirror-theme-vscode",
             "@codemirror/lang-json",
           ],
-          // Charts - only for visualization tools
-          charts: ["recharts"],
           // Animation library
           animation: ["framer-motion"],
           // i18n
