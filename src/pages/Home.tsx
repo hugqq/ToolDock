@@ -2,7 +2,6 @@ import { Info, Star, Pin, List, LayoutGrid, ChevronDown, ChevronRight, Search, X
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { Button, Tooltip } from "../components/mui";
 import { CATEGORIES, TOOLS, Tool } from "../tools/registry";
 import { useSettingsStore } from "../stores/useSettingsStore";
@@ -138,116 +137,102 @@ export function Home({ activeCategory, setActiveCategory, searchText, setSearchT
 
   const renderToolGridView = () => (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
-      <AnimatePresence mode="popLayout">
-        {filteredTools.map((tool) => {
-          const isFavorited = favoriteTools.includes(tool.id);
-          const isPinned = pinnedTools.includes(tool.id);
+      {filteredTools.map((tool) => {
+        const isFavorited = favoriteTools.includes(tool.id);
+        const isPinned = pinnedTools.includes(tool.id);
 
-          return (
-            <motion.div
-              key={tool.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.15 }}
-              className="group relative flex flex-col items-center gap-2 p-4 bg-(--card-bg) border border-(--border-color) rounded-xl hover:border-primary hover:shadow-lg hover:shadow-primary/5 cursor-pointer transition-all"
-              onClick={() => handleToolClick(tool.route)}
+        return (
+          <div
+            key={tool.id}
+            className="tool-card group relative flex flex-col items-center gap-2 p-4 bg-(--card-bg) border border-(--border-color) rounded-xl hover:border-primary cursor-pointer transition-colors"
+            onClick={() => handleToolClick(tool.route)}
+          >
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-xl"
+              style={{
+                backgroundColor: `${tool.color}15`,
+                color: tool.color,
+              }}
             >
-              <div
-                className="flex items-center justify-center w-10 h-10 rounded-xl transition-transform group-hover:scale-110"
-                style={{
-                  backgroundColor: `${tool.color}15`,
-                  color: tool.color,
+              <tool.icon size={22} />
+            </div>
+            <span className="text-sm text-(--text-main) font-medium text-center truncate w-full">
+              {t(tool.nameKey)}
+            </span>
+
+            <div className="absolute top-1.5 right-1.5 flex gap-0.5">
+              <button
+                className={`p-1 rounded transition-colors ${
+                  isPinned
+                    ? "text-orange-500 opacity-100"
+                    : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:text-orange-500"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePin(tool.id);
                 }}
               >
-                <tool.icon size={22} />
-              </div>
-              <span className="text-sm text-(--text-main) font-medium text-center truncate w-full">
-                {t(tool.nameKey)}
-              </span>
-
-              <div className="absolute top-1.5 right-1.5 flex gap-0.5">
-                <button
-                  className={`p-1 rounded transition-all ${
-                    isPinned
-                      ? "text-orange-500 opacity-100"
-                      : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:text-orange-500"
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePin(tool.id);
-                  }}
-                >
-                  <Pin size={12} fill={isPinned ? "currentColor" : "none"} />
-                </button>
-                <button
-                  className={`p-1 rounded transition-all ${
-                    isFavorited
-                      ? "text-yellow-500 opacity-100"
-                      : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:text-yellow-500"
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(tool.id);
-                  }}
-                >
-                  <Star size={12} fill={isFavorited ? "currentColor" : "none"} />
-                </button>
-              </div>
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
+                <Pin size={12} fill={isPinned ? "currentColor" : "none"} />
+              </button>
+              <button
+                className={`p-1 rounded transition-colors ${
+                  isFavorited
+                    ? "text-yellow-500 opacity-100"
+                    : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:text-yellow-500"
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(tool.id);
+                }}
+              >
+                <Star size={12} fill={isFavorited ? "currentColor" : "none"} />
+              </button>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 
   // 列表视图
   const renderListView = () => (
     <div className="flex flex-col gap-1">
-      <AnimatePresence mode="popLayout">
-        {filteredTools.map((tool) => {
-          const isFavorited = favoriteTools.includes(tool.id);
-          const isPinned = pinnedTools.includes(tool.id);
+      {filteredTools.map((tool) => {
+        const isFavorited = favoriteTools.includes(tool.id);
+        const isPinned = pinnedTools.includes(tool.id);
 
-          return (
-            <motion.div
-              key={tool.id}
-              layout
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.15 }}
-              className="group flex items-center gap-3 px-3 py-2 bg-(--card-bg) border border-(--border-color) rounded-lg hover:border-primary hover:bg-(--hover-bg) cursor-pointer"
-              onClick={() => handleToolClick(tool.route)}
+        return (
+          <div
+            key={tool.id}
+            className="tool-card group flex items-center gap-3 px-3 py-2 bg-(--card-bg) border border-(--border-color) rounded-lg hover:border-primary hover:bg-(--hover-bg) cursor-pointer transition-colors"
+            onClick={() => handleToolClick(tool.route)}
+          >
+            <div
+              className="flex items-center justify-center shrink-0 w-8 h-8 rounded-lg"
+              style={{
+                backgroundColor: `${tool.color}15`,
+                color: tool.color,
+              }}
             >
-              <div
-                className="flex items-center justify-center shrink-0 w-8 h-8 rounded-lg"
-                style={{
-                  backgroundColor: `${tool.color}15`,
-                  color: tool.color,
-                }}
-              >
-                <tool.icon size={18} />
+              <tool.icon size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-(--text-main) font-medium truncate">
+                  {t(tool.nameKey)}
+                </span>
+                {isPinned && (
+                  <Pin size={12} className="text-orange-500 shrink-0" fill="currentColor" />
+                )}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-(--text-main) font-medium truncate">
-                    {t(tool.nameKey)}
-                  </span>
-                  {isPinned && (
-                    <Pin size={12} className="text-orange-500 shrink-0" fill="currentColor" />
-                  )}
-                </div>
-                <p className="text-xs text-(--text-muted) truncate">
-                  {t(tool.descriptionKey)}
-                </p>
-              </div>
-              {renderToolActions(tool, isFavorited, isPinned)}
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
+              <p className="text-xs text-(--text-muted) truncate">
+                {t(tool.descriptionKey)}
+              </p>
+            </div>
+            {renderToolActions(tool, isFavorited, isPinned)}
+          </div>
+        );
+      })}
     </div>
   );
 
@@ -290,80 +275,67 @@ export function Home({ activeCategory, setActiveCategory, searchText, setSearchT
                 </span>
               </button>
 
-              <AnimatePresence>
-                {!isCollapsed && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
-                      {tools.map((tool) => {
-                        const isFavorited = favoriteTools.includes(tool.id);
-                        const isPinned = pinnedTools.includes(tool.id);
+              {!isCollapsed && (
+                <div className="overflow-hidden">
+                  <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-3">
+                    {tools.map((tool) => {
+                      const isFavorited = favoriteTools.includes(tool.id);
+                      const isPinned = pinnedTools.includes(tool.id);
 
-                        return (
-                          <motion.div
-                            key={tool.id}
-                            layout
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ duration: 0.15 }}
-                            className="group relative flex flex-col items-center gap-2 p-4 bg-(--card-bg) border border-(--border-color) rounded-xl hover:border-primary hover:shadow-lg hover:shadow-primary/5 cursor-pointer transition-all"
-                            onClick={() => handleToolClick(tool.route)}
+                      return (
+                        <div
+                          key={tool.id}
+                          className="tool-card group relative flex flex-col items-center gap-2 p-4 bg-(--card-bg) border border-(--border-color) rounded-xl hover:border-primary cursor-pointer transition-colors"
+                          onClick={() => handleToolClick(tool.route)}
+                        >
+                          <div
+                            className="flex items-center justify-center w-10 h-10 rounded-xl"
+                            style={{
+                              backgroundColor: `${tool.color}15`,
+                              color: tool.color,
+                            }}
                           >
-                            <div
-                              className="flex items-center justify-center w-10 h-10 rounded-xl transition-transform group-hover:scale-110"
-                              style={{
-                                backgroundColor: `${tool.color}15`,
-                                color: tool.color,
+                            <tool.icon size={22} />
+                          </div>
+                          <span className="text-sm text-(--text-main) font-medium text-center truncate w-full">
+                            {t(tool.nameKey)}
+                          </span>
+
+                          {/* 悬停操作 */}
+                          <div className="absolute top-1.5 right-1.5 flex gap-0.5">
+                            <button
+                              className={`p-1 rounded transition-colors ${
+                                isPinned
+                                  ? "text-orange-500 opacity-100"
+                                  : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:text-orange-500"
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                togglePin(tool.id);
                               }}
                             >
-                              <tool.icon size={22} />
-                            </div>
-                            <span className="text-sm text-(--text-main) font-medium text-center truncate w-full">
-                              {t(tool.nameKey)}
-                            </span>
-
-                            {/* 悬停操作 */}
-                            <div className="absolute top-1.5 right-1.5 flex gap-0.5">
-                              <button
-                                className={`p-1 rounded transition-all ${
-                                  isPinned
-                                    ? "text-orange-500 opacity-100"
-                                    : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:text-orange-500"
-                                }`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  togglePin(tool.id);
-                                }}
-                              >
-                                <Pin size={12} fill={isPinned ? "currentColor" : "none"} />
-                              </button>
-                              <button
-                                className={`p-1 rounded transition-all ${
-                                  isFavorited
-                                    ? "text-yellow-500 opacity-100"
-                                    : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:text-yellow-500"
-                                }`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleFavorite(tool.id);
-                                }}
-                              >
-                                <Star size={12} fill={isFavorited ? "currentColor" : "none"} />
-                              </button>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                              <Pin size={12} fill={isPinned ? "currentColor" : "none"} />
+                            </button>
+                            <button
+                              className={`p-1 rounded transition-colors ${
+                                isFavorited
+                                  ? "text-yellow-500 opacity-100"
+                                  : "text-(--text-muted) opacity-0 group-hover:opacity-100 hover:text-yellow-500"
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(tool.id);
+                              }}
+                            >
+                              <Star size={12} fill={isFavorited ? "currentColor" : "none"} />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}

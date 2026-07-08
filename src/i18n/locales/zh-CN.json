@@ -1517,7 +1517,7 @@
   "about": {
     "title": "关于 ToolDock",
     "description_title": "项目简介",
-    "description": "ToolDock 是一个基于 Tauri 构建的多系统实用工具箱，提供文件管理、系统监控、网络工具、开发辅助等丰富功能。当前优先适配 Windows，部分功能在其他桌面系统上可能受限。项目采用现代化技术栈，注重原生体验、类型安全和模块化设计。",
+    "description": "ToolDock 是一个基于 Tauri 构建的 Windows 优先实用工具箱，提供文件管理、系统监控、网络工具、开发辅助等丰富功能。macOS 当前属于实验性支持，部分功能可能受限，性能体验也尚未优化。项目采用现代化技术栈，注重原生体验、类型安全和模块化设计。",
     "view_source": "查看源代码",
     "features_title": "核心特性",
     "features": {

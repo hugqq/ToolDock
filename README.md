@@ -2,7 +2,7 @@
 
 # 🧰 ToolDock
 
-**A cross-platform desktop toolbox for daily file, system, network, and developer utilities, with Windows as the primary supported platform today.**
+**A Windows-first desktop toolbox for daily file, system, network, and developer utilities. macOS support is experimental and may feel slow today.**
 
 Built with Tauri v2, React 19, TypeScript, Rust, MUI v7, and Vite.
 
@@ -21,7 +21,7 @@ Built with Tauri v2, React 19, TypeScript, Rust, MUI v7, and Vite.
 
 ToolDock is a native-feeling desktop utility app that collects common tools in one place. It is designed for quick access, local-first workflows, and small but useful tasks that usually require separate apps or command-line snippets.
 
-The app is built on Tauri's cross-platform foundation. Windows is currently the main development and testing target, and some features depend on Windows APIs, but the project is not intentionally limited to Windows-only use.
+The app is built on Tauri's cross-platform foundation, but Windows is currently the main development and testing target. macOS builds are experimental for now: some features depend on Windows APIs, and the current macOS experience may be noticeably slower.
 
 The project uses a React frontend for the interface and a Tauri/Rust backend for desktop capabilities such as file access, local commands, clipboard features, OCR, and native packaging.
 
@@ -60,7 +60,7 @@ The project uses a React frontend for the interface and a Tauri/Rust backend for
 
 | Component | Requirement |
 | --- | --- |
-| OS | Windows 10 / 11 currently tested first; other Tauri-supported desktop systems may need feature-specific adaptation |
+| OS | Windows 10 / 11 recommended; macOS is experimental and currently not performance-optimized |
 | Node.js | 20 or newer |
 | pnpm | Current stable version |
 | Rust | Stable toolchain with the target for your current system |

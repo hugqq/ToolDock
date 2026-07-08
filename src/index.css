@@ -352,4 +352,8 @@
   .animate-fadeOut {
     animation: fadeOut 0.2s ease-in forwards;
   }
+
+  .tool-card {
+    contain: layout paint;
+  }
 }
