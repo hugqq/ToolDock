@@ -1509,7 +1509,7 @@
   "about": {
     "title": "About ToolDock",
     "description_title": "Project Description",
-    "description": "ToolDock is a Windows utility toolbox built with Tauri, providing rich features including file management, system monitoring, network tools, and development assistance. It adopts modern technology stack with focus on native experience, type safety, and modular design.",
+    "description": "ToolDock is a cross-platform utility toolbox built with Tauri, providing rich features including file management, system monitoring, network tools, and development assistance. Windows is currently the primary supported platform, and some features may be limited on other desktop systems. It adopts a modern technology stack with focus on native experience, type safety, and modular design.",
     "view_source": "View Source Code",
     "features_title": "Core Features",
     "features": {

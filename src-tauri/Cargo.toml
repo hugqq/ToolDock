@@ -1,7 +1,7 @@
 [package]
 name = "tooldock"
 version = "1.0.2"
-description = "ToolDock - A Windows utility toolbox"
+description = "ToolDock - A cross-platform utility toolbox"
 authors = ["Glow"]
 edition = "2021"
 license = "MIT"

@@ -1,8 +1,8 @@
 <div align="center">
 
-# ToolDock
+# 🧰 ToolDock
 
-**A Windows-first desktop toolbox for daily file, system, network, and developer utilities.**
+**A cross-platform desktop toolbox for daily file, system, network, and developer utilities, with Windows as the primary supported platform today.**
 
 Built with Tauri v2, React 19, TypeScript, Rust, MUI v7, and Vite.
 
@@ -17,13 +17,37 @@ Built with Tauri v2, React 19, TypeScript, Rust, MUI v7, and Vite.
 
 ---
 
-## What Is ToolDock?
+## ✨ What Is ToolDock?
 
-ToolDock is a native-feeling Windows utility app that collects common desktop tools in one place. It is designed for quick access, local-first workflows, and small but useful tasks that usually require separate apps or command-line snippets.
+ToolDock is a native-feeling desktop utility app that collects common tools in one place. It is designed for quick access, local-first workflows, and small but useful tasks that usually require separate apps or command-line snippets.
+
+The app is built on Tauri's cross-platform foundation. Windows is currently the main development and testing target, and some features depend on Windows APIs, but the project is not intentionally limited to Windows-only use.
 
 The project uses a React frontend for the interface and a Tauri/Rust backend for desktop capabilities such as file access, local commands, clipboard features, OCR, and native packaging.
 
-## Highlights
+## 🖼️ Screenshots
+
+### 🧩 Tool Overview
+
+![ToolDock tool overview in Chinese](img/1.png)
+
+### 🌐 English Interface
+
+![ToolDock tool overview in English](img/2.png)
+
+### 🌙 Dark Theme
+
+![ToolDock dark theme](img/3.png)
+
+### ⚙️ Settings
+
+![ToolDock settings page](img/4.png)
+
+### ℹ️ About Dialog
+
+![ToolDock about dialog](img/5.png)
+
+## ⭐ Highlights
 
 - 28 utility tools plus a settings center, grouped by file, system, network, developer, and entertainment categories.
 - Native desktop packaging through Tauri v2, with a small footprint compared with Electron-style apps.
@@ -32,17 +56,17 @@ The project uses a React frontend for the interface and a Tauri/Rust backend for
 - Built-in Chinese and English localization.
 - Central tool registry in `src/tools/registry.ts`, making tools easier to discover and extend.
 
-## Requirements
+## 📋 Requirements
 
 | Component | Requirement |
 | --- | --- |
-| OS | Windows 10 / 11 |
+| OS | Windows 10 / 11 currently tested first; other Tauri-supported desktop systems may need feature-specific adaptation |
 | Node.js | 20 or newer |
 | pnpm | Current stable version |
-| Rust | Stable toolchain with the Windows target |
+| Rust | Stable toolchain with the target for your current system |
 | WebView2 | Required by Tauri on Windows |
 
-## Quick Start
+## 🚀 Quick Start
 
 Use PowerShell 7:
 
@@ -53,7 +77,7 @@ pnpm install
 pnpm tauri dev
 ```
 
-## Common Commands
+## 🛠️ Common Commands
 
 Use PowerShell 7:
 
@@ -77,9 +101,9 @@ Build artifacts are generated under:
 src-tauri/target/release/bundle/
 ```
 
-## Tool List
+## 🧭 Tool List
 
-### File Tools
+### 📁 File Tools
 
 - Folder Size: scan folders and analyze disk usage.
 - Hash Calculator: calculate MD5, SHA1, SHA256, and related checksums.
@@ -87,7 +111,7 @@ src-tauri/target/release/bundle/
 - Image Converter: convert images between common formats and resize them.
 - PDF to Image: render PDF pages as exportable images.
 
-### System Tools
+### 🖥️ System Tools
 
 - Notepad: manage plans, memos, attachments, reminders, and Pomodoro sessions.
 - Screen OCR: capture screen areas and recognize text.
@@ -95,7 +119,7 @@ src-tauri/target/release/bundle/
 - Clipboard Manager: record and search clipboard history.
 - Settings: manage app preferences, translator keys, AI settings, update checks, and import/export configuration.
 
-### Network Tools
+### 🌐 Network Tools
 
 - DNS Helper: run DNS queries and related diagnostics.
 - Nginx Editor: edit, validate, template, and manage local Nginx configs.
@@ -103,7 +127,7 @@ src-tauri/target/release/bundle/
 - IP Lookup: query IP location and network information.
 - Simple Web Server: serve a local folder over HTTP for quick LAN sharing or static page testing.
 
-### Developer Tools
+### 💻 Developer Tools
 
 - Node Cleaner: find and clean `node_modules` and package cache folders.
 - AI Variable Naming: generate naming suggestions.
@@ -117,12 +141,12 @@ src-tauri/target/release/bundle/
 - Text Diff: compare text or file differences.
 - Timestamp Converter: convert Unix timestamps and readable date/time values.
 
-### Entertainment
+### 🎮 Entertainment
 
 - 2048: classic number puzzle game with AI-assisted play.
 - Othello: local AI and online multiplayer Othello.
 
-## Project Structure
+## 🗂️ Project Structure
 
 ```text
 ToolDock/
@@ -148,7 +172,7 @@ ToolDock/
 └── public/                 # Static assets
 ```
 
-## Adding a Tool
+## ➕ Adding a Tool
 
 The usual flow is:
 
@@ -159,7 +183,7 @@ The usual flow is:
 5. If native access is needed, add Rust logic under `src-tauri/src/core/` and expose it through `src-tauri/src/commands/`.
 6. Update Tauri capabilities if the tool requires additional permissions.
 
-## Troubleshooting
+## 🔎 Troubleshooting
 
 Use PowerShell 7:
 
@@ -180,7 +204,7 @@ $env:RUST_LOG = "debug"
 pnpm tauri dev
 ```
 
-## Release
+## 📦 Release
 
 The release helper updates version numbers, creates a commit, creates or replaces the release tag, and pushes the branch and tag.
 
@@ -190,7 +214,7 @@ Use PowerShell 7 only when you are ready to publish:
 .\scripts\release.ps1 1.0.2
 ```
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome. Please keep changes focused, include clear reproduction steps for bugs, and follow the existing frontend/Rust structure.
 
@@ -205,6 +229,6 @@ Suggested commit types:
 - `test`: tests
 - `chore`: maintenance
 
-## License
+## 📄 License
 
 ToolDock is released under the [MIT License](LICENSE).
