@@ -5,13 +5,17 @@
 use crate::errors::AppError;
 use std::sync::mpsc::{channel, Sender};
 use std::sync::{Arc, Mutex};
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::AppHandle;
+
+#[cfg(target_os = "windows")]
+use tauri::{Emitter, Manager};
 
 #[cfg(target_os = "windows")]
 use winapi::um::winuser::{
     RegisterHotKey, UnregisterHotKey, MOD_ALT, MOD_CONTROL, MOD_SHIFT, MOD_WIN,
 };
 
+#[cfg(target_os = "windows")]
 const HOTKEY_ID: i32 = 1;
 
 #[allow(dead_code)]
@@ -23,8 +27,6 @@ enum HotkeyCommand {
 
 #[derive(Clone)]
 pub struct HotkeyManager {
-    #[allow(dead_code)]
-    app_handle: AppHandle,
     registered: Arc<Mutex<bool>>,
     current_shortcut: Arc<Mutex<String>>,
     command_sender: Arc<Mutex<Option<Sender<HotkeyCommand>>>>,
@@ -41,7 +43,6 @@ impl HotkeyManager {
         });
 
         Self {
-            app_handle,
             registered: Arc::new(Mutex::new(false)),
             current_shortcut: Arc::new(Mutex::new(String::new())),
             command_sender: Arc::new(Mutex::new(Some(tx))),
@@ -81,6 +82,7 @@ impl HotkeyManager {
     }
 
     /// 将按键字符串转换为 Windows 虚拟键码
+    #[cfg(target_os = "windows")]
     fn key_to_vk(key: &str) -> Result<u32, AppError> {
         match key {
             "A" | "a" => Ok(0x41),

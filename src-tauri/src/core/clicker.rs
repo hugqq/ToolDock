@@ -2,8 +2,11 @@ use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use tauri::{AppHandle, Emitter};
+use tauri::AppHandle;
 use tokio::time::sleep;
+
+#[cfg(target_os = "windows")]
+use tauri::Emitter;
 
 #[cfg(target_os = "windows")]
 use winapi::um::winuser::{
@@ -33,11 +36,15 @@ pub struct ClickerManager {
     hotkey_enabled: Arc<AtomicBool>,
     mouse_settings: Arc<Mutex<Option<(u64, MouseButton, ClickType)>>>,
     keyboard_settings: Arc<Mutex<Option<(u64, u16)>>>,
+    #[cfg(target_os = "windows")]
     app_handle: AppHandle,
 }
 
 impl ClickerManager {
     pub fn new(app_handle: AppHandle) -> Self {
+        #[cfg(not(target_os = "windows"))]
+        let _ = app_handle;
+
         Self {
             mouse_running: Arc::new(AtomicBool::new(false)),
             keyboard_running: Arc::new(AtomicBool::new(false)),
@@ -48,6 +55,7 @@ impl ClickerManager {
                 ClickType::Single,
             )))),
             keyboard_settings: Arc::new(Mutex::new(Some((100, 0x20)))),
+            #[cfg(target_os = "windows")]
             app_handle,
         }
         // Note: hotkey listener NOT started at init, started on-demand via set_hotkey_enabled

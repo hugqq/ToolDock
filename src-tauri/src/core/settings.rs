@@ -9,6 +9,8 @@ use aes_gcm::{
 };
 use base64::{engine::general_purpose, Engine as _};
 use sha2::{Digest, Sha256};
+
+#[cfg(target_os = "windows")]
 use std::env;
 
 #[cfg(target_os = "windows")]

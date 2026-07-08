@@ -165,7 +165,8 @@ pub fn run() {
                         }
                     }
                 })
-                .icon(app.default_window_icon().unwrap().clone())
+                .icon(tauri::include_image!("./icons/tray-template.png"))
+                .icon_as_template(true)
                 .build(app)?;
 
             // 窗口默认 visible:false，根据启动方式决定是否显示

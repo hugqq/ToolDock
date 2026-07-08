@@ -14,17 +14,7 @@ export function TitleBar() {
         const appWindow = getCurrentWindow();
 
         // 初始化时检查窗口状态
-        appWindow.isMaximized().then(setIsMaximized);
-
-        // 监听窗口大小变化事件
-        const unlisten = appWindow.onResized(async () => {
-            const maximized = await appWindow.isMaximized();
-            setIsMaximized(maximized);
-        });
-
-        return () => {
-            unlisten.then((fn) => fn());
-        };
+        appWindow.isMaximized().then(setIsMaximized).catch(() => setIsMaximized(false));
     }, []);
 
     const handleMinimize = async () => {
@@ -34,11 +24,13 @@ export function TitleBar() {
 
     const handleMaximize = async () => {
         const appWindow = getCurrentWindow();
+        const nextMaximized = !isMaximized;
         if (isMaximized) {
             await appWindow.unmaximize();
         } else {
             await appWindow.maximize();
         }
+        setIsMaximized(nextMaximized);
     };
 
     const handleClose = async () => {

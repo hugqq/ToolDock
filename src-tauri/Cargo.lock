@@ -6013,7 +6013,7 @@ checksum = "ab16f14aed21ee8bfd8ec22513f7287cd4a91aa92e44edfe2c17ddd004e92607"
 
 [[package]]
 name = "tooldock"
-version = "1.0.2"
+version = "1.0.3"
 dependencies = [
  "aes-gcm",
  "base64 0.22.1",
