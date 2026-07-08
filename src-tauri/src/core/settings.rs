@@ -15,6 +15,22 @@ use std::env;
 use winreg::enums::*;
 #[cfg(target_os = "windows")]
 use winreg::RegKey;
+#[cfg(target_os = "windows")]
+use winreg::RegValue;
+
+#[cfg(target_os = "windows")]
+const AUTO_START_APP_NAME: &str = "ToolDock";
+#[cfg(target_os = "windows")]
+const AUTO_START_ARG: &str = "--autostart";
+#[cfg(target_os = "windows")]
+const AUTO_START_RUN_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\Run";
+#[cfg(target_os = "windows")]
+const AUTO_START_APPROVED_KEY: &str =
+    r"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run";
+#[cfg(target_os = "windows")]
+const AUTO_START_APPROVED_ENABLED: [u8; 12] = [
+    0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+];
 
 /// 加密配置数据
 pub fn encrypt_config(data: &str, password: &str) -> Result<String, AppError> {
@@ -62,6 +78,110 @@ pub fn decrypt_config(encrypted_data: &str, password: &str) -> Result<String, Ap
         .map_err(|e| AppError::Internal(format!("Decryption failed: {}", e)))?;
 
     String::from_utf8(plaintext).map_err(|e| AppError::Internal(format!("Invalid UTF-8: {}", e)))
+}
+
+#[cfg(target_os = "windows")]
+fn build_auto_start_command(exe_path: &str) -> String {
+    format!("\"{}\" {}", exe_path, AUTO_START_ARG)
+}
+
+#[cfg(target_os = "windows")]
+fn auto_start_command_matches(command: &str, exe_path: &str) -> bool {
+    command == build_auto_start_command(exe_path)
+        || command == format!("{} {}", exe_path, AUTO_START_ARG)
+}
+
+#[cfg(target_os = "windows")]
+fn task_manager_startup_enabled(bytes: &[u8]) -> Option<bool> {
+    if bytes.len() < 8 {
+        return None;
+    }
+    Some(bytes.iter().rev().take(8).all(|value| *value == 0))
+}
+
+#[cfg(target_os = "windows")]
+fn current_auto_start_command() -> Result<String, AppError> {
+    let exe_path = env::current_exe()
+        .map_err(AppError::Io)?
+        .to_string_lossy()
+        .to_string();
+    Ok(build_auto_start_command(&exe_path))
+}
+
+#[cfg(target_os = "windows")]
+pub fn set_auto_start(enabled: bool) -> Result<(), AppError> {
+    let hkcu = RegKey::predef(HKEY_CURRENT_USER);
+    let (run_key, _) = hkcu.create_subkey(AUTO_START_RUN_KEY).map_err(AppError::Io)?;
+
+    if enabled {
+        run_key
+            .set_value(AUTO_START_APP_NAME, &current_auto_start_command()?)
+            .map_err(AppError::Io)?;
+
+        if let Ok((approved_key, _)) = hkcu.create_subkey(AUTO_START_APPROVED_KEY) {
+            approved_key
+                .set_raw_value(
+                    AUTO_START_APP_NAME,
+                    &RegValue {
+                        vtype: RegType::REG_BINARY,
+                        bytes: AUTO_START_APPROVED_ENABLED.to_vec(),
+                    },
+                )
+                .map_err(AppError::Io)?;
+        }
+    } else {
+        let _ = run_key.delete_value(AUTO_START_APP_NAME);
+
+        if let Ok(approved_key) = hkcu.open_subkey_with_flags(AUTO_START_APPROVED_KEY, KEY_SET_VALUE)
+        {
+            let _ = approved_key.delete_value(AUTO_START_APP_NAME);
+        }
+    }
+
+    Ok(())
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn set_auto_start(_enabled: bool) -> Result<(), AppError> {
+    Err(AppError::Internal(
+        "Auto start is only supported on Windows".into(),
+    ))
+}
+
+#[cfg(target_os = "windows")]
+pub fn is_auto_start_enabled() -> Result<bool, AppError> {
+    let hkcu = RegKey::predef(HKEY_CURRENT_USER);
+    let run_key = match hkcu.open_subkey_with_flags(AUTO_START_RUN_KEY, KEY_READ) {
+        Ok(key) => key,
+        Err(_) => return Ok(false),
+    };
+
+    let command = match run_key.get_value::<String, _>(AUTO_START_APP_NAME) {
+        Ok(value) => value,
+        Err(_) => return Ok(false),
+    };
+
+    let exe_path = env::current_exe()
+        .map_err(AppError::Io)?
+        .to_string_lossy()
+        .to_string();
+    if !auto_start_command_matches(&command, &exe_path) {
+        return Ok(false);
+    }
+
+    let task_manager_enabled = hkcu
+        .open_subkey_with_flags(AUTO_START_APPROVED_KEY, KEY_READ)
+        .ok()
+        .and_then(|key| key.get_raw_value(AUTO_START_APP_NAME).ok())
+        .and_then(|value| task_manager_startup_enabled(&value.bytes))
+        .unwrap_or(true);
+
+    Ok(task_manager_enabled)
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn is_auto_start_enabled() -> Result<bool, AppError> {
+    Ok(false)
 }
 
 /// 设置是否以管理员身份启动
@@ -188,10 +308,10 @@ pub fn load_silent_start(data_dir: &std::path::Path) -> bool {
             return json
                 .get("silentStart")
                 .and_then(|v| v.as_bool())
-                .unwrap_or(true);
+                .unwrap_or(false);
         }
     }
-    true
+    false
 }
 
 /// 读取全局快捷键配置
@@ -214,4 +334,49 @@ pub fn load_global_shortcut() -> Result<String, AppError> {
 #[cfg(not(target_os = "windows"))]
 pub fn load_global_shortcut() -> Result<String, AppError> {
     Ok(String::new())
+}
+
+#[cfg(all(test, target_os = "windows"))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn auto_start_command_quotes_paths_with_spaces() {
+        let command = build_auto_start_command(r"C:\Program Files\ToolDock\ToolDock.exe");
+
+        assert_eq!(
+            command,
+            r#""C:\Program Files\ToolDock\ToolDock.exe" --autostart"#
+        );
+    }
+
+    #[test]
+    fn auto_start_command_matches_legacy_unquoted_value() {
+        let exe_path = r"C:\Program Files\ToolDock\ToolDock.exe";
+
+        assert!(auto_start_command_matches(
+            r#""C:\Program Files\ToolDock\ToolDock.exe" --autostart"#,
+            exe_path
+        ));
+        assert!(auto_start_command_matches(
+            r"C:\Program Files\ToolDock\ToolDock.exe --autostart",
+            exe_path
+        ));
+    }
+
+    #[test]
+    fn task_manager_enabled_requires_last_eight_bytes_to_be_zero() {
+        assert_eq!(
+            task_manager_startup_enabled(&[
+                0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            ]),
+            Some(true)
+        );
+        assert_eq!(
+            task_manager_startup_enabled(&[
+                0x03, 0x00, 0x00, 0x00, 0x55, 0x3f, 0x8a, 0xa7, 0xd1, 0x3f, 0xdb, 0x01,
+            ]),
+            Some(false)
+        );
+    }
 }

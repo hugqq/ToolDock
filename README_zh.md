@@ -187,7 +187,7 @@ pnpm tauri dev
 只有在确认要发布时，再在 PowerShell 7 中执行：
 
 ```powershell
-.\scripts\release.ps1 1.0.1
+.\scripts\release.ps1 1.0.2
 ```
 
 ## 贡献
@@ -208,4 +208,3 @@ pnpm tauri dev
 ## 许可证
 
 ToolDock 基于 [MIT License](LICENSE) 开源。
-

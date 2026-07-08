@@ -6,7 +6,7 @@ import { ToolLayout } from "../components/layout/ToolLayout";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { Copy, ExternalLink, Lightbulb } from "lucide-react";
-import { InstructionsCard } from "../components/shared/InstructionsCard";
+import { InstructionsDialog } from "../components/shared/InstructionsDialog";
 
 interface ServerStatus {
   is_running: boolean;
@@ -129,32 +129,39 @@ export default function SimpleWebServer() {
   return (
     <ToolLayout title={t("tools.simple_web_server.name")}>
       <div className="space-y-6">
-        {/* 使用说明卡片 */}
-        <InstructionsCard
-          title={t("tools.simple_web_server.instructions.title")}
-          color="blue"
-          steps={[
-            {
-              title: t("tools.simple_web_server.instructions.step1_title"),
-              description: t("tools.simple_web_server.instructions.step1_desc"),
-            },
-            {
-              title: t("tools.simple_web_server.instructions.step2_title"),
-              description: t("tools.simple_web_server.instructions.step2_desc"),
-            },
-            {
-              title: t("tools.simple_web_server.instructions.step3_title"),
-              description: t("tools.simple_web_server.instructions.step3_desc"),
-            },
-            {
-              title: t("tools.simple_web_server.instructions.step4_title"),
-              description: t("tools.simple_web_server.instructions.step4_desc"),
-            },
-          ]}
-        />
-
         {/* 设计思路 */}
         <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
+          <div className="flex justify-end mb-3">
+            <InstructionsDialog
+              title={t("tools.simple_web_server.instructions.title")}
+              steps={[
+                {
+                  title: t("tools.simple_web_server.instructions.step1_title"),
+                  description: t(
+                    "tools.simple_web_server.instructions.step1_desc"
+                  ),
+                },
+                {
+                  title: t("tools.simple_web_server.instructions.step2_title"),
+                  description: t(
+                    "tools.simple_web_server.instructions.step2_desc"
+                  ),
+                },
+                {
+                  title: t("tools.simple_web_server.instructions.step3_title"),
+                  description: t(
+                    "tools.simple_web_server.instructions.step3_desc"
+                  ),
+                },
+                {
+                  title: t("tools.simple_web_server.instructions.step4_title"),
+                  description: t(
+                    "tools.simple_web_server.instructions.step4_desc"
+                  ),
+                },
+              ]}
+            />
+          </div>
           <div className="flex items-start gap-3">
             <Lightbulb className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
             <div>

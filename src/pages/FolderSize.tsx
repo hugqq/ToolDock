@@ -14,7 +14,7 @@ import {
 import { useModal } from "../components/ModalContext";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import { Button } from "../components/mui";
-import { InstructionsCard } from "../components/shared/InstructionsCard";
+import { InstructionsDialog } from "../components/shared/InstructionsDialog";
 import { ScanProgress } from "../components/shared/ScanProgress";
 import { useTauriEvent } from "../hooks/useTauriEvent";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
@@ -198,6 +198,25 @@ const FolderSize: React.FC = () => {
     [results]
   );
 
+  const instructionSteps = [
+    {
+      title: t("tools.folder_size.instructions.step1_title"),
+      description: t("tools.folder_size.instructions.step1_desc"),
+    },
+    {
+      title: t("tools.folder_size.instructions.step2_title"),
+      description: t("tools.folder_size.instructions.step2_desc"),
+    },
+    {
+      title: t("tools.folder_size.instructions.step3_title"),
+      description: t("tools.folder_size.instructions.step3_desc"),
+    },
+    {
+      title: t("tools.folder_size.instructions.step4_title"),
+      description: t("tools.folder_size.instructions.step4_desc"),
+    },
+  ];
+
   const largestItem = useMemo(
     () =>
       results.length > 0
@@ -275,35 +294,17 @@ const FolderSize: React.FC = () => {
   return (
     <ToolLayout title={t("tools.folder_size.name")} status={statusText}>
       <div className="space-y-6">
-        {/* 使用说明卡片 */}
-        <InstructionsCard
-          title={t("tools.folder_size.instructions.title")}
-          color="blue"
-          steps={[
-            {
-              title: t("tools.folder_size.instructions.step1_title"),
-              description: t("tools.folder_size.instructions.step1_desc"),
-            },
-            {
-              title: t("tools.folder_size.instructions.step2_title"),
-              description: t("tools.folder_size.instructions.step2_desc"),
-            },
-            {
-              title: t("tools.folder_size.instructions.step3_title"),
-              description: t("tools.folder_size.instructions.step3_desc"),
-            },
-            {
-              title: t("tools.folder_size.instructions.step4_title"),
-              description: t("tools.folder_size.instructions.step4_desc"),
-            },
-          ]}
-        />
-
         <div className="bg-(--card-bg) p-4 sm:p-6 rounded-2xl border border-(--border-color) shadow-sm">
           <div className="flex flex-col gap-4">
-            <label className="text-sm font-bold text-(--text-main)">
-              {t("tools.folder_size.col_path")}
-            </label>
+            <div className="flex items-center justify-between gap-3">
+              <label className="text-sm font-bold text-(--text-main)">
+                {t("tools.folder_size.col_path")}
+              </label>
+              <InstructionsDialog
+                title={t("tools.folder_size.instructions.title")}
+                steps={instructionSteps}
+              />
+            </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1 relative group">
                 <input
@@ -322,7 +323,7 @@ const FolderSize: React.FC = () => {
                   </div>
                 )}
               </div>
-              <div className="flex gap-2 sm:gap-3">
+              <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3">
                 <Button
                   variant="outlined"
                   onClick={handleGoUp}
@@ -362,6 +363,15 @@ const FolderSize: React.FC = () => {
                     </>
                   )}
                 </Button>
+                <Button
+                  variant="outlined"
+                  onClick={handleClear}
+                  disabled={scanning}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-red-500 hover:bg-red-500/10 border-red-500/20 hover:border-red-500/50"
+                >
+                  <Trash2 size={18} />
+                  <span>{t("tools.folder_size.clear_cache")}</span>
+                </Button>
               </div>
             </div>
           </div>
@@ -392,20 +402,6 @@ const FolderSize: React.FC = () => {
             return currentItem || t("tools.folder_size.scanning_root");
           }}
         />
-
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className="sm:ml-auto w-full sm:w-auto">
-            <Button
-              variant="outlined"
-              onClick={handleClear}
-              disabled={scanning}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-red-500 hover:bg-red-500/10 border-red-500/20 hover:border-red-500/50"
-            >
-              <Trash2 size={18} />
-              <span>{t("tools.folder_size.clear_cache")}</span>
-            </Button>
-          </div>
-        </div>
 
         {results.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -656,6 +652,7 @@ const FolderSize: React.FC = () => {
           </div>
         )}
       </div>
+
     </ToolLayout>
   );
 };

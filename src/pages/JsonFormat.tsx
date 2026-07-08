@@ -31,6 +31,7 @@ import { useTheme } from "../components/ThemeContext";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import { Button } from "../components/mui";
 import { TIMING, UI } from "../constants";
+import { isXmlText, jsonToXml, xmlToJson } from "../lib/jsonXml";
 
 const JsonTreeNode: React.FC<{
   label?: string;
@@ -302,31 +303,31 @@ const JsonFormat: React.FC = () => {
     }
   };
 
-  const handleToXml = () => {
-    if (!jsonObject) return;
+  const handleConvertXmlJson = () => {
     try {
-      const toXml = (v: any, name: string): string => {
-        if (Array.isArray(v)) {
-          return v.map((item) => toXml(item, name)).join("");
-        }
-        if (typeof v === "object" && v !== null) {
-          const children = Object.entries(v)
-            .map(([key, value]) => toXml(value, key))
-            .join("");
-          return `<${name}>${children}</${name}>`;
-        }
-        return `<${name}>${v}</${name}>`;
-      };
-      const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<root>${Object.entries(
-        jsonObject
-      )
-        .map(([k, v]) => toXml(v, k))
-        .join("")}</root>`;
+      if (isXmlText(output)) {
+        const parsed = xmlToJson(output);
+        const formatted = JSON.stringify(parsed, null, 2);
+        setInput(formatted);
+        setOutput(formatted);
+        setJsonObject(parsed);
+        setViewMode("code");
+        setError(null);
+        setStatusText(t("tools.json_format.to_json_success"));
+        return;
+      }
+
+      if (!jsonObject) return;
+      const xml = jsonToXml(jsonObject);
       setOutput(xml);
       setViewMode("code");
+      setError(null);
       setStatusText(t("tools.json_format.to_xml_success"));
     } catch (e: any) {
-      setError(`${t("tools.json_format.xml_failed")}: ${e.message}`);
+      const failureKey = isXmlText(output)
+        ? "tools.json_format.json_failed"
+        : "tools.json_format.xml_failed";
+      setError(`${t(failureKey)}: ${e.message}`);
     }
   };
 
@@ -558,8 +559,12 @@ const JsonFormat: React.FC = () => {
                   size="small"
                   sx={{ minWidth: 32, height: 32, p: 0 }}
                   className="hover:bg-(--border-color) rounded-lg transition-colors text-(--text-muted) hover:text-primary shrink-0"
-                  title={t("tools.json_format.to_xml")}
-                  onClick={handleToXml}
+                  title={t(
+                    isXmlText(output)
+                      ? "tools.json_format.to_json"
+                      : "tools.json_format.to_xml"
+                  )}
+                  onClick={handleConvertXmlJson}
                 >
                   <FileCode size={16} />
                 </Button>

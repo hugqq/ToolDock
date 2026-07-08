@@ -6,7 +6,10 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { ToolLayout } from "../components/layout/ToolLayout";
-import { useSettingsStore } from "../stores/useSettingsStore";
+import {
+  useSettingsStore,
+  type DeveloperLogLevel,
+} from "../stores/useSettingsStore";
 import {
   Save,
   CheckCircle2,
@@ -27,6 +30,8 @@ import {
   PlusCircle,
   X,
   XCircle,
+  Bug,
+  FileText,
 } from "lucide-react";
 import { getVersion } from "@tauri-apps/api/app";
 import { openPath, openUrl } from "@tauri-apps/plugin-opener";
@@ -47,6 +52,7 @@ type SettingsCategory =
   | "ai"
   | "ocr"
   | "translator"
+  | "developer"
   | "importExport";
 
 interface CategoryConfig {
@@ -61,11 +67,25 @@ interface GitHubRelease {
   html_url?: string;
 }
 
+interface DeveloperLogs {
+  logDir: string;
+  runLogPath?: string | null;
+  errorLogPath?: string | null;
+  runLog: string;
+  errorLog: string;
+}
+
 type UpdateStatus = "idle" | "latest" | "available" | "error";
 
 const RELEASES_URL = "https://github.com/hugqq/ToolDock/releases";
-const LATEST_RELEASE_API = "https://api.github.com/repos/hugqq/ToolDock/releases/latest";
 const FALLBACK_VERSION = "1.0.0";
+const LOG_LEVELS: DeveloperLogLevel[] = [
+  "error",
+  "warn",
+  "info",
+  "debug",
+  "trace",
+];
 
 const normalizeVersion = (version: string) =>
   version
@@ -127,6 +147,11 @@ const CATEGORIES: CategoryConfig[] = [
     id: "translator",
     icon: Languages,
     labelKey: "tools.settings.translator_keys",
+  },
+  {
+    id: "developer",
+    icon: Bug,
+    labelKey: "tools.settings.developer_settings",
   },
   {
     id: "importExport",
@@ -214,6 +239,10 @@ const Settings: React.FC = () => {
     setCloseBehavior,
     silentStart,
     setSilentStart,
+    developerSettingsEnabled,
+    setDeveloperSettingsEnabled,
+    developerLogLevel,
+    setDeveloperLogLevel,
   } = useSettingsStore();
 
   const [saved, setSaved] = React.useState(false);
@@ -225,6 +254,9 @@ const Settings: React.FC = () => {
   const [isCheckingUpdate, setIsCheckingUpdate] = React.useState(false);
   const [updateStatus, setUpdateStatus] = React.useState<UpdateStatus>("idle");
   const [latestRelease, setLatestRelease] = React.useState<GitHubRelease | null>(null);
+  const [developerLogs, setDeveloperLogs] =
+    React.useState<DeveloperLogs | null>(null);
+  const [isRefreshingLogs, setIsRefreshingLogs] = React.useState(false);
   const [activeCategory, setActiveCategory] =
     React.useState<SettingsCategory>("general");
   // 导出导入相关状态
@@ -232,10 +264,47 @@ const Settings: React.FC = () => {
   const [exportPassword, setExportPassword] = React.useState("");
   const [importPassword, setImportPassword] = React.useState("");
 
+  const refreshDeveloperLogs = React.useCallback(async () => {
+    setIsRefreshingLogs(true);
+    try {
+      const res = await invokeWrapper<DeveloperLogs>("get_developer_logs");
+      if (res.ok) {
+        setDeveloperLogs(res.data);
+      } else {
+        toast.error(res.message || t("common.error"));
+      }
+    } catch {
+      toast.error(t("common.error"));
+    } finally {
+      setIsRefreshingLogs(false);
+    }
+  }, [t]);
+
+  const handleDeveloperLogLevelChange = async (level: DeveloperLogLevel) => {
+    setDeveloperLogLevel(level);
+    const res = await invokeWrapper<string>("set_developer_log_level", {
+      level,
+    });
+    if (!res.ok) {
+      toast.error(res.message || t("common.error"));
+      return;
+    }
+    toast.success(t("tools.settings.developer_log_level_saved"));
+    await refreshDeveloperLogs();
+  };
+
+  const handleToggleDeveloperSettings = async (checked: boolean) => {
+    setDeveloperSettingsEnabled(checked);
+    if (checked) {
+      await handleDeveloperLogLevelChange(developerLogLevel);
+      await refreshDeveloperLogs();
+    }
+  };
+
   React.useEffect(() => {
-    invoke<boolean>("plugin:autostart|is_enabled")
-      .then((yes) => setAutoStart(yes))
-      .catch(() => {});
+    invokeWrapper<boolean>("is_auto_start_enabled").then((res) => {
+      if (res.ok) setAutoStart(res.data);
+    });
 
     invoke("set_close_behavior", { behavior: closeBehavior }).catch(() => {});
 
@@ -261,6 +330,14 @@ const Settings: React.FC = () => {
     getVersion()
       .then(setCurrentVersion)
       .catch(() => setCurrentVersion(FALLBACK_VERSION));
+  }, []);
+
+  React.useEffect(() => {
+    if (!developerSettingsEnabled) return;
+    invokeWrapper<string>("set_developer_log_level", {
+      level: developerLogLevel,
+    }).catch(() => {});
+    refreshDeveloperLogs();
   }, []);
 
   // AI 服务商列表（带防御性默认值）
@@ -315,9 +392,17 @@ const Settings: React.FC = () => {
   const toggleAutoStart = async (checked: boolean) => {
     try {
       if (checked) {
-        await invoke("plugin:autostart|enable");
+        const res = await invokeWrapper("set_auto_start", { enabled: true });
+        if (!res.ok) {
+          toast.error(res.message || t("common.error"));
+          return;
+        }
       } else {
-        await invoke("plugin:autostart|disable");
+        const res = await invokeWrapper("set_auto_start", { enabled: false });
+        if (!res.ok) {
+          toast.error(res.message || t("common.error"));
+          return;
+        }
         setSilentStart(false);
         await invokeWrapper("set_silent_start", { enabled: false });
       }
@@ -337,7 +422,13 @@ const Settings: React.FC = () => {
   const handleToggleSilentStart = async (checked: boolean) => {
     try {
       if (checked) {
-        await invoke("plugin:autostart|enable");
+        const autoStartRes = await invokeWrapper("set_auto_start", {
+          enabled: true,
+        });
+        if (!autoStartRes.ok) {
+          toast.error(autoStartRes.message || t("common.error"));
+          return;
+        }
         setAutoStart(true);
       }
 
@@ -359,15 +450,13 @@ const Settings: React.FC = () => {
     setUpdateStatus("idle");
 
     try {
-      const response = await fetch(LATEST_RELEASE_API, {
-        headers: { Accept: "application/vnd.github+json" },
-      });
+      const releaseRes = await invokeWrapper<GitHubRelease>("check_latest_release");
 
-      if (!response.ok) {
-        throw new Error(`GitHub release request failed: ${response.status}`);
+      if (!releaseRes.ok) {
+        throw new Error(releaseRes.message);
       }
 
-      const release = (await response.json()) as GitHubRelease;
+      const release = releaseRes.data;
       const latestVersion = release.tag_name || release.name;
 
       if (!latestVersion) {
@@ -1256,6 +1345,106 @@ const Settings: React.FC = () => {
     );
   };
 
+  const renderDeveloperSettings = () => (
+    <div className="space-y-4">
+      <ToggleSwitch
+        checked={developerSettingsEnabled}
+        onChange={handleToggleDeveloperSettings}
+        label={t("tools.settings.developer_settings")}
+        description={t("tools.settings.developer_settings_desc")}
+      />
+
+      {developerSettingsEnabled && (
+        <div className="space-y-4 rounded-xl border border-(--border-color) bg-(--bg-main)/50 p-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-[220px_1fr]">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-(--text-main)">
+                {t("tools.settings.developer_log_level")}
+              </label>
+              <select
+                value={developerLogLevel}
+                onChange={(event) =>
+                  handleDeveloperLogLevelChange(
+                    event.target.value as DeveloperLogLevel
+                  )
+                }
+                className="w-full rounded-lg border border-(--border-color) bg-(--card-bg) px-3 py-2 text-sm text-(--text-main) outline-none focus:border-(--primary-color)"
+              >
+                {LOG_LEVELS.map((level) => (
+                  <option key={level} value={level}>
+                    {t(`tools.settings.developer_log_level_${level}`)}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-(--text-muted)">
+                {t("tools.settings.developer_log_level_desc")}
+              </p>
+            </div>
+
+            <div className="flex flex-col justify-end gap-2 sm:flex-row sm:items-end">
+              <Button
+                variant="outlined"
+                onClick={refreshDeveloperLogs}
+                disabled={isRefreshingLogs}
+                className="flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm"
+              >
+                <RefreshCw
+                  size={16}
+                  className={isRefreshingLogs ? "animate-spin" : ""}
+                />
+                {t("tools.settings.developer_logs_refresh")}
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() =>
+                  developerLogs?.logDir &&
+                  openPath(developerLogs.logDir).catch(() =>
+                    toast.error(t("common.error"))
+                  )
+                }
+                disabled={!developerLogs?.logDir}
+                className="flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm"
+              >
+                <FolderInput size={16} />
+                {t("tools.settings.developer_logs_open_dir")}
+              </Button>
+            </div>
+          </div>
+
+          {developerLogs?.logDir && (
+            <div className="rounded-lg border border-(--border-color) bg-(--card-bg) px-3 py-2 text-xs text-(--text-muted)">
+              {developerLogs.logDir}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-semibold text-(--text-main)">
+                <FileText size={16} />
+                {t("tools.settings.developer_run_log")}
+              </div>
+              <pre className="h-80 overflow-auto rounded-xl border border-(--border-color) bg-(--card-bg) p-3 text-xs leading-relaxed text-(--text-main)">
+                {developerLogs?.runLog ||
+                  t("tools.settings.developer_logs_empty")}
+              </pre>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-semibold text-(--text-main)">
+                <Bug size={16} />
+                {t("tools.settings.developer_error_log")}
+              </div>
+              <pre className="h-80 overflow-auto rounded-xl border border-(--border-color) bg-(--card-bg) p-3 text-xs leading-relaxed text-(--text-main)">
+                {developerLogs?.errorLog ||
+                  t("tools.settings.developer_logs_empty")}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const renderImportExportSettings = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* 导出 */}
@@ -1356,6 +1545,8 @@ const Settings: React.FC = () => {
         return renderOcrSettings();
       case "translator":
         return renderTranslatorSettings();
+      case "developer":
+        return renderDeveloperSettings();
       case "importExport":
         return renderImportExportSettings();
       default:

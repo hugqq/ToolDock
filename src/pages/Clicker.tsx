@@ -11,14 +11,6 @@ import {
   Alert,
   Tabs,
   Tab,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Divider,
-  Card,
-  CardContent,
-  CardActions,
   Switch,
   Chip,
 } from "@mui/material";
@@ -28,9 +20,6 @@ import {
   Mouse as MouseIcon,
   Keyboard as KeyboardIcon,
   TextFields as TextFieldsIcon,
-  Add,
-  Edit,
-  Delete,
   ContentCopy,
   Send,
   Bolt as BoltIcon,
@@ -39,7 +28,7 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { ToolLayout } from "../components/layout/ToolLayout";
-import { InstructionsCard } from "../components/shared/InstructionsCard";
+import { InstructionsDialog } from "../components/shared/InstructionsDialog";
 import { toast } from "react-hot-toast";
 
 const COMMON_KEYS = [
@@ -72,14 +61,6 @@ const COMMON_KEYS = [
   })),
 ];
 
-interface Macro {
-  id: string;
-  name: string;
-  content: string;
-}
-
-const STORAGE_KEY = "clicker_macros";
-
 const Clicker: React.FC = () => {
   const { t } = useTranslation();
   const [tabValue, setTabValue] = useState(0);
@@ -98,37 +79,17 @@ const Clicker: React.FC = () => {
   // Quick Input State
   const [quickText, setQuickText] = useState<string>("");
   const [keyDelay, setKeyDelay] = useState<number>(10);
-  const [macros, setMacros] = useState<Macro[]>([]);
-  const [macroDialogOpen, setMacroDialogOpen] = useState(false);
-  const [editingMacro, setEditingMacro] = useState<Macro | null>(null);
-  const [macroName, setMacroName] = useState("");
-  const [macroContent, setMacroContent] = useState("");
 
   // F8/F9 热键开关，默认关闭，持久化到 localStorage
   const [hotkeyEnabled, setHotkeyEnabled] = useState<boolean>(() => {
     return localStorage.getItem("clicker_hotkey_enabled") === "true";
   });
 
-  // Load macros from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        setMacros(JSON.parse(saved));
-      } catch (err) {
-        console.error("Failed to load macros:", err);
-      }
-    }
     // 初始化时将热键状态同步到后端
     const enabled = localStorage.getItem("clicker_hotkey_enabled") === "true";
     invoke("set_clicker_hotkey_enabled", { enabled }).catch(console.error);
   }, []);
-
-  // Save macros to localStorage
-  const saveMacros = (newMacros: Macro[]) => {
-    setMacros(newMacros);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newMacros));
-  };
 
   // 切换 F8/F9 热键开关
   const handleHotkeyToggle = async (enabled: boolean) => {
@@ -219,7 +180,7 @@ const Clicker: React.FC = () => {
 
   const handleSendText = async () => {
     if (!quickText.trim()) {
-      toast.error(t("tools.clicker.macro_content_required"));
+      toast.error(t("tools.clicker.text_required"));
       return;
     }
     try {
@@ -240,7 +201,7 @@ const Clicker: React.FC = () => {
 
   const handleCopyText = async () => {
     if (!quickText.trim()) {
-      toast.error(t("tools.clicker.macro_content_required"));
+      toast.error(t("tools.clicker.text_required"));
       return;
     }
     try {
@@ -252,102 +213,10 @@ const Clicker: React.FC = () => {
     }
   };
 
-  const handleAddMacro = () => {
-    setEditingMacro(null);
-    setMacroName("");
-    setMacroContent("");
-    setMacroDialogOpen(true);
-  };
-
-  const handleEditMacro = (macro: Macro) => {
-    setEditingMacro(macro);
-    setMacroName(macro.name);
-    setMacroContent(macro.content);
-    setMacroDialogOpen(true);
-  };
-
-  const handleSaveMacro = () => {
-    if (!macroName.trim()) {
-      toast.error(t("tools.clicker.macro_name_required"));
-      return;
-    }
-    if (!macroContent.trim()) {
-      toast.error(t("tools.clicker.macro_content_required"));
-      return;
-    }
-
-    if (editingMacro) {
-      // Update existing
-      const updated = macros.map((m) =>
-        m.id === editingMacro.id
-          ? { ...m, name: macroName, content: macroContent }
-          : m
-      );
-      saveMacros(updated);
-    } else {
-      // Add new
-      const newMacro: Macro = {
-        id: Date.now().toString(),
-        name: macroName,
-        content: macroContent,
-      };
-      saveMacros([...macros, newMacro]);
-    }
-    setMacroDialogOpen(false);
-    toast.success(t("tools.clicker.macro_saved"));
-  };
-
-  const handleDeleteMacro = (id: string) => {
-    const updated = macros.filter((m) => m.id !== id);
-    saveMacros(updated);
-    toast.success(t("tools.clicker.macro_deleted"));
-  };
-
-  const handleExecuteMacro = async (content: string) => {
-    try {
-      const res = await invoke<any>("send_text_input", {
-        text: content,
-        delayMs: keyDelay,
-      });
-      if (res.ok) {
-        toast.success(t("tools.clicker.text_sent"));
-      } else {
-        toast.error(res.error?.message || "Failed to send text");
-      }
-    } catch (err) {
-      console.error("Failed to execute macro:", err);
-      toast.error(String(err));
-    }
-  };
-
   return (
     <ToolLayout title={t("tools.clicker.name")}>
       <Box sx={{ p: 3 }}>
-        {/* 使用说明卡片 */}
         <Stack spacing={4} sx={{ mx: "auto" }}>
-          {/* Tabs 卡片 */}
-          <InstructionsCard
-            title={t("common.instructions")}
-            color="blue"
-            steps={[
-              {
-                title: t("tools.clicker.step1"),
-                description: t("tools.clicker.step1_desc"),
-              },
-              {
-                title: t("tools.clicker.step2"),
-                description: t("tools.clicker.step2_desc"),
-              },
-              {
-                title: t("tools.clicker.step3"),
-                description: t("tools.clicker.step3_desc"),
-              },
-              {
-                title: t("tools.clicker.step4"),
-                description: t("tools.clicker.step4_desc"),
-              },
-            ]}
-          />
           {/* F8/F9 热键全局开关 */}
           <Paper
             sx={{
@@ -377,6 +246,27 @@ const Clicker: React.FC = () => {
               </Box>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <InstructionsDialog
+                title={t("common.instructions")}
+                steps={[
+                  {
+                    title: t("tools.clicker.step1"),
+                    description: t("tools.clicker.step1_desc"),
+                  },
+                  {
+                    title: t("tools.clicker.step2"),
+                    description: t("tools.clicker.step2_desc"),
+                  },
+                  {
+                    title: t("tools.clicker.step3"),
+                    description: t("tools.clicker.step3_desc"),
+                  },
+                  {
+                    title: t("tools.clicker.step4"),
+                    description: t("tools.clicker.step4_desc"),
+                  },
+                ]}
+              />
               {hotkeyEnabled && (
                 <Chip
                   label="F8 · F9"
@@ -642,90 +532,6 @@ const Clicker: React.FC = () => {
                     </Button>
                   </Box>
 
-                  <Divider sx={{ my: 2 }} />
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      {t("tools.clicker.macro_list")}
-                    </Typography>
-                    <Button
-                      variant="contained"
-                      startIcon={<Add />}
-                      onClick={handleAddMacro}
-                      size="small"
-                    >
-                      {t("tools.clicker.add_macro")}
-                    </Button>
-                  </Box>
-
-                  {macros.length === 0 ? (
-                    <Alert severity="info" sx={{ borderRadius: 1 }}>
-                      {t("tools.clicker.no_macros")}
-                    </Alert>
-                  ) : (
-                    <Stack spacing={2}>
-                      {macros.map((macro) => (
-                        <Card
-                          key={macro.id}
-                          sx={{
-                            borderRadius: 1,
-                            boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
-                          }}
-                        >
-                          <CardContent>
-                            <Typography
-                              variant="subtitle1"
-                              sx={{ fontWeight: 600, mb: 1 }}
-                            >
-                              {macro.name}
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              sx={{
-                                whiteSpace: "pre-wrap",
-                                wordBreak: "break-word",
-                              }}
-                            >
-                              {macro.content}
-                            </Typography>
-                          </CardContent>
-                          <CardActions sx={{ px: 2, pb: 2 }}>
-                            <Button
-                              size="small"
-                              startIcon={<PlayArrow />}
-                              onClick={() => handleExecuteMacro(macro.content)}
-                              variant="contained"
-                            >
-                              {t("tools.clicker.execute_macro")}
-                            </Button>
-                            <Button
-                              size="small"
-                              startIcon={<Edit />}
-                              onClick={() => handleEditMacro(macro)}
-                            >
-                              {t("tools.clicker.edit_macro")}
-                            </Button>
-                            <Button
-                              size="small"
-                              startIcon={<Delete />}
-                              color="error"
-                              onClick={() => handleDeleteMacro(macro.id)}
-                            >
-                              {t("tools.clicker.delete_macro")}
-                            </Button>
-                          </CardActions>
-                        </Card>
-                      ))}
-                    </Stack>
-                  )}
-
                   <Typography
                     variant="caption"
                     sx={{
@@ -747,47 +553,6 @@ const Clicker: React.FC = () => {
               )}
             </Box>
           </Paper>
-
-          {/* Macro Dialog */}
-          <Dialog
-            open={macroDialogOpen}
-            onClose={() => setMacroDialogOpen(false)}
-            maxWidth="sm"
-            fullWidth
-          >
-            <DialogTitle>
-              {editingMacro
-                ? t("tools.clicker.edit_macro")
-                : t("tools.clicker.add_macro")}
-            </DialogTitle>
-            <DialogContent>
-              <Stack spacing={2} sx={{ mt: 1 }}>
-                <TextField
-                  label={t("tools.clicker.macro_name")}
-                  value={macroName}
-                  onChange={(e) => setMacroName(e.target.value)}
-                  fullWidth
-                  autoFocus
-                />
-                <TextField
-                  label={t("tools.clicker.macro_content")}
-                  multiline
-                  rows={6}
-                  value={macroContent}
-                  onChange={(e) => setMacroContent(e.target.value)}
-                  fullWidth
-                />
-              </Stack>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setMacroDialogOpen(false)}>
-                {t("common.cancel")}
-              </Button>
-              <Button onClick={handleSaveMacro} variant="contained">
-                {t("common.save")}
-              </Button>
-            </DialogActions>
-          </Dialog>
         </Stack>
       </Box>
     </ToolLayout>

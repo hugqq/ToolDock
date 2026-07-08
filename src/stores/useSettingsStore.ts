@@ -47,6 +47,7 @@ interface OthelloSettings {
 }
 
 export type HomeViewMode = "list" | "grouped";
+export type DeveloperLogLevel = "error" | "warn" | "info" | "debug" | "trace";
 
 export const DEFAULT_AI_PROVIDERS: AiProviderSettings[] = [
   {
@@ -78,6 +79,8 @@ interface SettingsState {
   globalShortcut: string;
   closeBehavior: "minimize" | "exit";
   silentStart: boolean;
+  developerSettingsEnabled: boolean;
+  developerLogLevel: DeveloperLogLevel;
   homeViewMode: HomeViewMode;
   favoriteTools: string[];
   pinnedTools: string[];
@@ -109,6 +112,8 @@ interface SettingsState {
   setRunAsAdmin: (enabled: boolean) => void;
   setCloseBehavior: (behavior: "minimize" | "exit") => void;
   setSilentStart: (enabled: boolean) => void;
+  setDeveloperSettingsEnabled: (enabled: boolean) => void;
+  setDeveloperLogLevel: (level: DeveloperLogLevel) => void;
   setClipboardEnabled: (enabled: boolean) => void;
   setClipboardPrefix: (prefix: string) => void;
   setClipboardSuffix: (suffix: string) => void;
@@ -146,7 +151,9 @@ export const useSettingsStore = create<SettingsState>()(
       },
       runAsAdmin: false,
       closeBehavior: "minimize",
-      silentStart: true,
+      silentStart: false,
+      developerSettingsEnabled: false,
+      developerLogLevel: "info",
       homeViewMode: "grouped",
       clipboardEnabled: false,
       clipboardPrefix: "",
@@ -218,6 +225,9 @@ export const useSettingsStore = create<SettingsState>()(
       setRunAsAdmin: (enabled) => set({ runAsAdmin: enabled }),
       setCloseBehavior: (behavior) => set({ closeBehavior: behavior }),
       setSilentStart: (enabled) => set({ silentStart: enabled }),
+      setDeveloperSettingsEnabled: (enabled) =>
+        set({ developerSettingsEnabled: enabled }),
+      setDeveloperLogLevel: (level) => set({ developerLogLevel: level }),
       setClipboardEnabled: (enabled) => set({ clipboardEnabled: enabled }),
       setClipboardPrefix: (prefix) => set({ clipboardPrefix: prefix }),
       setClipboardSuffix: (suffix) => set({ clipboardSuffix: suffix }),

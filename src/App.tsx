@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, useLayoutEffect, lazy, Suspense } from "react";
 import {
   HashRouter as Router,
   Routes,
@@ -59,6 +59,10 @@ function PageLoader() {
   );
 }
 
+function TransparentPageLoader() {
+  return <div className="h-full w-full bg-transparent" />;
+}
+
 // 独立窗口路由配置（不显示主布局）
 const STANDALONE_ROUTES: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   "/magnifier": Magnifier,
@@ -73,6 +77,25 @@ function AppContent() {
   const navigate = useNavigate();
   const { clipboardEnabled, clipboardPrefix, clipboardSuffix } =
     useSettingsStore();
+
+  useLayoutEffect(() => {
+    if (location.pathname !== "/magnifier") return;
+
+    const bodyBackground = document.body.style.backgroundColor;
+    const htmlBackground = document.documentElement.style.backgroundColor;
+    const root = document.getElementById("root");
+    const rootBackground = root?.style.backgroundColor;
+
+    document.body.style.backgroundColor = "transparent";
+    document.documentElement.style.backgroundColor = "transparent";
+    if (root) root.style.backgroundColor = "transparent";
+
+    return () => {
+      document.body.style.backgroundColor = bodyBackground;
+      document.documentElement.style.backgroundColor = htmlBackground;
+      if (root) root.style.backgroundColor = rootBackground ?? "";
+    };
+  }, [location.pathname]);
 
   // 监听后端全局热键触发事件
   useEffect(() => {
@@ -105,8 +128,11 @@ function AppContent() {
   // 独立窗口：不渲染主布局，直接渲染对应组件
   const StandaloneComponent = STANDALONE_ROUTES[location.pathname];
   if (StandaloneComponent) {
+    const fallback =
+      location.pathname === "/magnifier" ? <TransparentPageLoader /> : <PageLoader />;
+
     return (
-      <Suspense fallback={<PageLoader />}>
+      <Suspense fallback={fallback}>
         <StandaloneComponent />
       </Suspense>
     );

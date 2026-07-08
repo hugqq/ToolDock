@@ -187,7 +187,7 @@ The release helper updates version numbers, creates a commit, creates or replace
 Use PowerShell 7 only when you are ready to publish:
 
 ```powershell
-.\scripts\release.ps1 1.0.1
+.\scripts\release.ps1 1.0.2
 ```
 
 ## Contributing
@@ -208,4 +208,3 @@ Suggested commit types:
 ## License
 
 ToolDock is released under the [MIT License](LICENSE).
-

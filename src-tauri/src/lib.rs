@@ -58,8 +58,10 @@ use commands::renamer::{
 };
 use commands::reveal_in_explorer;
 use commands::settings::{
-    export_config, get_global_shortcut, get_silent_start, import_config, is_run_as_admin,
-    set_global_shortcut, set_run_as_admin, set_silent_start, test_ai_connection,
+    check_latest_release, export_config, get_developer_logs, get_global_shortcut,
+    get_silent_start, import_config, is_auto_start_enabled, is_run_as_admin, set_auto_start,
+    set_developer_log_level, set_global_shortcut, set_run_as_admin, set_silent_start,
+    test_ai_connection,
 };
 use commands::timestamp::{
     batch_convert_timestamps, convert_timestamp, get_current_datetime, get_current_timestamp,
@@ -95,26 +97,19 @@ fn greet(name: &str) -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    // 设置日志过滤，屏蔽 tao 的警告信息 (NewEvents emitted without explicit RedrawEventsCleared)
-    // 这些警告是 tao/winit 在 Windows 上的已知问题，通常可以安全忽略
-    tracing_subscriber::fmt()
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info,tao=error")),
-        )
-        .init();
-
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_clipboard_manager::init())
-        .plugin(tauri_plugin_autostart::init(
-            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
-            Some(vec!["--autostart"]),
-        ))
         .setup(|app| {
+            let data_dir = app
+                .path()
+                .app_data_dir()
+                .unwrap_or_else(|_| std::path::PathBuf::from("data"));
+            crate::core::logging::init_logging(data_dir.join("logs"));
+
             let manager = Arc::new(ClipboardManager::new(app.handle()));
             app.manage(manager.clone());
             start_listening(app.handle().clone(), manager);
@@ -285,11 +280,16 @@ pub fn run() {
             import_config,
             set_run_as_admin,
             is_run_as_admin,
+            set_auto_start,
+            is_auto_start_enabled,
+            set_developer_log_level,
+            get_developer_logs,
             test_ai_connection,
             get_global_shortcut,
             set_global_shortcut,
             set_silent_start,
             get_silent_start,
+            check_latest_release,
             reveal_in_explorer,
             convert_images,
             convert_timestamp,

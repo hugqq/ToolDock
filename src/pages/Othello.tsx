@@ -31,7 +31,7 @@ import {
 import { useSettingsStore } from "../stores/useSettingsStore";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { InstructionsCard } from "../components/shared/InstructionsCard";
+import { InstructionsDialog } from "../components/shared/InstructionsDialog";
 
 // --- Types ---
 type Player = 1 | 2; // 1: Black, 2: White
@@ -925,23 +925,24 @@ const Othello: React.FC = () => {
       width="100%"
       mt={{ xs: 2, md: 4 }}
     >
-      <Box width="100%" maxWidth={800}>
-        <InstructionsCard
-          title={t("tools.othello.rules_title")}
-          icon={Disc}
-          steps={[
-            {
-              title: t("tools.othello.rules_title"),
-              description: t("tools.othello.rules_desc"),
-            },
-            {
-              title: t("tools.othello.black"),
-              description: t("tools.othello.black_first"),
-            },
-          ]}
-          columns={2}
-        />
-      </Box>
+      <Card sx={{ width: "100%", maxWidth: 800 }}>
+        <CardContent sx={{ py: 1.5, display: "flex", justifyContent: "flex-end" }}>
+          <InstructionsDialog
+            title={t("tools.othello.rules_title")}
+            triggerIcon={Disc}
+            steps={[
+              {
+                title: t("tools.othello.rules_title"),
+                description: t("tools.othello.rules_desc"),
+              },
+              {
+                title: t("tools.othello.black"),
+                description: t("tools.othello.black_first"),
+              },
+            ]}
+          />
+        </CardContent>
+      </Card>
 
       <Stack
         direction={{ xs: "column", md: "row" }}

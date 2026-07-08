@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import { useSettingsStore } from "../stores/useSettingsStore";
 import { invokeWrapper } from "../api";
-import { InstructionsCard } from "../components/shared/InstructionsCard";
+import { InstructionsDialog } from "../components/shared/InstructionsDialog";
 import {
   Search,
   Copy,
@@ -20,7 +20,6 @@ import {
   Variable,
   FunctionSquare,
   Cpu,
-  Lightbulb,
 } from "lucide-react";
 import { writeText } from "@tauri-apps/plugin-clipboard-manager";
 import { Select } from "../components/mui";
@@ -151,33 +150,39 @@ const VariableNaming: React.FC = () => {
   return (
     <ToolLayout title={t("tools.variable_naming.name")}>
       <div className="max-w-5xl mx-auto w-full space-y-6 pb-10">
-        {/* 使用说明 */}
-        <InstructionsCard
-          title={t("tools.variable_naming.instructions.title")}
-          color="purple"
-          icon={Lightbulb}
-          steps={[
-            {
-              title: t("tools.variable_naming.instructions.step1_title"),
-              description: t("tools.variable_naming.instructions.step1_desc"),
-            },
-            {
-              title: t("tools.variable_naming.instructions.step2_title"),
-              description: t("tools.variable_naming.instructions.step2_desc"),
-            },
-            {
-              title: t("tools.variable_naming.instructions.step3_title"),
-              description: t("tools.variable_naming.instructions.step3_desc"),
-            },
-            {
-              title: t("tools.variable_naming.instructions.step4_title"),
-              description: t("tools.variable_naming.instructions.step4_desc"),
-            },
-          ]}
-        />
-
         {/* 参数配置区域 */}
         <div className="bg-(--card-bg) p-6 rounded-2xl border border-(--border-color) shadow-sm space-y-4">
+          <div className="flex justify-end">
+            <InstructionsDialog
+              title={t("tools.variable_naming.instructions.title")}
+              steps={[
+                {
+                  title: t("tools.variable_naming.instructions.step1_title"),
+                  description: t(
+                    "tools.variable_naming.instructions.step1_desc"
+                  ),
+                },
+                {
+                  title: t("tools.variable_naming.instructions.step2_title"),
+                  description: t(
+                    "tools.variable_naming.instructions.step2_desc"
+                  ),
+                },
+                {
+                  title: t("tools.variable_naming.instructions.step3_title"),
+                  description: t(
+                    "tools.variable_naming.instructions.step3_desc"
+                  ),
+                },
+                {
+                  title: t("tools.variable_naming.instructions.step4_title"),
+                  description: t(
+                    "tools.variable_naming.instructions.step4_desc"
+                  ),
+                },
+              ]}
+            />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 模型选择 */}
             <div className="space-y-2">

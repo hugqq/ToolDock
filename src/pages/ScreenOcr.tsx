@@ -5,12 +5,12 @@ import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { listen } from "@tauri-apps/api/event";
 import { Copy, Trash2, Loader2, MousePointer2, Image as ImageIcon } from "lucide-react";
 import { ToolLayout } from "../components/layout/ToolLayout";
-import { Button, Select } from "../components/mui";
+import { Button, Select, Switch } from "../components/mui";
 import { toast } from "react-hot-toast";
 import { useSettingsStore } from "../stores/useSettingsStore";
 import { OcrDetailResult } from "../types/ocr";
 import { ImagePreview } from "../components/ocr/ImagePreview";
-import { TextBoxList } from "../components/ocr/TextBoxList";
+import { formatOcrText } from "../lib/ocrText";
 
 const ScreenOcr: React.FC = () => {
   const { t } = useTranslation();
@@ -18,7 +18,7 @@ const ScreenOcr: React.FC = () => {
   const [text, setText] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [ocrResult, setOcrResult] = useState<OcrDetailResult | null>(null);
-  const [selectedBoxIndex, setSelectedBoxIndex] = useState<number | null>(null);
+  const [preserveLineBreaks, setPreserveLineBreaks] = useState(true);
 
   const ocrOptions = useMemo(() => {
     const options = [{ key: "windows", labelKey: "tools.ocr.engine_windows" }];
@@ -88,8 +88,7 @@ const ScreenOcr: React.FC = () => {
           setOcrResult(result);
 
           // 提取所有文字用于文本显示
-          const allText = result.text_boxes.map(box => box.text).join(" ");
-          setText(allText);
+          setText(formatOcrText(result.text_boxes, preserveLineBreaks));
 
           if (result.text_boxes.length > 0) {
             toast.success(`识别成功! 找到 ${result.text_boxes.length} 个文字框`);
@@ -110,9 +109,22 @@ const ScreenOcr: React.FC = () => {
     return () => {
       unlisten.then((f) => f());
     };
-  }, [t]);
+  }, [
+    t,
+    ocr.engine,
+    ocr.tencentSecretId,
+    ocr.tencentSecretKey,
+    ocr.tencentRegion,
+    ocr.baiduApiKey,
+    ocr.baiduSecretKey,
+    preserveLineBreaks,
+  ]);
 
-
+  useEffect(() => {
+    if (ocrResult) {
+      setText(formatOcrText(ocrResult.text_boxes, preserveLineBreaks));
+    }
+  }, [ocrResult, preserveLineBreaks]);
 
   const handleManualCapture = async () => {
     const appWindow = WebviewWindow.getCurrent();
@@ -182,7 +194,6 @@ const ScreenOcr: React.FC = () => {
   const handleClear = () => {
     setText("");
     setOcrResult(null);
-    setSelectedBoxIndex(null);
   };
 
   return (
@@ -220,6 +231,14 @@ const ScreenOcr: React.FC = () => {
                 options={ocrOptions}
               />
             </div>
+
+            <div className="h-8 w-[1px] bg-(--border-color)" />
+
+            <Switch
+              checked={preserveLineBreaks}
+              onChange={(event) => setPreserveLineBreaks(event.target.checked)}
+              label={t("tools.ocr.preserve_line_breaks")}
+            />
           </div>
 
           {text && (
@@ -263,16 +282,17 @@ const ScreenOcr: React.FC = () => {
               </div>
             </div>
 
-            {/* 文字框列表 */}
+            {/* 识别文本 */}
             <div className="flex flex-col gap-2 min-h-0">
               <h3 className="text-sm font-bold text-(--text-muted)">
-                识别结果 ({ocrResult.text_boxes.length}个文字框)
+                {t("tools.ocr.result")}
               </h3>
-              <div className="flex-1 min-h-0">
-                <TextBoxList
-                  textBoxes={ocrResult.text_boxes}
-                  selectedIndex={selectedBoxIndex}
-                  onSelect={setSelectedBoxIndex}
+              <div className="flex-1 min-h-0 bg-(--card-bg) border border-(--border-color) rounded-xl shadow-sm overflow-hidden">
+                <textarea
+                  className="w-full h-full p-4 bg-transparent border-none outline-none resize-none whitespace-pre-wrap font-mono text-(--text-main) text-sm leading-relaxed custom-scrollbar"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  spellCheck={false}
                 />
               </div>
             </div>

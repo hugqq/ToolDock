@@ -7,7 +7,7 @@
  * - tabs: TabItem[] 标签页配置数组
  * - instructions?: Step[] 使用说明步骤数组（可选）
  * - instructionsTitle?: string 使用说明标题（可选）
- * - instructionsColor?: 兼容旧配置，使用说明统一显示为蓝色
+ * - instructionsColor?: 兼容旧配置，弹窗入口统一使用默认样式
  * - activeTab: number 当前激活的标签页索引
  * - onTabChange: (index: number) => void 标签页切换回调
  *
@@ -31,7 +31,7 @@
 
 import React, { ReactNode } from "react";
 import { Box, Stack, Paper, Tabs, Tab } from "@mui/material";
-import { InstructionsCard } from "../shared/InstructionsCard";
+import { InstructionsDialog } from "../shared/InstructionsDialog";
 import { Lightbulb } from "lucide-react";
 
 interface Step {
@@ -53,7 +53,6 @@ interface TabLayoutProps {
   activeTab: number;
   onTabChange: (index: number) => void;
   showInstructions?: boolean;
-  maxInstructionsHeight?: number;
 }
 
 export const TabLayout: React.FC<TabLayoutProps> = ({
@@ -61,7 +60,6 @@ export const TabLayout: React.FC<TabLayoutProps> = ({
   activeTab,
   onTabChange,
   showInstructions = true,
-  maxInstructionsHeight = 180,
 }) => {
   const currentTab = tabs[activeTab];
   const hasInstructions =
@@ -72,36 +70,6 @@ export const TabLayout: React.FC<TabLayoutProps> = ({
   return (
     <Box sx={{ p: 3 }}>
       <Stack spacing={4} sx={{ mx: "auto" }}>
-        {/* 使用说明卡片 */}
-        {hasInstructions && (
-          <Box
-            sx={{
-              maxHeight: maxInstructionsHeight,
-              overflowY: "auto",
-              overflowX: "hidden",
-              "&::-webkit-scrollbar": {
-                width: "6px",
-              },
-              "&::-webkit-scrollbar-track": {
-                background: "transparent",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                background: "var(--border-color)",
-                borderRadius: "3px",
-                "&:hover": {
-                  background: "var(--text-muted)",
-                },
-              },
-            }}
-          >
-            <InstructionsCard
-              title={currentTab.instructionsTitle || "使用说明"}
-              icon={Lightbulb}
-              steps={currentTab.instructions!}
-            />
-          </Box>
-        )}
-
         {/* Tabs 卡片 */}
         <Paper
           sx={{
@@ -110,29 +78,44 @@ export const TabLayout: React.FC<TabLayoutProps> = ({
             boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
           }}
         >
-          <Tabs
-            value={activeTab}
-            onChange={(_, v) => onTabChange(v)}
-            variant="fullWidth"
+          <Box
             sx={{
+              display: "flex",
+              alignItems: "center",
               borderBottom: "1px solid",
               borderColor: "divider",
               bgcolor: "background.paper",
             }}
           >
-            {tabs.map((tab, index) => (
-              <Tab
-                key={index}
-                icon={
-                  typeof tab.icon === "string"
-                    ? undefined
-                    : (tab.icon as React.ReactElement)
-                }
-                label={tab.label}
-                iconPosition="start"
-              />
-            ))}
-          </Tabs>
+            <Tabs
+              value={activeTab}
+              onChange={(_, v) => onTabChange(v)}
+              variant="fullWidth"
+              sx={{ flex: 1 }}
+            >
+              {tabs.map((tab, index) => (
+                <Tab
+                  key={index}
+                  icon={
+                    typeof tab.icon === "string"
+                      ? undefined
+                      : (tab.icon as React.ReactElement)
+                  }
+                  label={tab.label}
+                  iconPosition="start"
+                />
+              ))}
+            </Tabs>
+            {hasInstructions && (
+              <Box sx={{ px: 2, flexShrink: 0 }}>
+                <InstructionsDialog
+                  title={currentTab.instructionsTitle || "使用说明"}
+                  triggerIcon={Lightbulb}
+                  steps={currentTab.instructions!}
+                />
+              </Box>
+            )}
+          </Box>
 
           <Box sx={{ p: 4, bgcolor: "background.paper" }}>
             {tabs[activeTab]?.content}

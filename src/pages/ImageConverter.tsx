@@ -53,7 +53,9 @@ export default function ImageConverter() {
   const [customHeight, setCustomHeight] = useState<number | null>(null);
   const [outputPath, setOutputPath] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const dragDepthRef = useRef(0);
 
   const onFiles = (list: FileList | null) => {
     if (!list) return;
@@ -82,6 +84,36 @@ export default function ImageConverter() {
     if (selected && typeof selected === "string") {
       setOutputPath(selected);
     }
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragDepthRef.current += 1;
+    setIsDragging(true);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragging) setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+    if (dragDepthRef.current === 0) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragDepthRef.current = 0;
+    setIsDragging(false);
+    onFiles(e.dataTransfer.files);
   };
 
   const handleConvertOne = async (file: File) => {
@@ -187,18 +219,22 @@ export default function ImageConverter() {
         {/* 上传区域 */}
         <Paper
           variant="outlined"
-          onDrop={(e) => {
-            e.preventDefault();
-            onFiles(e.dataTransfer.files);
-          }}
-          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+          onDragEnter={handleDragEnter}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
           sx={{
             p: files.length > 0 ? 2 : 6,
             textAlign: "center",
             borderStyle: "dashed",
             cursor: "pointer",
             mb: 3,
-            bgcolor: "action.hover",
+            position: "relative",
+            overflow: "hidden",
+            bgcolor: isDragging ? "rgba(59, 130, 246, 0.08)" : "action.hover",
+            borderColor: isDragging ? "primary.main" : undefined,
+            boxShadow: isDragging ? "0 0 0 4px rgba(59, 130, 246, 0.12)" : "none",
+            transform: isDragging ? "scale(1.01)" : "scale(1)",
             transition: "all 0.2s",
             "&:hover": {
               bgcolor: "action.selected",
@@ -224,7 +260,9 @@ export default function ImageConverter() {
             }}
           >
             <Typography variant="h6" color="primary">
-              {t("tools.image_converter.drag_drop")}
+              {isDragging
+                ? t("tools.image_converter.drop_active")
+                : t("tools.image_converter.drag_drop")}
             </Typography>
             <Typography variant="caption" color="textSecondary">
               {t("tools.image_converter.supported_formats")}

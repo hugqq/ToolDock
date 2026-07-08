@@ -3,6 +3,7 @@
  * 职责：暴露配置导出、导入及管理员模式设置给前端
  */
 use crate::core::hotkey::HotkeyManager;
+use crate::core::logging::DeveloperLogs;
 use crate::core::settings;
 use crate::models::ApiResponse;
 use tauri::{Manager, State};
@@ -83,6 +84,42 @@ pub async fn is_run_as_admin() -> ApiResponse<bool> {
 }
 
 #[tauri::command]
+pub async fn set_auto_start(enabled: bool) -> ApiResponse<()> {
+    match settings::set_auto_start(enabled) {
+        Ok(_) => ApiResponse::ok(()),
+        Err(e) => ApiResponse::error("SET_AUTO_START_FAILED", e.to_string()),
+    }
+}
+
+#[tauri::command]
+pub async fn is_auto_start_enabled() -> ApiResponse<bool> {
+    match settings::is_auto_start_enabled() {
+        Ok(val) => ApiResponse::ok(val),
+        Err(e) => ApiResponse::error("CHECK_AUTO_START_FAILED", e.to_string()),
+    }
+}
+
+#[tauri::command]
+pub async fn set_developer_log_level(level: String) -> ApiResponse<String> {
+    match crate::core::logging::set_log_level(&level) {
+        Ok(level) => ApiResponse::ok(level),
+        Err(e) => ApiResponse::error("SET_LOG_LEVEL_FAILED", e.to_string()),
+    }
+}
+
+#[tauri::command]
+pub async fn get_developer_logs(app: tauri::AppHandle) -> ApiResponse<DeveloperLogs> {
+    let data_dir = app
+        .path()
+        .app_data_dir()
+        .unwrap_or_else(|_| std::path::PathBuf::from("data"));
+    match crate::core::logging::read_developer_logs(data_dir.join("logs")) {
+        Ok(logs) => ApiResponse::ok(logs),
+        Err(e) => ApiResponse::error("READ_LOGS_FAILED", e.to_string()),
+    }
+}
+
+#[tauri::command]
 pub async fn set_global_shortcut(
     manager: State<'_, HotkeyManager>,
     shortcut: String,
@@ -132,4 +169,12 @@ pub async fn get_silent_start(app: tauri::AppHandle) -> ApiResponse<bool> {
         .app_data_dir()
         .unwrap_or_else(|_| std::path::PathBuf::from("data"));
     ApiResponse::ok(settings::load_silent_start(&data_dir))
+}
+
+#[tauri::command]
+pub async fn check_latest_release() -> ApiResponse<crate::core::update::LatestRelease> {
+    match crate::core::update::check_latest_release().await {
+        Ok(val) => ApiResponse::ok(val),
+        Err(e) => ApiResponse::error("CHECK_UPDATE_FAILED", e),
+    }
 }

@@ -255,70 +255,106 @@ export default function PdfToImage() {
 
   return (
     <ToolLayout title={t("pdf_to_image.name", "PDF 转图片")}>
-      <Box sx={{ maxWidth: 1200, mx: "auto", pb: 4 }}>
+      <Box sx={{ width: "100%", maxWidth: 1200, mx: "auto", pb: 4 }}>
         {!pdfDocument ? (
           /* Step 1: File Selection Area */
-          <Box
-            sx={{
-              mt: 4,
-              p: 8,
-              border: "2px dashed",
-              borderColor: "divider",
-              borderRadius: "24px",
-              backgroundColor: "background.paper",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 3,
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              "&:hover": {
-                borderColor: "primary.main",
-                backgroundColor: "action.hover",
-                transform: "translateY(-4px)",
-                boxShadow: "0 12px 24px rgba(0,0,0,0.05)",
-              },
-            }}
-            onClick={() => fileInputRef.current?.click()}
-            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            onDrop={handleDrop}
-          >
-            <Box
+          <Stack spacing={3}>
+            <Paper
+              variant="outlined"
               sx={{
-                width: 100,
-                height: 100,
-                borderRadius: "30%",
-                backgroundColor: "primary.light",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "primary.main",
-                opacity: 0.9,
+                p: { xs: 3, md: 4 },
+                borderRadius: 2,
+                bgcolor: "var(--card-bg)",
+                borderColor: "var(--border-color)",
+                boxShadow: "0 1px 3px rgba(15, 23, 42, 0.04)",
               }}
             >
-              <FileUp size={48} />
-            </Box>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="h5" fontWeight="800" sx={{ mb: 1 }}>
-                {t("pdf_to_image.step1_title", "点击或拖入 PDF 文件")}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                支持批量转换每一页，完全本地处理
-              </Typography>
-            </Box>
-            <input
-              type="file"
-              hidden
-              accept="application/pdf"
-              ref={fileInputRef}
-              onChange={(e) => {
-                if (e.target.files && e.target.files.length > 0) {
-                  handleFileChange(e.target.files[0]);
-                }
+              <Stack spacing={1}>
+                <Typography variant="h6" fontWeight={800} color="text.primary">
+                  {t("pdf_to_image.step1_title", "点击或拖入 PDF 文件")}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  选择一个 PDF 后，可预览首页、设置输出格式和清晰度，再转换为图片。
+                </Typography>
+              </Stack>
+            </Paper>
+
+            <Paper
+              variant="outlined"
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
               }}
-            />
-          </Box>
+              onDrop={handleDrop}
+              sx={{
+                p: { xs: 5, md: 7 },
+                minHeight: 360,
+                borderRadius: 2,
+                borderStyle: "dashed",
+                borderWidth: 2,
+                borderColor: "var(--border-color)",
+                bgcolor: "var(--card-bg)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+                cursor: "pointer",
+                textAlign: "center",
+                transition: "all 0.2s",
+                "&:hover": {
+                  borderColor: "primary.main",
+                  bgcolor: "action.hover",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  width: 72,
+                  height: 72,
+                  borderRadius: 2,
+                  bgcolor: "primary.main",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 8px 18px rgba(59, 130, 246, 0.22)",
+                }}
+              >
+                <FileUp size={34} />
+              </Box>
+
+              <Box>
+                <Typography variant="h6" fontWeight={800} sx={{ mb: 0.75 }}>
+                  选择 PDF
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  支持拖拽文件到这里，文件只在本机处理。
+                </Typography>
+              </Box>
+
+              <Button
+                variant="contained"
+                startIcon={<FileUp size={18} />}
+                sx={{ mt: 1, px: 3, borderRadius: 1.5, textTransform: "none" }}
+              >
+                浏览文件
+              </Button>
+
+              <input
+                type="file"
+                hidden
+                accept="application/pdf"
+                ref={fileInputRef}
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    handleFileChange(e.target.files[0]);
+                  }
+                }}
+              />
+            </Paper>
+          </Stack>
         ) : (
           /* Step 2: Preview & Settings */
           <Stack spacing={3}>
@@ -333,11 +369,14 @@ export default function PdfToImage() {
               <Card
                 variant="outlined"
                 sx={{
-                  borderRadius: "20px",
+                  borderRadius: 2,
                   overflow: "hidden",
                   display: "flex",
                   flexDirection: "column",
                   minHeight: 400,
+                  bgcolor: "var(--card-bg)",
+                  borderColor: "var(--border-color)",
+                  boxShadow: "0 1px 3px rgba(15, 23, 42, 0.04)",
                 }}
               >
                 <Box
@@ -347,9 +386,9 @@ export default function PdfToImage() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    bgcolor: "action.hover",
+                    bgcolor: "var(--bg-main)",
                     borderBottom: "1px solid",
-                    borderColor: "divider",
+                    borderColor: "var(--border-color)",
                   }}
                 >
                   <Stack direction="row" spacing={1.5} alignItems="center">
@@ -374,7 +413,7 @@ export default function PdfToImage() {
                     alignItems: "center",
                     justifyContent: "center",
                     p: 4,
-                    bgcolor: "#f8f9fa",
+                    bgcolor: "var(--bg-main)",
                   }}
                 >
                   {previewUrl ? (
@@ -386,8 +425,8 @@ export default function PdfToImage() {
                           maxWidth: "100%",
                           maxHeight: 450,
                           borderRadius: "8px",
-                          boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
-                          border: "1px solid rgba(0,0,0,0.05)",
+                          boxShadow: "0 8px 20px rgba(15,23,42,0.10)",
+                          border: "1px solid var(--border-color)",
                         }}
                       />
                       <Box
@@ -418,10 +457,13 @@ export default function PdfToImage() {
                 variant="outlined"
                 sx={{
                   p: 3,
-                  borderRadius: "20px",
+                  borderRadius: 2,
                   display: "flex",
                   flexDirection: "column",
                   gap: 3,
+                  bgcolor: "var(--card-bg)",
+                  borderColor: "var(--border-color)",
+                  boxShadow: "0 1px 3px rgba(15, 23, 42, 0.04)",
                 }}
               >
                 <Stack direction="row" spacing={1} alignItems="center">
@@ -441,7 +483,7 @@ export default function PdfToImage() {
                       label="输出格式"
                       onChange={(e) => setFormat(e.target.value)}
                       disabled={isConverting}
-                      sx={{ borderRadius: "10px" }}
+                      sx={{ borderRadius: 1.5 }}
                     >
                       <MenuItem value="image/jpeg">JPEG 高性能</MenuItem>
                       <MenuItem value="image/png">PNG 无损</MenuItem>
@@ -455,7 +497,7 @@ export default function PdfToImage() {
                       label="清晰度 (DPI)"
                       onChange={(e) => setScale(Number(e.target.value))}
                       disabled={isConverting}
-                      sx={{ borderRadius: "10px" }}
+                      sx={{ borderRadius: 1.5 }}
                     >
                       <MenuItem value={1}>1x (72 DPI - 标清)</MenuItem>
                       <MenuItem value={2}>2x (144 DPI - 高清)</MenuItem>
@@ -507,10 +549,10 @@ export default function PdfToImage() {
                         startIcon={<FileImage size={20} />}
                         sx={{
                           py: 1.5,
-                          borderRadius: "12px",
+                          borderRadius: 1.5,
                           textTransform: "none",
                           fontSize: "1rem",
-                          boxShadow: "0 8px 16px rgba(25, 118, 210, 0.2)",
+                          boxShadow: "0 6px 14px rgba(59, 130, 246, 0.16)",
                         }}
                       >
                         开始转换
@@ -527,8 +569,10 @@ export default function PdfToImage() {
                 variant="outlined"
                 sx={{
                   p: 3,
-                  borderRadius: "24px",
-                  bgcolor: "background.paper",
+                  borderRadius: 2,
+                  bgcolor: "var(--card-bg)",
+                  borderColor: "var(--border-color)",
+                  boxShadow: "0 1px 3px rgba(15, 23, 42, 0.04)",
                 }}
               >
                 <Box
@@ -556,7 +600,7 @@ export default function PdfToImage() {
                     startIcon={<FolderArchive size={18} />}
                     onClick={downloadAllZip}
                     sx={{
-                      borderRadius: "10px",
+                      borderRadius: 1.5,
                       textTransform: "none",
                       px: 3,
                     }}
@@ -577,20 +621,21 @@ export default function PdfToImage() {
                       key={img.pageNum}
                       variant="outlined"
                       sx={{
-                        borderRadius: "16px",
+                        borderRadius: 1.5,
                         overflow: "hidden",
                         transition: "all 0.2s",
+                        bgcolor: "var(--card-bg)",
+                        borderColor: "var(--border-color)",
                         "&:hover": {
-                          transform: "scale(1.02)",
                           borderColor: "primary.main",
-                          boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+                          boxShadow: "0 6px 16px rgba(15,23,42,0.08)",
                         },
                         "&:hover .action-overlay": {
                           opacity: 1,
                         },
                       }}
                     >
-                      <Box sx={{ position: "relative", pt: "141%", bgcolor: "action.hover" }}>
+                      <Box sx={{ position: "relative", pt: "141%", bgcolor: "var(--bg-main)" }}>
                         <img
                           src={img.url}
                           alt={`Page ${img.pageNum}`}
@@ -635,7 +680,7 @@ export default function PdfToImage() {
                           </IconButton>
                         </Box>
                       </Box>
-                      <Box sx={{ py: 1, textAlign: "center", borderTop: "1px solid", borderColor: "divider" }}>
+                      <Box sx={{ py: 1, textAlign: "center", borderTop: "1px solid", borderColor: "var(--border-color)" }}>
                         <Typography variant="caption" fontWeight="bold" color="text.secondary">
                           P.{img.pageNum}
                         </Typography>

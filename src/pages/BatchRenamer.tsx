@@ -12,8 +12,6 @@ import {
   Settings2,
   FolderPlus,
   Info,
-  MousePointerClick,
-  Keyboard,
   History,
   RotateCcw,
   Clock,
@@ -27,7 +25,8 @@ import {
 
 } from "lucide-react";
 import { ToolLayout } from "../components/layout/ToolLayout";
-import { Select,Button } from "../components/mui";
+import { Select, Button } from "../components/mui";
+import { InstructionsDialog } from "../components/shared/InstructionsDialog";
 import { toast } from "react-hot-toast";
 import { RegexHelpModal } from "./BatchRenamer/components/RegexHelpModal";
 import { VariablePickerModal } from "./BatchRenamer/components/VariablePickerModal";
@@ -433,94 +432,34 @@ const BatchRenamer: React.FC = () => {
   return (
     <ToolLayout title={t("tools.batch_renamer.name")}>
       <div className="space-y-6">
-        {/* 使用说明卡片 */}
-        <div className="p-6 rounded-2xl border border-blue-500/20 bg-blue-500/5">
-          <div className="flex items-center gap-2 mb-4">
-            <Info className="w-5 h-5 text-blue-600" />
-            <div className="text-lg font-bold text-blue-700">
-              {t("tools.batch_renamer.instructions.title")}
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <div className="text-sm font-semibold text-blue-700">
-                {t("tools.batch_renamer.instructions.step1_title")}
-              </div>
-              <div className="text-xs text-blue-600/80 leading-relaxed">
-                {t("tools.batch_renamer.instructions.step1_desc")}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-sm font-semibold text-blue-700">
-                {t("tools.batch_renamer.instructions.step2_title")}
-              </div>
-              <div className="text-xs text-blue-600/80 leading-relaxed">
-                {t("tools.batch_renamer.instructions.step2_desc")}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-sm font-semibold text-blue-700">
-                {t("tools.batch_renamer.instructions.step3_title")}
-              </div>
-              <div className="text-xs text-blue-600/80 leading-relaxed">
-                {t("tools.batch_renamer.instructions.step3_desc")}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-sm font-semibold text-blue-700">
-                {t("tools.batch_renamer.instructions.step4_title")}
-              </div>
-              <div className="text-xs text-blue-600/80 leading-relaxed">
-                {t("tools.batch_renamer.instructions.step4_desc")}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 友好提示卡片 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 rounded-2xl border border-blue-500/20 bg-blue-500/5 flex items-start gap-3">
-            <MousePointerClick className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
-            <div>
-              <div className="text-sm font-bold text-blue-600 mb-1">
-                {t("tools.batch_renamer.tips.title")}
-              </div>
-              <div className="text-xs text-blue-500/80 leading-relaxed">
-                {t("tools.batch_renamer.tips.multi_select")}
-                <br />
-                {t("tools.batch_renamer.tips.range_select")}
-              </div>
-            </div>
-          </div>
-          <div className="p-4 rounded-2xl border border-purple-500/20 bg-purple-500/5 flex items-start gap-3">
-            <Keyboard className="w-5 h-5 text-purple-500 shrink-0 mt-0.5" />
-            <div>
-              <div className="text-sm font-bold text-purple-600 mb-1">
-                {t("tools.batch_renamer.tips.shortcuts")}
-              </div>
-              <div className="text-xs text-purple-500/80 leading-relaxed">
-                {t("tools.batch_renamer.tips.select_all")}
-              </div>
-            </div>
-          </div>
-          <div className="p-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 flex items-start gap-3">
-            <Info className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-            <div>
-              <div className="text-sm font-bold text-amber-600 mb-1">
-                {t("tools.batch_renamer.tips.warning")}
-              </div>
-              <div className="text-xs text-amber-500/80 leading-relaxed">
-                {t("tools.batch_renamer.tips.warning_msg")}
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* 第一部分：规则配置卡片 */}
         <div className="p-6 rounded-2xl border border-(--border-color) bg-(--card-bg) shadow-sm">
-          <div className="flex items-center gap-2 font-bold text-lg mb-4">
-            <Settings2 className="w-5 h-5 text-blue-500" />
-            {t("tools.batch_renamer.rules")}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-2 font-bold text-lg">
+              <Settings2 className="w-5 h-5 text-blue-500" />
+              {t("tools.batch_renamer.rules")}
+            </div>
+            <InstructionsDialog
+              title={t("tools.batch_renamer.instructions.title")}
+              steps={[
+                {
+                  title: t("tools.batch_renamer.instructions.step1_title"),
+                  description: t("tools.batch_renamer.instructions.step1_desc"),
+                },
+                {
+                  title: t("tools.batch_renamer.instructions.step2_title"),
+                  description: t("tools.batch_renamer.instructions.step2_desc"),
+                },
+                {
+                  title: t("tools.batch_renamer.instructions.step3_title"),
+                  description: t("tools.batch_renamer.instructions.step3_desc"),
+                },
+                {
+                  title: t("tools.batch_renamer.instructions.step4_title"),
+                  description: t("tools.batch_renamer.instructions.step4_desc"),
+                },
+              ]}
+            />
           </div>
 
           {/* 操作按钮栏 - 移动到标题下方 */}

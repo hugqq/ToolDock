@@ -20,7 +20,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import { DataTable } from "../components/shared/DataTable";
-import { InstructionsCard } from "../components/shared/InstructionsCard";
+import { InstructionsDialog } from "../components/shared/InstructionsDialog";
 import { GridColDef } from "@mui/x-data-grid";
 import toast from "react-hot-toast";
 
@@ -188,31 +188,30 @@ export default function PortScanner() {
   return (
     <ToolLayout title={t("tools.port_scanner.name")}>
       <Box sx={{ p: 3 }}>
-        {/* 使用说明卡片 */}
-        <InstructionsCard
-          title={t("tools.port_scanner.instructions.title")}
-          color="blue"
-          steps={[
-            {
-              title: t("tools.port_scanner.instructions.step1_title"),
-              description: t("tools.port_scanner.instructions.step1_desc"),
-            },
-            {
-              title: t("tools.port_scanner.instructions.step2_title"),
-              description: t("tools.port_scanner.instructions.step2_desc"),
-            },
-            {
-              title: t("tools.port_scanner.instructions.step3_title"),
-              description: t("tools.port_scanner.instructions.step3_desc"),
-            },
-            {
-              title: t("tools.port_scanner.instructions.step4_title"),
-              description: t("tools.port_scanner.instructions.step4_desc"),
-            },
-          ]}
-        />
-
         <Paper sx={{ p: 3, my: 3 }}>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
+            <InstructionsDialog
+              title={t("tools.port_scanner.instructions.title")}
+              steps={[
+                {
+                  title: t("tools.port_scanner.instructions.step1_title"),
+                  description: t("tools.port_scanner.instructions.step1_desc"),
+                },
+                {
+                  title: t("tools.port_scanner.instructions.step2_title"),
+                  description: t("tools.port_scanner.instructions.step2_desc"),
+                },
+                {
+                  title: t("tools.port_scanner.instructions.step3_title"),
+                  description: t("tools.port_scanner.instructions.step3_desc"),
+                },
+                {
+                  title: t("tools.port_scanner.instructions.step4_title"),
+                  description: t("tools.port_scanner.instructions.step4_desc"),
+                },
+              ]}
+            />
+          </Box>
           <Grid container spacing={3} alignItems="center">
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField

@@ -19,6 +19,11 @@ import React, { useCallback, useEffect, useMemo, useState, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import { Button } from "../components/mui";
+import {
+  MAGNIFIER_WINDOW_LABEL,
+  MAGNIFIER_WINDOW_OPTIONS,
+  waitForWindowCreated,
+} from "../lib/magnifierWindow";
 
 // 颜色转换工具函数
 const hexToRgb = (hex: string) => {
@@ -342,28 +347,18 @@ const ColorPicker: React.FC = () => {
     const appWindow = getCurrentWindow();
 
     try {
-      // 如果开启了隐藏窗口，则隐藏
+      // 先准备好透明放大镜窗口，再隐藏主窗口，避免首次创建时的白屏帧露出来。
+      let magnifier = await WebviewWindow.getByLabel(MAGNIFIER_WINDOW_LABEL);
+      if (!magnifier) {
+        magnifier = await waitForWindowCreated(
+          new WebviewWindow(MAGNIFIER_WINDOW_LABEL, MAGNIFIER_WINDOW_OPTIONS)
+        );
+      }
+
       if (hideOnPick) {
         await appWindow.hide();
       }
 
-      // 无论是否隐藏主窗口，都显示放大镜窗口
-      let magnifier = await WebviewWindow.getByLabel("magnifier");
-      if (!magnifier) {
-        magnifier = new WebviewWindow("magnifier", {
-          url: "index.html#/magnifier",
-          title: "Magnifier",
-          maximized: true,
-          decorations: false,
-          transparent: true,
-          alwaysOnTop: true,
-          skipTaskbar: true,
-          visible: false,
-          resizable: false,
-          shadow: false,
-        });
-        await new Promise((resolve) => setTimeout(resolve, 200));
-      }
       await magnifier.show();
 
       // 调用 Rust 命令，该命令会等待用户点击
@@ -383,7 +378,9 @@ const ColorPicker: React.FC = () => {
       setStatusText(typeof e === "string" ? e : e.message || "Pick failed");
     } finally {
       // 隐藏放大镜
-      const magnifierToHide = await WebviewWindow.getByLabel("magnifier");
+      const magnifierToHide = await WebviewWindow.getByLabel(
+        MAGNIFIER_WINDOW_LABEL
+      );
       if (magnifierToHide) {
         await magnifierToHide.hide();
       }

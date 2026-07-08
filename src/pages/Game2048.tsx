@@ -8,21 +8,16 @@ import {
   Stack,
   Typography,
   useTheme,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
   FormControlLabel,
   Switch,
 } from "@mui/material";
 import {
   RotateCcw as ResetIcon,
-  HelpCircle as HelpIcon,
   Cpu as AiIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
+import { InstructionsDialog } from "../components/shared/InstructionsDialog";
 
 // --- Types ---
 type Grid = number[][];
@@ -327,7 +322,6 @@ export default function Game2048() {
     return parseInt(localStorage.getItem("tooldock_2048_best") || "0");
   });
   const [status, setStatus] = useState<GameStatus>("playing");
-  const [showHelp, setShowHelp] = useState(false);
   const [aiEnabled, setAiEnabled] = useState(false);
   const [wonContinue, setWonContinue] = useState(false);
 
@@ -511,9 +505,27 @@ export default function Game2048() {
                 />
               </Box>
               <Stack direction="row" spacing={1} alignItems="center">
-                <IconButton onClick={() => setShowHelp(true)}>
-                  <HelpIcon size={20} />
-                </IconButton>
+                <InstructionsDialog
+                  title={t("tools.game2048.instructions.title")}
+                  steps={[
+                    {
+                      title: t("tools.game2048.instructions.step1_title"),
+                      description: t("tools.game2048.instructions.step1_desc"),
+                    },
+                    {
+                      title: t("tools.game2048.instructions.step2_title"),
+                      description: t("tools.game2048.instructions.step2_desc"),
+                    },
+                    {
+                      title: t("tools.game2048.instructions.step3_title"),
+                      description: t("tools.game2048.instructions.step3_desc"),
+                    },
+                    {
+                      title: t("tools.game2048.instructions.step4_title"),
+                      description: t("tools.game2048.instructions.step4_desc"),
+                    },
+                  ]}
+                />
                 <Button
                   variant="contained"
                   startIcon={<ResetIcon size={18} />}
@@ -675,52 +687,6 @@ export default function Game2048() {
 
         </Stack>
       </Container>
-
-      {/* Help Dialog */}
-      <Dialog open={showHelp} onClose={() => setShowHelp(false)}>
-        <DialogTitle>{t("tools.game2048.instructions.title")}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <Box>
-              <Typography variant="subtitle2" fontWeight="bold">
-                {t("tools.game2048.instructions.step1_title")}
-              </Typography>
-              <Typography variant="body2">
-                {t("tools.game2048.instructions.step1_desc")}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="subtitle2" fontWeight="bold">
-                {t("tools.game2048.instructions.step2_title")}
-              </Typography>
-              <Typography variant="body2">
-                {t("tools.game2048.instructions.step2_desc")}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="subtitle2" fontWeight="bold">
-                {t("tools.game2048.instructions.step3_title")}
-              </Typography>
-              <Typography variant="body2">
-                {t("tools.game2048.instructions.step3_desc")}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="subtitle2" fontWeight="bold">
-                {t("tools.game2048.instructions.step4_title")}
-              </Typography>
-              <Typography variant="body2">
-                {t("tools.game2048.instructions.step4_desc")}
-              </Typography>
-            </Box>
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowHelp(false)} color="primary">
-            {t("common.close")}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </ToolLayout>
   );
 }

@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
 
 interface PixelInfo {
   x: number;
@@ -12,17 +12,18 @@ const Magnifier: React.FC = () => {
   const [info, setInfo] = useState<PixelInfo | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const appWindow = getCurrentWindow();
-    // Make window click-through
-    appWindow.setIgnoreCursorEvents(true);
-
-    // Make background transparent
+  useLayoutEffect(() => {
     document.body.style.backgroundColor = "transparent";
     document.documentElement.style.backgroundColor = "transparent";
 
     const root = document.getElementById("root");
     if (root) root.style.backgroundColor = "transparent";
+  }, []);
+
+  useEffect(() => {
+    const appWindow = getCurrentWindow();
+    // Make window click-through
+    appWindow.setIgnoreCursorEvents(true);
 
     let animationFrameId: number;
     let isRunning = true;

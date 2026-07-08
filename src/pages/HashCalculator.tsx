@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import { Button } from "../components/mui";
-import { InstructionsCard } from "../components/shared/InstructionsCard";
+import { InstructionsDialog } from "../components/shared/InstructionsDialog";
 import { ScanProgress } from "../components/shared/ScanProgress";
 import { toast } from "react-hot-toast";
 import { useTauriEvent } from "../hooks/useTauriEvent";
@@ -46,6 +46,7 @@ const HashCalculator: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<ScanProgress | null>(null);
   const [toastId, setToastId] = useState<string | null>(null);
+  const [selectedFolder, setSelectedFolder] = useState("");
 
   // 监听扫描进度事件
   useTauriEvent("duplicate-scan-progress", (event: any) => {
@@ -93,6 +94,7 @@ const HashCalculator: React.FC = () => {
       });
 
       if (selected && !Array.isArray(selected)) {
+        setSelectedFolder(selected);
         setLoading(true);
         setProgress(null);
         setResults([]);
@@ -161,33 +163,73 @@ const HashCalculator: React.FC = () => {
   return (
     <ToolLayout title={t("tools.hash_calculator.name")}>
       <div className="space-y-6">
-        {/* 使用说明卡片 */}
-        <InstructionsCard
-          title={t("tools.hash_calculator.instructions.title")}
-          color="blue"
-          steps={[
-            {
-              title: t("tools.hash_calculator.instructions.step1_title"),
-              description: t("tools.hash_calculator.instructions.step1_desc"),
-            },
-            {
-              title: t("tools.hash_calculator.instructions.step2_title"),
-              description: t("tools.hash_calculator.instructions.step2_desc"),
-            },
-            {
-              title: t("tools.hash_calculator.instructions.step3_title"),
-              description: t("tools.hash_calculator.instructions.step3_desc"),
-            },
-            {
-              title: t("tools.hash_calculator.instructions.step4_title"),
-              description: t("tools.hash_calculator.instructions.step4_desc"),
-            },
-          ]}
-        />
-
         {/* 操作栏卡片 */}
-        <div className="p-6 rounded-2xl border border-(--border-color) bg-(--card-bg) shadow-sm flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+        <div className="p-6 rounded-2xl border border-(--border-color) bg-(--card-bg) shadow-sm space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm font-bold text-(--text-main)">
+              {t("tools.hash_calculator.path_label")}
+            </div>
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-3">
+              {results.length > 0 && (
+                <>
+                  <div className="px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold">
+                    {results.length}{" "}
+                    {t("tools.hash_calculator.duplicate_groups")}
+                  </div>
+                  {getTotalDuplicateSize() > 0 && (
+                    <div className="px-4 py-2 rounded-full bg-red-500/10 text-red-500 text-sm font-bold">
+                      {t("tools.hash_calculator.total_size")}:{" "}
+                      {formatSize(getTotalDuplicateSize())}
+                    </div>
+                  )}
+                </>
+              )}
+              <InstructionsDialog
+                title={t("tools.hash_calculator.instructions.title")}
+                steps={[
+                  {
+                    title: t("tools.hash_calculator.instructions.step1_title"),
+                    description: t(
+                      "tools.hash_calculator.instructions.step1_desc"
+                    ),
+                  },
+                  {
+                    title: t("tools.hash_calculator.instructions.step2_title"),
+                    description: t(
+                      "tools.hash_calculator.instructions.step2_desc"
+                    ),
+                  },
+                  {
+                    title: t("tools.hash_calculator.instructions.step3_title"),
+                    description: t(
+                      "tools.hash_calculator.instructions.step3_desc"
+                    ),
+                  },
+                  {
+                    title: t("tools.hash_calculator.instructions.step4_title"),
+                    description: t(
+                      "tools.hash_calculator.instructions.step4_desc"
+                    ),
+                  },
+                ]}
+              />
+            </div>
+          </div>
+
+          <div className="flex min-w-0 flex-col sm:flex-row sm:items-center gap-3">
+            <div className="relative min-w-0 flex-1">
+              <FolderOpen className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--text-muted)" />
+              <input
+                readOnly
+                value={selectedFolder}
+                title={
+                  selectedFolder ||
+                  t("tools.hash_calculator.path_placeholder")
+                }
+                placeholder={t("tools.hash_calculator.path_placeholder")}
+                className="h-10 w-full rounded-xl border border-(--border-color) bg-(--bg-main) pl-10 pr-3 text-sm text-(--text-main) outline-none placeholder:text-(--text-muted)"
+              />
+            </div>
             <Button
               onClick={handleSelectFolder}
               disabled={loading}
@@ -211,19 +253,6 @@ const HashCalculator: React.FC = () => {
               {t("common.clear")}
             </Button>
           </div>
-          {results.length > 0 && (
-            <div className="flex gap-4">
-              <div className="px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-bold">
-                {results.length} {t("tools.hash_calculator.duplicate_groups")}
-              </div>
-              {getTotalDuplicateSize() > 0 && (
-                <div className="px-4 py-2 rounded-full bg-red-500/10 text-red-500 text-sm font-bold">
-                  {t("tools.hash_calculator.total_size")}:{" "}
-                  {formatSize(getTotalDuplicateSize())}
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* 扫描进度条 */}
