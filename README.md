@@ -2,243 +2,210 @@
 
 # ToolDock
 
-**A polished native-like Windows utilities toolbox**
+**A Windows-first desktop toolbox for daily file, system, network, and developer utilities.**
 
-Built with Tauri v2 + React 19 + MUI v7
+Built with Tauri v2, React 19, TypeScript, Rust, MUI v7, and Vite.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Tauri](https://img.shields.io/badge/Tauri-v2.0-24C8D8.svg)](https://tauri.app)
+[![Tauri](https://img.shields.io/badge/Tauri-v2-24C8D8.svg)](https://tauri.app)
 [![React](https://img.shields.io/badge/React-19-61DAFB.svg)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6.svg)](https://www.typescriptlang.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6.svg)](https://www.typescriptlang.org)
 
-[English](README.md) | [简体中文](README_zh.md) | [Usage Guide](docs/USAGE_en.md)
+[English](README.md) | [简体中文](README_zh.md)
 
 </div>
 
 ---
+
+## What Is ToolDock?
+
+ToolDock is a native-feeling Windows utility app that collects common desktop tools in one place. It is designed for quick access, local-first workflows, and small but useful tasks that usually require separate apps or command-line snippets.
+
+The project uses a React frontend for the interface and a Tauri/Rust backend for desktop capabilities such as file access, local commands, clipboard features, OCR, and native packaging.
 
 ## Highlights
 
-- Material-like UI using MUI v7 (light/dark themes)
-- High-performance native-feel using Tauri v2
-- 29+ handy tools across Files, System, Network, Dev and Entertainment
-- Built-in localization (i18n) with English & Chinese
-- Granular permission model; sensitive actions require confirmation
-- Small footprint and optimized memory usage
-- Strong type-safety across frontend (TypeScript) and backend (Rust)
+- 28 utility tools plus a settings center, grouped by file, system, network, developer, and entertainment categories.
+- Native desktop packaging through Tauri v2, with a small footprint compared with Electron-style apps.
+- React 19 + MUI v7 interface with light/dark theme support.
+- Rust command layer for filesystem, network, OCR, clipboard, conversion, and local automation tasks.
+- Built-in Chinese and English localization.
+- Central tool registry in `src/tools/registry.ts`, making tools easier to discover and extend.
 
----
+## Requirements
 
-## Quickstart
+| Component | Requirement |
+| --- | --- |
+| OS | Windows 10 / 11 |
+| Node.js | 20 or newer |
+| pnpm | Current stable version |
+| Rust | Stable toolchain with the Windows target |
+| WebView2 | Required by Tauri on Windows |
 
-### Requirements
+## Quick Start
 
-| Component | Requirement                 |
-| --------- | --------------------------- |
-| Windows   | 10 / 11                     |
-| Node.js   | v20+                        |
-| pnpm      | Latest                      |
-| Rust      | 1.70+ (with windows target) |
-
-### Install dependencies
-
-```bash
-# clone repo
-git clone https://github.com/yourusername/ToolDock.git
-cd ToolDock
-
-# install frontend dependencies
-pnpm install
-```
-
-### Development
-
-```bash
-# start dev server with hot reload
-pnpm tauri dev
-```
-
-### Build & Package
-
-```bash
-# build frontend assets
-pnpm build
-
-# package installers
-pnpm tauri build
-
-# output: src-tauri/target/release/bundle/
-```
-
-### Clear cache (PowerShell)
+Use PowerShell 7:
 
 ```powershell
-Remove-Item -Path "$env:LOCALAPPDATA\tooldock" -Recurse -Force -ErrorAction SilentlyContinue
-
-taskkill /F /IM ToolDock.exe 2>$null; pnpm tauri dev
-
-cd src-tauri
-cargo clean
-cd ..
+git clone https://github.com/hugqq/ToolDock.git
+cd ToolDock
+pnpm install
 pnpm tauri dev
 ```
 
----
+## Common Commands
 
-## Tools Overview
+Use PowerShell 7:
 
-(Short summary; full list available inside the app)
+```powershell
+# Start Vite only
+pnpm dev
+
+# Start the full Tauri desktop app
+pnpm tauri dev
+
+# Build frontend assets
+pnpm build
+
+# Build desktop installers and bundles
+pnpm tauri build
+```
+
+Build artifacts are generated under:
+
+```text
+src-tauri/target/release/bundle/
+```
+
+## Tool List
 
 ### File Tools
 
-- Folder Size — recursive disk analysis (treemap / table)
-- Duplicate Finder — deduplicate by hash (MD5/SHA)
-- Batch Renamer — regex, numbering, case conversion with preview
-- Hash Calculator — file checksums (MD5/SHA1/SHA256)
-- Image Converter — batch conversion and custom resolution
+- Folder Size: scan folders and analyze disk usage.
+- Hash Calculator: calculate MD5, SHA1, SHA256, and related checksums.
+- Batch Renamer: preview and apply batch rename rules.
+- Image Converter: convert images between common formats and resize them.
+- PDF to Image: render PDF pages as exportable images.
 
 ### System Tools
 
-- Notepad — notes & Pomodoro-style tasks
-- System Activator — activation helper for Windows/Office
-- System Info — CPU, memory, disk stats and export
-- Screen OCR — capture & extract text from screen
-- Clicker — auto click / automation helper
-- Clipboard Manager — history for text & images
-- Magnifier — pixel-perfect zoom & color picker
-- Floating Widgets — quick access shortcuts and small widgets
+- Notepad: manage plans, memos, attachments, reminders, and Pomodoro sessions.
+- Screen OCR: capture screen areas and recognize text.
+- Clicker: automate mouse clicks, keyboard presses, and quick text input.
+- Clipboard Manager: record and search clipboard history.
+- Settings: manage app preferences, translator keys, AI settings, update checks, and import/export configuration.
 
 ### Network Tools
 
-- DNS Helper — DNS query & latency checks
-- Nginx Editor — templates and syntax validation
-- Port Scanner — TCP/UDP port scanning
-- IP Lookup — IP geolocation and info
-- Simple Web Server — quick static file hosting
+- DNS Helper: run DNS queries and related diagnostics.
+- Nginx Editor: edit, validate, template, and manage local Nginx configs.
+- Port Scanner: scan open ports by common ports, ranges, or custom lists.
+- IP Lookup: query IP location and network information.
+- Simple Web Server: serve a local folder over HTTP for quick LAN sharing or static page testing.
 
-### Dev Tools
+### Developer Tools
 
-- Node Manager — clean node_modules and caches
-- AI Variable Naming — generate naming suggestions
-- Unit Converter — currency, length, weight, temperature, bases
-- Cron Generator — visual cron expression builder
-- JSON Formatter — pretty-print, minify, tree view
-- Encoders — Base64/URL/Hex/JWT and more
-- Translator — multiple engines (Google/DeepL/Baidu/etc)
-- Color Picker — pick and copy Hex/RGB/HSL
-- QR Code — generate and scan
-- Diff / Text Compare — highlight line-level differences
-- Timestamp Converter — unix <-> human date/time
+- Node Cleaner: find and clean `node_modules` and package cache folders.
+- AI Variable Naming: generate naming suggestions.
+- Unit Converter: convert currency, length, weight, temperature, base, storage, and network speed units.
+- Cron Generator: build and preview cron expressions.
+- JSON Formatter: beautify, minify, validate, and inspect JSON.
+- Encoder/Decoder: handle Base64, URL, Hex, HTML, Unicode, Binary, JWT, Punycode, and Morse formats.
+- Translator: translate text with Google, DeepL, Baidu, Youdao, Tencent, and Volcengine providers.
+- Color Picker: pick and convert colors.
+- QR Code: generate QR codes and scan QR codes from images.
+- Text Diff: compare text or file differences.
+- Timestamp Converter: convert Unix timestamps and readable date/time values.
 
 ### Entertainment
 
-- Games (2048 / Othello) — quick casual games with AI
+- 2048: classic number puzzle game with AI-assisted play.
+- Othello: local AI and online multiplayer Othello.
 
----
+## Project Structure
 
-## Usage Guide
-
-For detailed usage and examples, see the full guide: `docs/USAGE_en.md`.
-
-### Basic operations
-
-1. Search tools using the top search bar
-2. Favorite a tool by clicking the star on its card
-3. Filter by category using the left sidebar
-4. Switch theme in Settings (light/dark)
-5. Configure global hotkey for quick access
-
-### Permissions
-
-- Admin privileges: editing system files like `hosts`, system-level Nginx configs
-- File access: folder scans, batch rename
-- Network: translation, port scanning, IP lookup
-- Clipboard: clipboard history, OCR
-
-Tauri will prompt permission dialogs when a tool first requires a capability.
-
----
-
-## Development & Contributing
-
-### Project layout
-
-```
+```text
 ToolDock/
-├── src/                    # frontend
-│   ├── pages/              # lazily-loaded pages
-│   ├── components/         # shared components & layout
-│   ├── tools/              # SSOT registry (tools/registry.ts)
+├── src/                    # React frontend
+│   ├── api/                # Frontend API helpers
+│   ├── components/         # Shared UI components and layouts
+│   ├── hooks/              # Reusable React hooks
+│   ├── i18n/               # Chinese and English locale files
+│   ├── lib/                # Tauri wrappers and shared frontend helpers
+│   ├── pages/              # Tool pages
 │   ├── stores/             # Zustand stores
-│   ├── hooks/              # custom hooks
-│   ├── i18n/               # i18n locales
-│   └── lib/                # Tauri API wrappers
-├── src-tauri/              # backend (Rust)
-│   ├── src/
-│   │   ├── commands/       # Tauri commands
-│   │   ├── core/           # pure core logic (no tauri deps)
-│   │   ├── models/         # shared DTOs
-│   │   └── errors.rs       # error types
-│   └── capabilities/       # tauri capabilities config
-└── docs/                   # docs & usage guides
+│   └── tools/              # Tool registry
+├── src-tauri/              # Tauri and Rust backend
+│   ├── capabilities/       # Tauri permission capability files
+│   ├── scripts/            # Packaging scripts
+│   └── src/
+│       ├── commands/       # Tauri command entry points
+│       ├── core/           # Core Rust logic
+│       ├── models/         # Shared data models
+│       └── errors.rs       # Shared error handling
+├── scripts/                # Project helper scripts
+├── tests/                  # Node-based tests
+└── public/                 # Static assets
 ```
 
-### How to add a tool
+## Adding a Tool
 
-Follow the workflow in `AGENTS.md` (Logic → I18n → Core Rust → Command → React UI). Add translations, register the tool in `tools/registry.ts`, and provide tests for core logic.
+The usual flow is:
 
-### Debug tips
+1. Add the user-facing page under `src/pages/`.
+2. Add or reuse shared UI in `src/components/`.
+3. Add translations in `src/i18n/locales/en.json` and `src/i18n/locales/zh-CN.json`.
+4. Register the tool in `src/tools/registry.ts`.
+5. If native access is needed, add Rust logic under `src-tauri/src/core/` and expose it through `src-tauri/src/commands/`.
+6. Update Tauri capabilities if the tool requires additional permissions.
+
+## Troubleshooting
+
+Use PowerShell 7:
 
 ```powershell
-# clear app cache
-Remove-Item -Path "$env:LOCALAPPDATA\tooldock" -Recurse -Force
+# Clear local app data
+Remove-Item -Path "$env:LOCALAPPDATA\tooldock" -Recurse -Force -ErrorAction SilentlyContinue
 
-# kill lingering process
+# Stop a running app process
 taskkill /F /IM ToolDock.exe
 
-# clean Rust build
-cd src-tauri
+# Clean Rust build artifacts
+Push-Location src-tauri
 cargo clean
+Pop-Location
 
-# enable verbose backend logs
-$env:RUST_LOG="debug"
+# Enable verbose Rust logs for the current shell
+$env:RUST_LOG = "debug"
 pnpm tauri dev
 ```
 
----
+## Release
+
+The release helper updates version numbers, creates a commit, creates or replaces the release tag, and pushes the branch and tag.
+
+Use PowerShell 7 only when you are ready to publish:
+
+```powershell
+.\scripts\release.ps1 1.0.1
+```
 
 ## Contributing
 
-Contributions are welcome. Please follow the commit conventions and open issues with reproduction steps and logs.
+Contributions are welcome. Please keep changes focused, include clear reproduction steps for bugs, and follow the existing frontend/Rust structure.
 
-Suggested commit types: feat, fix, docs, style, refactor, perf, test
+Suggested commit types:
 
-See `AGENTS.md` for architecture and coding guidelines.
-
----
+- `feat`: new feature
+- `fix`: bug fix
+- `docs`: documentation
+- `style`: formatting only
+- `refactor`: internal restructuring
+- `perf`: performance improvement
+- `test`: tests
+- `chore`: maintenance
 
 ## License
 
-MIT License — see `LICENSE`.
+ToolDock is released under the [MIT License](LICENSE).
 
----
-
-## Thanks
-
-Thanks to Tauri, MUI, Lucide and all contributors.
-
----
-
-## Contact
-
-- Issues: https://github.com/yourusername/ToolDock/issues
-- Discussions: https://github.com/yourusername/ToolDock/discussions
-
----
-
-<div align="center">
-**If this project helps you, please give it a ⭐ on GitHub!**
-
-Made by the ToolDock Team
-
-</div>

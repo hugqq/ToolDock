@@ -2,267 +2,210 @@
 
 # ToolDock
 
-**一个功能强大、原生感十足的 Windows 实用工具箱**
+**一个面向 Windows 的桌面工具箱，整合文件、系统、网络和开发常用小工具。**
 
-基于 Tauri v2 + React 19 + MUI v7 构建
+基于 Tauri v2、React 19、TypeScript、Rust、MUI v7 和 Vite 构建。
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Tauri](https://img.shields.io/badge/Tauri-v2.0-24C8D8.svg)](https://tauri.app)
+[![Tauri](https://img.shields.io/badge/Tauri-v2-24C8D8.svg)](https://tauri.app)
 [![React](https://img.shields.io/badge/React-19-61DAFB.svg)](https://react.dev)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6.svg)](https://www.typescriptlang.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6.svg)](https://www.typescriptlang.org)
 
-[简体中文](README_zh.md) | [English](README.md) | [使用指南](docs/USAGE_zh.md)
+[简体中文](README_zh.md) | [English](README.md)
 
 </div>
 
 ---
 
-## 特性
+## 项目简介
 
-- **Material Design 3** - 遵循 MUI v7 设计规范，支持亮色/暗色主题自动切换
-- **高性能原生体验** - Tauri v2 提供接近原生应用的性能和体积优势
-- **实用工具** - 涵盖文件处理、系统管理、网络工具、开发辅助等多个领域
-- **国际化支持** - 内置中文、英文等多语言支持，易于扩展
-- **安全可靠** - 细粒度权限控制，所有系统操作需明确授权
-- **体积小巧** - 安装包小于 15MB，运行时占用内存低
-- **类型安全** - 前后端全程 TypeScript/Rust 类型校验
+ToolDock 是一个偏本地、偏实用的 Windows 桌面工具箱。它把日常会用到的文件处理、系统辅助、网络诊断、开发辅助和轻量娱乐工具集中到一个应用里，减少来回切换不同小软件或命令行脚本的成本。
 
----
+项目前端使用 React 构建界面，后端通过 Tauri/Rust 提供桌面能力，例如文件访问、本地命令、剪贴板、OCR、格式转换和原生打包。
+
+## 核心特点
+
+- 28 个实用工具，加上一个设置中心，按文件、系统、网络、开发、娱乐分类管理。
+- 基于 Tauri v2 打包，体积相对轻，启动和运行更接近原生桌面应用。
+- React 19 + MUI v7 界面，支持亮色/暗色主题。
+- Rust 命令层处理文件、网络、OCR、剪贴板、转换和本地自动化相关能力。
+- 内置中文和英文界面。
+- 工具入口集中维护在 `src/tools/registry.ts`，方便新增和调整工具。
+
+## 环境要求
+
+| 组件 | 要求 |
+| --- | --- |
+| 操作系统 | Windows 10 / 11 |
+| Node.js | 20 或更高版本 |
+| pnpm | 当前稳定版本 |
+| Rust | Stable 工具链，并带 Windows target |
+| WebView2 | Windows 上运行 Tauri 应用所需 |
 
 ## 快速开始
 
-### 环境要求
+以下命令适用于 PowerShell 7：
 
-| 组件    | 版本要求                    |
-| ------- | --------------------------- |
-| Windows | 10 / 11                     |
-| Node.js | v20+                        |
-| pnpm    | 最新版本                    |
-| Rust    | 1.70+ (带 `windows` target) |
-
-### 安装依赖
-
-```bash
-# 克隆仓库
-git clone https://github.com/yourusername/ToolDock.git
+```powershell
+git clone https://github.com/hugqq/ToolDock.git
 cd ToolDock
-
-# 安装前端依赖
 pnpm install
-```
-
-### 开发模式
-
-```bash
-# 启动开发服务器（热重载）
 pnpm tauri dev
 ```
 
-### 构建发行版
+## 常用命令
 
-```bash
-# 构建生产版本
+以下命令适用于 PowerShell 7：
+
+```powershell
+# 只启动 Vite 前端
+pnpm dev
+
+# 启动完整 Tauri 桌面应用
+pnpm tauri dev
+
+# 构建前端产物
 pnpm build
 
-# 打包安装程序
+# 构建桌面安装包和应用包
 pnpm tauri build
-
-# 输出目录: src-tauri/target/release/bundle/
 ```
 
----
+构建产物输出目录：
+
+```text
+src-tauri/target/release/bundle/
+```
 
 ## 工具清单
 
-### 文件工具 (5)
+### 文件工具
 
-| 工具            | 说明                       | 核心功能                |
-| --------------- | -------------------------- | ----------------------- |
-| 文件夹大小   | 递归扫描目录，分析磁盘占用 | 列表视图                |
-| 查找重复文件 | 基于 MD5/SHA256 去重       | 批量删除 / 智能筛选     |
-| 批量重命名   | 正则替换、序号、大小写转换 | 预览 / 撤销             |
-| 图片格式转换 | JPG/PNG/WEBP/ICO 互转      | 批量处理 / 自定义分辨率 |
+- 文件夹大小：扫描目录并分析磁盘占用。
+- 哈希计算：计算 MD5、SHA1、SHA256 等校验值。
+- 批量重命名：预览并执行批量重命名规则。
+- 图片格式转换：转换常见图片格式，并支持调整尺寸。
+- PDF 转图片：把 PDF 页面渲染并导出为图片。
 
-### 系统工具 (8)
+### 系统工具
 
-| 工具          | 说明                    | 核心功能                |
-| ------------- | ----------------------- | ----------------------- |
-| 便笺       | 任务管理 + 番茄工作法   | 今日计划 / 长短期规划   |
-| 系统激活   | Windows/Office 激活助手 | 一键激活                |
-| 系统信息   | CPU/内存/磁盘监控       | 实时监控 / 系统硬件信息 |
-| 屏幕 OCR   | 截图文字识别            | 多语言识别              |
-| 连点器     | 自动点击工具            | 鼠标连点 / 键盘连点     |
-| 剪贴板历史 | 剪贴板管理器            | 文本 / 图片 / 搜索      |
+- 便笺：管理计划、备忘录、附件、提醒和番茄钟。
+- 屏幕 OCR：截图并识别文字。
+- 连点器：自动执行鼠标点击、键盘按键和快捷文本输入。
+- 剪贴板历史：记录并搜索剪贴板内容。
+- 系统设置：管理应用偏好、翻译密钥、AI 配置、更新检查和配置导入导出。
 
-### 网络工具 (5)
+### 网络工具
 
-| 工具               | 说明             | 核心功能                |
-| ------------------ | ---------------- | ----------------------- |
-| DNS 助手        | DNS 查询与测速   | 刷新 DNS 缓存/ 公共 DNS |
-| Nginx 配置      | 可视化配置生成器 | 语法校验 / 模板         |
-| 端口扫描        | TCP/UDP 端口检测 | 批量扫描 / 服务识别     |
-| IP 地址查询     | IP 归属地查询    | IPv4/IPv6 / Geolocation |
-| 简单 Web 服务器 | 本地文件服务     | 静态托管 / CORS         |
+- DNS 助手：执行 DNS 查询和相关诊断。
+- Nginx 配置：编辑、校验、套用模板并管理本地 Nginx 配置。
+- 端口扫描：按常用端口、端口范围或自定义列表扫描开放端口。
+- IP 地址查询：查询 IP 归属地和网络信息。
+- 简单 Web 服务器：把本地文件夹快速作为 HTTP 服务分享，适合局域网传文件或静态页面测试。
 
-### 开发工具 (10)
+### 开发工具
 
-| 工具           | 说明                  | 核心功能               |
-| -------------- | --------------------- | ---------------------- |
-| Node 管理   | node_modules 清理     | 扫描 / 批量删除        |
-| AI 变量命名 | 智能命名建议          | 驼峰 / 下划线 / 帕斯卡 |
-| 单位换算    | 汇率、长度、进制转换  | 实时汇率 / 历史记录    |
-| ⏰ Cron 表达式 | 可视化生成 Cron       | 预览执行时间           |
-| {} JSON 格式化 | JSON 美化与压缩       | 树形视图 / 语法高亮    |
-| 编/解码     | Base64/URL/Hex/JWT 等 | 9 种编码格式           |
-| 翻译        | 多引擎翻译工具        | Google/DeepL/百度/有道 |
-| 取色器      | 屏幕颜色拾取          | Hex/RGB/HSL            |
-| 二维码      | 生成与识别二维码      | 自定义样式 / 批量生成  |
-| 文本对比    | Diff 工具             | 行级对比 / 高亮差异    |
-| ⏱️ 时间戳转换  | Unix 时间戳工具       | 毫秒 / 秒 / ISO 8601   |
+- Node 管理：查找并清理 `node_modules` 和包缓存目录。
+- AI 变量命名：生成变量命名建议。
+- 单位换算：换算汇率、长度、重量、温度、进制、存储和网速单位。
+- Cron 生成器：生成并预览 Cron 表达式。
+- JSON 格式化：美化、压缩、校验和查看 JSON。
+- 编/解码：处理 Base64、URL、Hex、HTML、Unicode、Binary、JWT、Punycode 和 Morse。
+- 翻译：支持 Google、DeepL、百度、有道、腾讯和火山引擎等翻译服务。
+- 取色器：拾取并转换颜色值。
+- 二维码：生成二维码，也可以从图片识别二维码。
+- 文本对比：对比文本或文件差异。
+- 时间戳转换：在 Unix 时间戳和可读日期时间之间转换。
 
-### 娱乐工具 (1)
+### 娱乐工具
 
-| 工具             | 说明           | 核心功能            |
-| ---------------- | -------------- | ------------------- |
-| 2048 / 奥赛罗 | 经典游戏       | AI 对战 / 联机模式  |
+- 2048：经典数字合成游戏，支持 AI 辅助。
+- 奥赛罗：支持本地 AI 和在线联机对战。
 
----
+## 项目结构
 
-## 使用指南
-
-详细使用说明请查看 [使用指南文档](docs/USAGE_zh.md)。
-
-### 基础操作
-
-1. **工具搜索**: 在顶部搜索框输入关键词快速定位工具
-2. **收藏夹**: 点击工具卡片右上角星标按钮收藏常用工具
-3. **分类筛选**: 左侧侧边栏按类别浏览工具
-4. **主题切换**: 通过设置页面切换亮色/暗色主题
-5. **全局快捷键**: 设置中配置快捷键快速唤起应用
-
-### 权限说明
-
-部分工具需要特殊权限：
-
-- **管理员权限**: DNS、编辑 Nginx 配置等
-- **文件系统访问**: 文件夹扫描、批量重命名
-- **网络访问**: 翻译、端口扫描、IP 查询
-- **剪贴板访问**: 剪贴板历史、截图 OCR
-
----
-
-## 开发指南
-
-### 项目结构
-
-```
+```text
 ToolDock/
-├── src/                    # 前端代码
-│   ├── pages/              # 页面组件（懒加载）
-│   ├── components/         # 共享组件
-│   │   ├── layout/         # ToolLayout 等布局
-│   │   └── shared/         # DataTable, LogViewer 等
-│   ├── tools/              # 工具注册表 (SSOT)
-│   ├── stores/             # Zustand 状态管理
-│   ├── hooks/              # 自定义 Hooks
-│   ├── i18n/               # 国际化配置
-│   └── lib/                # Tauri API 封装
-├── src-tauri/              # 后端代码
-│   ├── src/
-│   │   ├── commands/       # Tauri 命令层
-│   │   ├── core/           # 纯业务逻辑（无 Tauri 依赖）
-│   │   ├── models/         # 数据模型（DTO）
-│   │   └── errors.rs       # 统一错误处理
-│   └── capabilities/       # 权限配置
-└── docs/                   # 文档
+├── src/                    # React 前端
+│   ├── api/                # 前端 API 辅助方法
+│   ├── components/         # 通用组件和布局
+│   ├── hooks/              # 可复用 React Hooks
+│   ├── i18n/               # 中文和英文语言包
+│   ├── lib/                # Tauri 封装和前端公共方法
+│   ├── pages/              # 工具页面
+│   ├── stores/             # Zustand 状态
+│   └── tools/              # 工具注册表
+├── src-tauri/              # Tauri 和 Rust 后端
+│   ├── capabilities/       # Tauri 权限配置
+│   ├── scripts/            # 打包脚本
+│   └── src/
+│       ├── commands/       # Tauri 命令入口
+│       ├── core/           # Rust 核心逻辑
+│       ├── models/         # 共享数据模型
+│       └── errors.rs       # 统一错误处理
+├── scripts/                # 项目辅助脚本
+├── tests/                  # Node 测试
+└── public/                 # 静态资源
 ```
 
-### 开发规范
+## 新增工具流程
 
-1. **逻辑设计**: 确定数据流向与 Windows API 依赖
-2. **I18n 定义**: 在 `src/i18n/locales/*.json` 添加翻译
-3. **Rust Core**: 在 `src-tauri/src/core/` 实现核心逻辑
-4. **Tauri Command**: 在 `src-tauri/src/commands/` 添加接口
-5. **React 前端**: 在 `src/pages/` 创建组件，注册到 `tools/registry.ts`
+通常按下面顺序处理：
 
-### 调试技巧
+1. 在 `src/pages/` 新增工具页面。
+2. 在 `src/components/` 新增或复用通用 UI。
+3. 在 `src/i18n/locales/en.json` 和 `src/i18n/locales/zh-CN.json` 增加翻译。
+4. 在 `src/tools/registry.ts` 注册工具入口。
+5. 如果需要桌面原生能力，在 `src-tauri/src/core/` 增加 Rust 逻辑，并通过 `src-tauri/src/commands/` 暴露命令。
+6. 如果工具需要额外权限，更新 Tauri capabilities 配置。
+
+## 常见排查
+
+以下命令适用于 PowerShell 7：
 
 ```powershell
-# 清除应用数据缓存
-Remove-Item -Path "$env:LOCALAPPDATA\tooldock" -Recurse -Force
+# 清理本地应用数据
+Remove-Item -Path "$env:LOCALAPPDATA\tooldock" -Recurse -Force -ErrorAction SilentlyContinue
 
-# 强制终止进程
+# 结束正在运行的应用进程
 taskkill /F /IM ToolDock.exe
 
-# 清理 Rust 构建缓存
-cd src-tauri
+# 清理 Rust 构建产物
+Push-Location src-tauri
 cargo clean
+Pop-Location
 
-# 启用详细日志
-$env:RUST_LOG="debug"
+# 当前终端开启 Rust 详细日志
+$env:RUST_LOG = "debug"
 pnpm tauri dev
 ```
 
----
+## 发布
 
-## 自动构建
+发布脚本会更新版本号、创建提交、创建或替换 release tag，并推送分支和 tag。
 
-使用发布脚本一键更新版本号并触发 CI/CD 构建：
+只有在确认要发布时，再在 PowerShell 7 中执行：
 
 ```powershell
-# 发布新版本（自动更新版本号、提交、打 tag、推送）
 .\scripts\release.ps1 1.0.1
 ```
 
-脚本会自动完成：
+## 贡献
 
-1. 更新 `package.json`、`Cargo.toml`、`tauri.conf.json` 中的版本号
-2. 提交版本变更
-3. 创建 git tag（如已存在则自动替换）
-4. 推送代码和 tag，触发 GitHub Actions 构建 Windows + macOS 安装包
+欢迎提交 Issue 和 Pull Request。建议保持改动聚焦，Bug 反馈请带上复现步骤和相关日志，并尽量沿用现有前端/Rust 目录结构。
 
-## 贡献指南
+建议提交类型：
 
-欢迎提交 Issue 和 Pull Request！
-
-### 提交规范
-
-- **Feat**: 新增功能
-- **Fix**: 修复 Bug
-- **Docs**: 文档更新
-- **Style**: 代码格式调整
-- **Refactor**: 代码重构
-- **Perf**: 性能优化
-- **Test**: 测试相关
-
----
+- `feat`：新增功能
+- `fix`：修复问题
+- `docs`：文档更新
+- `style`：格式调整
+- `refactor`：内部重构
+- `perf`：性能优化
+- `test`：测试相关
+- `chore`：维护任务
 
 ## 许可证
 
-本项目采用 [MIT License](LICENSE) 开源协议。
+ToolDock 基于 [MIT License](LICENSE) 开源。
 
----
-
-## 致谢
-
-- [Tauri](https://tauri.app) - 跨平台桌面应用框架
-- [MUI](https://mui.com) - React 组件库
-- [Lucide](https://lucide.dev) - 图标库
-- 所有贡献者和用户的支持
-
----
-
-## 联系方式
-
-- **Issue**: [GitHub Issues](https://github.com/yourusername/ToolDock/issues)
-- **讨论**: [GitHub Discussions](https://github.com/yourusername/ToolDock/discussions)
-
----
-
-<div align="center">
-
-如果觉得这个项目对你有帮助，请给个 ⭐ Star 支持一下！
-
-Made by ToolDock Team
-
-</div>
