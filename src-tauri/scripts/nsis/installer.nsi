@@ -16,7 +16,7 @@
 !macroend
 
 !macro NSIS_HOOK_PREUNINSTALL
-  Call CloseToolDockBeforeFileOperation
+  Call un.CloseToolDockBeforeFileOperation
 !macroend
 
 !macro NSIS_HOOK_POSTUNINSTALL
@@ -42,6 +42,69 @@ Function IsToolDockRunning
   ${If} $0 == 0
     StrCpy $3 "1"
   ${EndIf}
+FunctionEnd
+
+Function un.IsToolDockRunning
+  StrCpy $3 "0"
+
+  nsExec::ExecToStack 'cmd /C tasklist /FI "IMAGENAME eq ToolDock.exe" /NH | find /I "ToolDock.exe" >NUL'
+  Pop $0
+  Pop $1
+  ${If} $0 == 0
+    StrCpy $3 "1"
+  ${EndIf}
+
+  nsExec::ExecToStack 'cmd /C tasklist /FI "IMAGENAME eq tooldock.exe" /NH | find /I "tooldock.exe" >NUL'
+  Pop $0
+  Pop $1
+  ${If} $0 == 0
+    StrCpy $3 "1"
+  ${EndIf}
+FunctionEnd
+
+Function un.WaitForToolDockExit
+  StrCpy $4 0
+
+  ${Do}
+    Call un.IsToolDockRunning
+    ${If} $3 == "0"
+      Return
+    ${EndIf}
+
+    Sleep 500
+    IntOp $4 $4 + 1
+  ${LoopUntil} $4 >= 10
+FunctionEnd
+
+Function un.CloseToolDockBeforeFileOperation
+  Call un.IsToolDockRunning
+  ${If} $3 == "0"
+    Return
+  ${EndIf}
+
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "检测到 ToolDock 正在运行。$\n$\n点击 确定 将自动关闭程序并继续卸载。$\n点击 取消 退出卸载程序。" IDOK DoClose
+  Quit
+
+  DoClose:
+    DetailPrint "正在关闭 ToolDock..."
+
+    ; Try a normal close first, then force-close any remaining tray/background process.
+    nsExec::ExecToLog 'cmd /C taskkill /T /IM "ToolDock.exe" >NUL 2>NUL'
+    nsExec::ExecToLog 'cmd /C taskkill /T /IM "tooldock.exe" >NUL 2>NUL'
+    Call un.WaitForToolDockExit
+
+    Call un.IsToolDockRunning
+    ${If} $3 == "1"
+      nsExec::ExecToLog 'cmd /C taskkill /F /T /IM "ToolDock.exe" >NUL 2>NUL'
+      nsExec::ExecToLog 'cmd /C taskkill /F /T /IM "tooldock.exe" >NUL 2>NUL'
+      Call un.WaitForToolDockExit
+    ${EndIf}
+
+    Call un.IsToolDockRunning
+    ${If} $3 == "1"
+      MessageBox MB_OK|MB_ICONSTOP "无法关闭 ToolDock 进程。请手动退出 ToolDock，或以管理员身份重新运行卸载程序。"
+      Quit
+    ${EndIf}
 FunctionEnd
 
 Function WaitForToolDockExit

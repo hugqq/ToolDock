@@ -49,6 +49,7 @@ impl HotkeyManager {
     }
 
     /// 解析快捷键字符串，返回修饰键和虚拟键码
+    #[cfg(target_os = "windows")]
     fn parse_shortcut(shortcut: &str) -> Result<(u32, u32), AppError> {
         let parts: Vec<&str> = shortcut.split('+').collect();
         if parts.is_empty() {
@@ -72,6 +73,11 @@ impl HotkeyManager {
         let vk = Self::key_to_vk(key_str)?;
 
         Ok((modifiers, vk))
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    fn parse_shortcut(_shortcut: &str) -> Result<(u32, u32), AppError> {
+        Ok((0, 0))
     }
 
     /// 将按键字符串转换为 Windows 虚拟键码
