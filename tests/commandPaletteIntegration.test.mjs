@@ -20,7 +20,7 @@ test("configures the standalone command palette window and permissions", async (
   const capability = JSON.parse(await read("../src-tauri/capabilities/default.json"));
   const palette = config.app.windows.find((window) => window.label === "command-palette");
   assert.ok(palette);
-  assert.equal(palette.url, "index.html#/command-palette");
+  assert.equal(palette.url, "#/command-palette");
   assert.equal(palette.visible, false);
   assert.equal(palette.width, 720);
   assert.equal(palette.height, 520);
@@ -32,14 +32,20 @@ test("configures the standalone command palette window and permissions", async (
 });
 
 test("routes shortcuts and palette UI events", async () => {
-  const [hotkey, app] = await Promise.all([
+  const [hotkey, app, lib] = await Promise.all([
     read("../src-tauri/src/core/hotkey.rs"),
     read("../src/App.tsx"),
+    read("../src-tauri/src/lib.rs"),
   ]);
   assert.match(hotkey, /toggle_command_palette/);
   assert.match(hotkey, /command-palette-focus/);
   assert.match(app, /"\/command-palette"/);
+  assert.match(app, /getCurrentWindow\(\)\.label\s*===\s*"command-palette"/);
   assert.match(app, /navigate-to-tool/);
+  assert.match(
+    lib,
+    /window\.label\(\)\s*==\s*"command-palette"[\s\S]*?window\.hide\(\)[\s\S]*?api\.prevent_close\(\)/,
+  );
 });
 
 test("palette searches files and supports full keyboard control", async () => {

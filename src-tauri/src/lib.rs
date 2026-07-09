@@ -10,10 +10,70 @@ use tauri::menu::{Menu, MenuItem};
 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
 use tauri::Manager;
 
+#[cfg(target_os = "windows")]
+use windows::Win32::{
+    Foundation::{LPARAM, WPARAM},
+    UI::WindowsAndMessaging::{
+        CreateIcon, DestroyIcon, SendMessageW, HICON, ICON_BIG, WM_SETICON,
+    },
+};
+
 pub struct AppState {
     pub cancel_scan: AtomicBool,
     pub network_tasks: Mutex<HashMap<String, Arc<AtomicBool>>>,
     pub port_scanner_tasks: Mutex<HashMap<String, Arc<AtomicBool>>>,
+}
+
+#[cfg(target_os = "windows")]
+struct WindowsTaskbarIcon(isize);
+
+#[cfg(target_os = "windows")]
+impl Drop for WindowsTaskbarIcon {
+    fn drop(&mut self) {
+        if self.0 != 0 {
+            let _ = unsafe { DestroyIcon(HICON(self.0 as *mut std::ffi::c_void)) };
+        }
+    }
+}
+
+#[cfg(target_os = "windows")]
+fn set_windows_taskbar_icon<R: tauri::Runtime>(
+    window: &tauri::WebviewWindow<R>,
+) -> Option<WindowsTaskbarIcon> {
+    let image = tauri::include_image!("./icons/64x64.png");
+    let mut bgra = image.rgba().to_vec();
+    let mut and_mask = Vec::with_capacity((image.width() * image.height()) as usize);
+
+    for pixel in bgra.chunks_exact_mut(4) {
+        and_mask.push(pixel[3].wrapping_sub(u8::MAX));
+        pixel.swap(0, 2);
+    }
+
+    let icon = unsafe {
+        CreateIcon(
+            None,
+            image.width() as i32,
+            image.height() as i32,
+            1,
+            32,
+            and_mask.as_ptr(),
+            bgra.as_ptr(),
+        )
+    }
+    .ok()?;
+    let retained_icon = WindowsTaskbarIcon(icon.0 as isize);
+    let hwnd = window.hwnd().ok()?;
+
+    unsafe {
+        SendMessageW(
+            hwnd,
+            WM_SETICON,
+            Some(WPARAM(ICON_BIG as usize)),
+            Some(LPARAM(icon.0 as isize)),
+        );
+    }
+
+    Some(retained_icon)
 }
 
 use commands::ai::{ask_ai, ask_ai_stream, ask_nginx_ai};
@@ -134,6 +194,16 @@ pub fn run() {
                 .unwrap_or_else(|_| std::path::PathBuf::from("data"));
             crate::core::logging::init_logging(data_dir.join("logs"));
 
+            #[cfg(target_os = "windows")]
+            if let Some(window) = app.get_webview_window("main") {
+                // Tauri decodes only the first ICO entry for the window icon. Ours is 16px,
+                // so provide a 32px ICON_SMALL and a separate high-resolution ICON_BIG.
+                let _ = window.set_icon(tauri::include_image!("./icons/32x32.png"));
+                if let Some(taskbar_icon) = set_windows_taskbar_icon(&window) {
+                    app.manage(taskbar_icon);
+                }
+            }
+
             let manager = Arc::new(ClipboardManager::new(app.handle()));
             app.manage(manager.clone());
             start_listening(app.handle().clone(), manager);
@@ -226,6 +296,12 @@ pub fn run() {
         .manage(HttpHistoryState(Mutex::new(None)))
         .on_window_event(|window, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                if window.label() == "command-palette" {
+                    let _ = window.hide();
+                    api.prevent_close();
+                    return;
+                }
+
                 if window.label() == "main" {
                     let app_handle = window.app_handle();
                     let state = app_handle.state::<AppSettings>();
