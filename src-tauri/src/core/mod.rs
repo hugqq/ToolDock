@@ -9,6 +9,7 @@ pub mod file;
 pub mod hash;
 pub mod hosts;
 pub mod http_client;
+pub mod http_history_db;
 pub mod hotkey;
 pub mod ip_lookup;
 pub mod logging;
