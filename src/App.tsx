@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useSettingsStore } from "./stores/useSettingsStore";
 import { Home } from "./pages/Home";
 import { Sidebar } from "./components/Sidebar";
@@ -137,10 +138,14 @@ function AppContent() {
   }, [clipboardPrefix, clipboardSuffix]);
 
   // 独立窗口：不渲染主布局，直接渲染对应组件
-  const StandaloneComponent = STANDALONE_ROUTES[location.pathname];
+  const standalonePath =
+    getCurrentWindow().label === "command-palette"
+      ? "/command-palette"
+      : location.pathname;
+  const StandaloneComponent = STANDALONE_ROUTES[standalonePath];
   if (StandaloneComponent) {
     const fallback =
-      location.pathname === "/magnifier" ? <TransparentPageLoader /> : <PageLoader />;
+      standalonePath === "/magnifier" ? <TransparentPageLoader /> : <PageLoader />;
 
     return (
       <Suspense fallback={fallback}>
