@@ -1,4 +1,6 @@
 ﻿pub mod ocr;
+pub mod http_client;
+pub mod search;
 pub mod port_scanner;
 pub mod unit_converter;
 pub mod variable_naming;

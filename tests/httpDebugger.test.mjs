@@ -1,0 +1,199 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  activePairs,
+  buildRequestUrl,
+  formatResponseBody,
+  generateCurl,
+  normalizeHttpRequest,
+  validateHttpDraft,
+} from "../src/lib/httpDebugger.ts";
+
+const row = (key, value, enabled = true) => ({ id: `${key}-${value}`, key, value, enabled });
+const multipartRow = ({
+  id,
+  key,
+  kind = "text",
+  value = "",
+  filePath = "",
+  fileName = "",
+  enabled = true,
+}) => ({ id, key, kind, value, filePath, fileName, enabled });
+
+test("encodes only enabled complete query rows", () => {
+  const url = buildRequestUrl("https://example.test/api?existing=1", [row("q", "a b"), row("", "x"), row("off", "x", false)]);
+  assert.equal(url, "https://example.test/api?existing=1&q=a+b");
+});
+
+test("filters disabled and blank key-value rows", () => {
+  assert.deepEqual(activePairs([row("A", "1"), row("", "2"), row("B", "3", false)]), [{ key: "A", value: "1" }]);
+  assert.deepEqual(activePairs([row("  Trimmed  ", "  preserved  "), row("   ", "x")]), [{ key: "Trimmed", value: "  preserved  " }]);
+});
+
+test("rejects unsupported URLs and invalid JSON", () => {
+  assert.equal(validateHttpDraft({ url: "file:///tmp/a", bodyMode: "none", bodyText: "", timeoutMs: 30000 }).url, "unsupported_scheme");
+  assert.equal(validateHttpDraft({ url: "   ", bodyMode: "none", bodyText: "", timeoutMs: 30000 }).url, "required");
+  assert.equal(validateHttpDraft({ url: "not a URL", bodyMode: "none", bodyText: "", timeoutMs: 30000 }).url, "invalid_url");
+  assert.equal(validateHttpDraft({ url: "https://x.test", bodyMode: "json", bodyText: "{", timeoutMs: 30000 }).body, "invalid_json");
+  assert.equal(validateHttpDraft({ url: "https://x.test", bodyMode: "none", bodyText: "", timeoutMs: 999 }).timeout, "out_of_range");
+  assert.equal(validateHttpDraft({ url: "https://x.test", bodyMode: "none", bodyText: "", timeoutMs: 120001 }).timeout, "out_of_range");
+  assert.equal(validateHttpDraft({ url: "https://x.test", bodyMode: "none", bodyText: "", timeoutMs: Number.NaN }).timeout, "out_of_range");
+  assert.equal(validateHttpDraft({ url: "https://x.test", bodyMode: "none", bodyText: "", timeoutMs: 1000 }).timeout, undefined);
+  assert.equal(validateHttpDraft({ url: "https://x.test", bodyMode: "none", bodyText: "", timeoutMs: 120000 }).timeout, undefined);
+
+  const jsonDraft = { url: "https://x.test", bodyMode: "json", bodyText: "{}", timeoutMs: 30000 };
+  assert.equal(validateHttpDraft({ ...jsonDraft, headers: [row("Content-Type", "text/plain")] }).body, "incompatible_content_type");
+  assert.equal(validateHttpDraft({ ...jsonDraft, headers: [row(" content-type ", "Application/Problem+JSON; charset=utf-8")] }).body, undefined);
+  assert.equal(validateHttpDraft({ ...jsonDraft, headers: [row("Content-Type", "text/plain", false)] }).body, undefined);
+
+  const formDraft = { url: "https://x.test", bodyMode: "form", bodyText: "", timeoutMs: 30000 };
+  assert.equal(validateHttpDraft({ ...formDraft, headers: [row("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")] }).body, undefined);
+  assert.equal(validateHttpDraft({ ...formDraft, headers: [row("Content-Type", "application/json")] }).body, "incompatible_content_type");
+
+  const textDraft = { url: "https://x.test", bodyMode: "text", bodyText: "hello", timeoutMs: 30000 };
+  assert.equal(validateHttpDraft({ ...textDraft, headers: [row("Content-Type", "Text/Plain; charset=utf-8")] }).body, undefined);
+  assert.equal(validateHttpDraft({ ...textDraft, headers: [row("Content-Type", "application/octet-stream")] }).body, "incompatible_content_type");
+  assert.equal(validateHttpDraft({ url: "https://x.test", bodyMode: "none", bodyText: "", timeoutMs: 30000, headers: [row("Content-Type", "application/octet-stream")] }).body, undefined);
+});
+
+test("formats valid JSON but preserves invalid JSON text", () => {
+  assert.deepEqual(formatResponseBody('{"a":1}', "application/json"), {
+    text: '{\n  "a": 1\n}',
+    jsonFormatted: true,
+    parseWarning: false,
+  });
+  assert.deepEqual(formatResponseBody("{", "application/json"), {
+    text: "{",
+    jsonFormatted: false,
+    parseWarning: true,
+  });
+  assert.deepEqual(formatResponseBody('{"a":1}', "Application/Problem+JSON; charset=utf-8"), {
+    text: '{\n  "a": 1\n}',
+    jsonFormatted: true,
+    parseWarning: false,
+  });
+  assert.deepEqual(formatResponseBody("plain text", "text/plain"), {
+    text: "plain text",
+    jsonFormatted: false,
+    parseWarning: false,
+  });
+});
+
+test("generates PowerShell-safe curl.exe with current secrets", () => {
+  const command = generateCurl({
+    method: "POST",
+    url: "https://example.test/api",
+    query: [row("q", "a b")],
+    headers: [row("Authorization", "Bearer it's-secret")],
+    bodyMode: "json",
+    bodyText: '{"name":"O\'Brien"}',
+    formFields: [],
+    multipartFields: [],
+    timeoutMs: 30000,
+  }, "windows");
+
+  assert.match(command, /^curl\.exe /);
+  assert.match(command, /'Authorization: Bearer it''s-secret'/);
+  assert.match(command, /https:\/\/example\.test\/api\?q=a\+b/);
+  assert.match(command, /--data-raw/);
+});
+
+test("generates POSIX-safe curl on macOS", () => {
+  const command = generateCurl({
+    method: "GET",
+    url: "https://example.test/a'b",
+    query: [],
+    headers: [],
+    bodyMode: "none",
+    bodyText: "",
+    formFields: [],
+    multipartFields: [],
+    timeoutMs: 30000,
+  }, "macos");
+
+  assert.match(command, /^curl /);
+  assert.match(command, /'\\''/);
+});
+
+test("generates URL-encoded form fields without disabled rows", () => {
+  const command = generateCurl({
+    method: "POST",
+    url: "https://example.test/form",
+    query: [],
+    headers: [],
+    bodyMode: "form",
+    bodyText: "",
+    formFields: [row("name", "A B"), row("ignored", "x", false)],
+    multipartFields: [],
+    timeoutMs: 30000,
+  }, "windows");
+
+  assert.match(command, /--data-urlencode 'name=A B'/);
+  assert.doesNotMatch(command, /ignored/);
+});
+
+test("validates multipart rows and managed content type", () => {
+  const draft = {
+    url: "https://example.test/upload",
+    bodyMode: "multipart",
+    bodyText: "",
+    timeoutMs: 30000,
+    headers: [],
+    multipartFields: [
+      multipartRow({ id: "blank-key", key: "", value: "hello" }),
+      multipartRow({ id: "blank-file", key: "avatar", kind: "file" }),
+    ],
+  };
+
+  assert.deepEqual(validateHttpDraft(draft).multipart, {
+    "blank-key": "field_required",
+    "blank-file": "file_required",
+  });
+  assert.equal(
+    validateHttpDraft({
+      ...draft,
+      multipartFields: [],
+      headers: [row("Content-Type", "multipart/form-data")],
+    }).body,
+    "multipart_content_type_managed",
+  );
+});
+
+test("normalizes old requests with one empty multipart row", () => {
+  const normalized = normalizeHttpRequest({
+    method: "GET",
+    url: "https://example.test",
+    query: [],
+    headers: [],
+    bodyMode: "none",
+    bodyText: "",
+    formFields: [],
+    timeoutMs: 30000,
+  });
+
+  assert.equal(normalized.multipartFields.length, 1);
+  assert.equal(normalized.multipartFields[0].kind, "text");
+});
+
+test("generates multipart cURL text and file forms in order", () => {
+  const command = generateCurl({
+    method: "POST",
+    url: "https://example.test/upload",
+    query: [],
+    headers: [],
+    bodyMode: "multipart",
+    bodyText: "",
+    formFields: [],
+    multipartFields: [
+      multipartRow({ id: "title", key: "title", value: "Summer photo" }),
+      multipartRow({ id: "file", key: "asset", kind: "file", filePath: "C:\\Media\\a b.png", fileName: "a b.png" }),
+      multipartRow({ id: "off", key: "ignored", value: "no", enabled: false }),
+    ],
+    timeoutMs: 30000,
+  }, "windows");
+
+  assert.match(command, /--form 'title=Summer photo'/);
+  assert.match(command, /--form 'asset=@C:\\Media\\a b\.png'/);
+  assert.ok(command.indexOf("title=Summer photo") < command.indexOf("asset=@"));
+  assert.doesNotMatch(command, /ignored/);
+});

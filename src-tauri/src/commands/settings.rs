@@ -121,6 +121,7 @@ pub async fn get_developer_logs(app: tauri::AppHandle) -> ApiResponse<DeveloperL
 
 #[tauri::command]
 pub async fn set_global_shortcut(
+    app: tauri::AppHandle,
     manager: State<'_, HotkeyManager>,
     shortcut: String,
 ) -> Result<ApiResponse<()>, String> {
@@ -128,7 +129,7 @@ pub async fn set_global_shortcut(
     let _ = manager.unregister();
 
     // 保存到注册表
-    if let Err(e) = settings::save_global_shortcut(&shortcut) {
+    if let Err(e) = settings::save_global_shortcut(&app, &shortcut) {
         return Ok(ApiResponse::error("SET_SHORTCUT_FAILED", e.to_string()));
     }
 
@@ -143,8 +144,8 @@ pub async fn set_global_shortcut(
 }
 
 #[tauri::command]
-pub async fn get_global_shortcut() -> ApiResponse<String> {
-    match settings::load_global_shortcut() {
+pub async fn get_global_shortcut(app: tauri::AppHandle) -> ApiResponse<String> {
+    match settings::load_global_shortcut(&app) {
         Ok(val) => ApiResponse::ok(val),
         Err(e) => ApiResponse::error("GET_SHORTCUT_FAILED", e.to_string()),
     }

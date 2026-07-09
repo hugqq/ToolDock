@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useSettingsStore } from "./stores/useSettingsStore";
 import { Home } from "./pages/Home";
 import { Sidebar } from "./components/Sidebar";
@@ -40,11 +41,13 @@ const ImageConverter = lazy(() => import("./pages/ImageConverter"));
 const Magnifier = lazy(() => import("./pages/Magnifier"));
 const FloatingWidget = lazy(() => import("./pages/FloatingWidget"));
 const ScreenshotSelector = lazy(() => import("./pages/ScreenshotSelector"));
+const CommandPalette = lazy(() => import("./pages/CommandPalette"));
 const TimestampConverter = lazy(() => import("./pages/TimestampConverter"));
 const IpLookup = lazy(() => import("./pages/IpLookup"));
 const Clicker = lazy(() => import("./pages/Clicker"));
 const SimpleWebServer = lazy(() => import("./pages/SimpleWebServer"));
 const PortScanner = lazy(() => import("./pages/PortScanner"));
+const HttpDebugger = lazy(() => import("./pages/HttpDebugger"));
 const Othello = lazy(() => import("./pages/Othello"));
 const Game2048 = lazy(() => import("./pages/Game2048"));
 const NotePad = lazy(() => import("./pages/NotePad"));
@@ -71,6 +74,7 @@ const STANDALONE_ROUTES: Record<string, React.LazyExoticComponent<React.Componen
   "/magnifier": Magnifier,
   "/floating-widget": FloatingWidget,
   "/screenshot-selector": ScreenshotSelector,
+  "/command-palette": CommandPalette,
 };
 
 function AppContent() {
@@ -114,6 +118,11 @@ function AppContent() {
   }, [navigate]);
 
   useEffect(() => {
+    const unlisten = listen<string>("navigate-to-tool", (event) => navigate(event.payload));
+    return () => { unlisten.then((fn) => fn()); };
+  }, [navigate]);
+
+  useEffect(() => {
     // 全局同步剪贴板监听状态
     invoke("set_clipboard_enabled", { enabled: clipboardEnabled }).catch(
       (err) => console.error("Failed to sync clipboard status:", err)
@@ -129,10 +138,14 @@ function AppContent() {
   }, [clipboardPrefix, clipboardSuffix]);
 
   // 独立窗口：不渲染主布局，直接渲染对应组件
-  const StandaloneComponent = STANDALONE_ROUTES[location.pathname];
+  const standalonePath =
+    getCurrentWindow().label === "command-palette"
+      ? "/command-palette"
+      : location.pathname;
+  const StandaloneComponent = STANDALONE_ROUTES[standalonePath];
   if (StandaloneComponent) {
     const fallback =
-      location.pathname === "/magnifier" ? <TransparentPageLoader /> : <PageLoader />;
+      standalonePath === "/magnifier" ? <TransparentPageLoader /> : <PageLoader />;
 
     return (
       <Suspense fallback={fallback}>
@@ -195,6 +208,7 @@ function AppContent() {
                 element={<SimpleWebServer />}
               />
               <Route path="/tools/port-scanner" element={<PortScanner />} />
+              <Route path="/tools/http-debugger" element={<HttpDebugger />} />
               <Route path="/tools/2048" element={<Game2048 />} />
               <Route path="/tools/notepad" element={<NotePad />} />
               <Route path="/tools/pdf-to-image" element={<PdfToImage />} />

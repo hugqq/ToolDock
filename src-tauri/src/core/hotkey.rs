@@ -5,10 +5,7 @@
 use crate::errors::AppError;
 use std::sync::mpsc::{channel, Sender};
 use std::sync::{Arc, Mutex};
-use tauri::AppHandle;
-
-#[cfg(target_os = "windows")]
-use tauri::{Emitter, Manager};
+use tauri::{AppHandle, Emitter, Manager};
 
 #[cfg(target_os = "windows")]
 use winapi::um::winuser::{
@@ -30,6 +27,24 @@ pub struct HotkeyManager {
     registered: Arc<Mutex<bool>>,
     current_shortcut: Arc<Mutex<String>>,
     command_sender: Arc<Mutex<Option<Sender<HotkeyCommand>>>>,
+    #[cfg(target_os = "macos")]
+    app_handle: AppHandle,
+}
+
+pub fn toggle_command_palette(app_handle: &AppHandle) {
+    let Some(window) = app_handle.get_webview_window("command-palette") else {
+        return;
+    };
+    if window.is_visible().unwrap_or(false) {
+        let _ = window.hide();
+        return;
+    }
+
+    let _ = window.center();
+    let _ = window.unminimize();
+    let _ = window.show();
+    let _ = window.set_focus();
+    let _ = window.emit("command-palette-focus", ());
 }
 
 impl HotkeyManager {
@@ -46,6 +61,8 @@ impl HotkeyManager {
             registered: Arc::new(Mutex::new(false)),
             current_shortcut: Arc::new(Mutex::new(String::new())),
             command_sender: Arc::new(Mutex::new(Some(tx))),
+            #[cfg(target_os = "macos")]
+            app_handle,
         }
     }
 
@@ -74,11 +91,6 @@ impl HotkeyManager {
         let vk = Self::key_to_vk(key_str)?;
 
         Ok((modifiers, vk))
-    }
-
-    #[cfg(not(target_os = "windows"))]
-    fn parse_shortcut(_shortcut: &str) -> Result<(u32, u32), AppError> {
-        Ok((0, 0))
     }
 
     /// 将按键字符串转换为 Windows 虚拟键码
@@ -147,16 +159,25 @@ impl HotkeyManager {
             return Ok(());
         }
 
-        // 解析快捷键
-        let (modifiers, vk) = Self::parse_shortcut(shortcut)?;
+        #[cfg(target_os = "windows")]
+        {
+            let (modifiers, vk) = Self::parse_shortcut(shortcut)?;
+            if let Some(sender) = self.command_sender.lock().unwrap().as_ref() {
+                sender
+                    .send(HotkeyCommand::Register { modifiers, vk })
+                    .map_err(|e| {
+                        AppError::Internal(format!("Failed to send register command: {}", e))
+                    })?;
+            }
+        }
 
-        // 发送注册命令到热键线程
-        if let Some(sender) = self.command_sender.lock().unwrap().as_ref() {
-            sender
-                .send(HotkeyCommand::Register { modifiers, vk })
-                .map_err(|e| {
-                    AppError::Internal(format!("Failed to send register command: {}", e))
-                })?;
+        #[cfg(target_os = "macos")]
+        {
+            use tauri_plugin_global_shortcut::GlobalShortcutExt;
+            self.app_handle
+                .global_shortcut()
+                .register(shortcut)
+                .map_err(|error| AppError::Internal(error.to_string()))?;
         }
 
         *self.registered.lock().unwrap() = true;
@@ -171,11 +192,21 @@ impl HotkeyManager {
             return Ok(());
         }
 
-        // 发送注销命令到热键线程
+        #[cfg(target_os = "windows")]
         if let Some(sender) = self.command_sender.lock().unwrap().as_ref() {
             sender.send(HotkeyCommand::Unregister).map_err(|e| {
                 AppError::Internal(format!("Failed to send unregister command: {}", e))
             })?;
+        }
+
+        #[cfg(target_os = "macos")]
+        {
+            use tauri_plugin_global_shortcut::GlobalShortcutExt;
+            let shortcut = self.current_shortcut.lock().unwrap().clone();
+            self.app_handle
+                .global_shortcut()
+                .unregister(shortcut)
+                .map_err(|error| AppError::Internal(error.to_string()))?;
         }
 
         *self.registered.lock().unwrap() = false;
@@ -232,15 +263,7 @@ impl HotkeyManager {
                     if msg.message == WM_HOTKEY && msg.wParam == HOTKEY_ID as usize {
                         tracing::info!("Hotkey triggered!");
 
-                        // 发送事件到前端
-                        let _ = app_handle.emit("hotkey_triggered", ());
-
-                        // 显示并聚焦主窗口
-                        if let Some(main_window) = app_handle.get_webview_window("main") {
-                            let _ = main_window.show();
-                            let _ = main_window.set_focus();
-                            let _ = main_window.unminimize();
-                        }
+                        toggle_command_palette(&app_handle);
                     }
 
                     TranslateMessage(&msg);

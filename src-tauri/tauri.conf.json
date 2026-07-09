@@ -20,6 +20,19 @@
         "decorations": false,
         "dragDropEnabled": false,
         "visible": false
+      },
+      {
+        "label": "command-palette",
+        "title": "ToolDock Search",
+        "url": "#/command-palette",
+        "width": 720,
+        "height": 520,
+        "center": true,
+        "decorations": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "resizable": false,
+        "visible": false
       }
     ],
     "security": {

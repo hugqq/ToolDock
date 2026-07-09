@@ -9,6 +9,8 @@ use aes_gcm::{
 };
 use base64::{engine::general_purpose, Engine as _};
 use sha2::{Digest, Sha256};
+#[cfg(not(target_os = "windows"))]
+use tauri::Manager;
 
 #[cfg(target_os = "windows")]
 use std::env;
@@ -271,7 +273,7 @@ pub fn is_run_as_admin() -> Result<bool, AppError> {
 
 /// 注册全局快捷键（保存到注册表/配置文件，供下次启动时使用）
 #[cfg(target_os = "windows")]
-pub fn save_global_shortcut(shortcut: &str) -> Result<(), AppError> {
+pub fn save_global_shortcut(_app: &tauri::AppHandle, shortcut: &str) -> Result<(), AppError> {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let path = r"Software\ToolDock\Settings";
 
@@ -288,8 +290,20 @@ pub fn save_global_shortcut(shortcut: &str) -> Result<(), AppError> {
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn save_global_shortcut(_shortcut: &str) -> Result<(), AppError> {
-    // On non-Windows, global shortcut persistence is not yet implemented
+pub fn save_global_shortcut(app: &tauri::AppHandle, shortcut: &str) -> Result<(), AppError> {
+    let directory = app
+        .path()
+        .app_config_dir()
+        .map_err(|error| AppError::Internal(error.to_string()))?;
+    std::fs::create_dir_all(&directory)?;
+    let path = directory.join("global-shortcut.txt");
+    if shortcut.is_empty() {
+        if path.exists() {
+            std::fs::remove_file(path)?;
+        }
+    } else {
+        std::fs::write(path, shortcut)?;
+    }
     Ok(())
 }
 
@@ -318,7 +332,7 @@ pub fn load_silent_start(data_dir: &std::path::Path) -> bool {
 
 /// 读取全局快捷键配置
 #[cfg(target_os = "windows")]
-pub fn load_global_shortcut() -> Result<String, AppError> {
+pub fn load_global_shortcut(_app: &tauri::AppHandle) -> Result<String, AppError> {
     let hkcu = RegKey::predef(HKEY_CURRENT_USER);
     let path = r"Software\ToolDock\Settings";
 
@@ -334,8 +348,17 @@ pub fn load_global_shortcut() -> Result<String, AppError> {
 }
 
 #[cfg(not(target_os = "windows"))]
-pub fn load_global_shortcut() -> Result<String, AppError> {
-    Ok(String::new())
+pub fn load_global_shortcut(app: &tauri::AppHandle) -> Result<String, AppError> {
+    let path = app
+        .path()
+        .app_config_dir()
+        .map_err(|error| AppError::Internal(error.to_string()))?
+        .join("global-shortcut.txt");
+    match std::fs::read_to_string(path) {
+        Ok(shortcut) => Ok(shortcut.trim().to_string()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(String::new()),
+        Err(error) => Err(AppError::Io(error)),
+    }
 }
 
 #[cfg(all(test, target_os = "windows"))]
