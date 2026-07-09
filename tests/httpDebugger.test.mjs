@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { activePairs, buildRequestUrl, formatResponseBody, validateHttpDraft } from "../src/lib/httpDebugger.ts";
+import {
+  activePairs,
+  buildRequestUrl,
+  formatResponseBody,
+  generateCurl,
+  validateHttpDraft,
+} from "../src/lib/httpDebugger.ts";
 
 const row = (key, value, enabled = true) => ({ id: `${key}-${value}`, key, value, enabled });
 
@@ -61,4 +67,54 @@ test("formats valid JSON but preserves invalid JSON text", () => {
     jsonFormatted: false,
     parseWarning: false,
   });
+});
+
+test("generates PowerShell-safe curl.exe with current secrets", () => {
+  const command = generateCurl({
+    method: "POST",
+    url: "https://example.test/api",
+    query: [row("q", "a b")],
+    headers: [row("Authorization", "Bearer it's-secret")],
+    bodyMode: "json",
+    bodyText: '{"name":"O\'Brien"}',
+    formFields: [],
+    timeoutMs: 30000,
+  }, "windows");
+
+  assert.match(command, /^curl\.exe /);
+  assert.match(command, /'Authorization: Bearer it''s-secret'/);
+  assert.match(command, /https:\/\/example\.test\/api\?q=a\+b/);
+  assert.match(command, /--data-raw/);
+});
+
+test("generates POSIX-safe curl on macOS", () => {
+  const command = generateCurl({
+    method: "GET",
+    url: "https://example.test/a'b",
+    query: [],
+    headers: [],
+    bodyMode: "none",
+    bodyText: "",
+    formFields: [],
+    timeoutMs: 30000,
+  }, "macos");
+
+  assert.match(command, /^curl /);
+  assert.match(command, /'\\''/);
+});
+
+test("generates URL-encoded form fields without disabled rows", () => {
+  const command = generateCurl({
+    method: "POST",
+    url: "https://example.test/form",
+    query: [],
+    headers: [],
+    bodyMode: "form",
+    bodyText: "",
+    formFields: [row("name", "A B"), row("ignored", "x", false)],
+    timeoutMs: 30000,
+  }, "windows");
+
+  assert.match(command, /--data-urlencode 'name=A B'/);
+  assert.doesNotMatch(command, /ignored/);
 });
