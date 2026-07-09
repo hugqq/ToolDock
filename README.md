@@ -49,7 +49,8 @@ The project uses a React frontend for the interface and a Tauri/Rust backend for
 
 ## ⭐ Highlights
 
-- 28 utility tools plus a settings center, grouped by file, system, network, developer, and entertainment categories.
+- 29 utility tools plus a settings center, grouped by file, system, network, developer, and entertainment categories.
+- A global command palette searches ToolDock tools and local files from the configured shortcut.
 - Native desktop packaging through Tauri v2, with a small footprint compared with Electron-style apps.
 - React 19 + MUI v7 interface with light/dark theme support.
 - Rust command layer for filesystem, network, OCR, clipboard, conversion, and local automation tasks.
@@ -65,6 +66,9 @@ The project uses a React frontend for the interface and a Tauri/Rust backend for
 | pnpm | Current stable version |
 | Rust | Stable toolchain with the target for your current system |
 | WebView2 | Required by Tauri on Windows |
+| Local file search | Everything 1.4+ with IPC enabled on Windows; system Spotlight on macOS |
+
+Everything is optional and only powers Windows file search. ToolDock never downloads or installs it automatically, and tool search remains available without it.
 
 ## 🚀 Quick Start
 
@@ -140,6 +144,7 @@ src-tauri/target/release/bundle/
 - QR Code: generate QR codes and scan QR codes from images.
 - Text Diff: compare text or file differences.
 - Timestamp Converter: convert Unix timestamps and readable date/time values.
+- HTTP/API Debugger: send GET/POST and other requests, edit headers, query parameters, and JSON/form/text bodies, then inspect responses, timing, history, and cURL output.
 
 ### 🎮 Entertainment
 

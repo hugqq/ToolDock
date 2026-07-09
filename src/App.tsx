@@ -40,6 +40,7 @@ const ImageConverter = lazy(() => import("./pages/ImageConverter"));
 const Magnifier = lazy(() => import("./pages/Magnifier"));
 const FloatingWidget = lazy(() => import("./pages/FloatingWidget"));
 const ScreenshotSelector = lazy(() => import("./pages/ScreenshotSelector"));
+const CommandPalette = lazy(() => import("./pages/CommandPalette"));
 const TimestampConverter = lazy(() => import("./pages/TimestampConverter"));
 const IpLookup = lazy(() => import("./pages/IpLookup"));
 const Clicker = lazy(() => import("./pages/Clicker"));
@@ -72,6 +73,7 @@ const STANDALONE_ROUTES: Record<string, React.LazyExoticComponent<React.Componen
   "/magnifier": Magnifier,
   "/floating-widget": FloatingWidget,
   "/screenshot-selector": ScreenshotSelector,
+  "/command-palette": CommandPalette,
 };
 
 function AppContent() {
@@ -112,6 +114,11 @@ function AppContent() {
     return () => {
       unlisten.then((fn) => fn());
     };
+  }, [navigate]);
+
+  useEffect(() => {
+    const unlisten = listen<string>("navigate-to-tool", (event) => navigate(event.payload));
+    return () => { unlisten.then((fn) => fn()); };
   }, [navigate]);
 
   useEffect(() => {

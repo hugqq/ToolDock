@@ -76,6 +76,22 @@
     "ko": "韩语",
     "it": "意大利语"
   },
+  "command_palette": {
+    "placeholder": "搜索工具或本地文件...",
+    "tools": "工具",
+    "files": "文件",
+    "hint": "输入关键词搜索 ToolDock 工具和本地文件",
+    "no_files": "没有匹配的文件",
+    "query_failed": "文件搜索暂时失败，请重试。工具搜索仍可使用。",
+    "everything_unavailable": "Everything 未安装、未运行，或 IPC 未启用。工具搜索仍可使用。",
+    "spotlight_unavailable": "Spotlight 暂时不可用，请确认索引功能已开启。工具搜索仍可使用。",
+    "unsupported": "当前系统暂不支持本地文件搜索。工具搜索仍可使用。",
+    "download_everything": "打开 Everything 官网",
+    "retry": "重试",
+    "missing_result": "文件已移动或不存在，请重新搜索",
+    "navigate": "选择",
+    "open": "打开"
+  },
   "tools": {
     "http_debugger": {
       "name": "HTTP/API 调试器",

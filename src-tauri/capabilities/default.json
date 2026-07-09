@@ -6,7 +6,8 @@
     "main",
     "floating_widget",
     "magnifier",
-    "screenshot-selector"
+    "screenshot-selector",
+    "command-palette"
   ],
   "permissions": [
     "core:default",
@@ -59,6 +60,9 @@
         },
         {
           "url": "https://github.com/*"
+        },
+        {
+          "url": "https://www.voidtools.com/downloads/"
         },
         {
           "url": "https://www.i18next.com/"

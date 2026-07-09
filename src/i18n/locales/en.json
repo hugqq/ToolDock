@@ -75,6 +75,22 @@
     "ko": "Korean",
     "it": "Italian"
   },
+  "command_palette": {
+    "placeholder": "Search tools or local files...",
+    "tools": "Tools",
+    "files": "Files",
+    "hint": "Type to search ToolDock tools and local files",
+    "no_files": "No matching files",
+    "query_failed": "File search failed. Retry when ready; tool search is still available.",
+    "everything_unavailable": "Everything is not installed, not running, or IPC is disabled. Tool search is still available.",
+    "spotlight_unavailable": "Spotlight is unavailable. Check that indexing is enabled. Tool search is still available.",
+    "unsupported": "Local file search is unavailable on this platform. Tool search is still available.",
+    "download_everything": "Open Everything website",
+    "retry": "Retry",
+    "missing_result": "The item was moved or no longer exists. Search again.",
+    "navigate": "Navigate",
+    "open": "Open"
+  },
   "tools": {
     "http_debugger": {
       "name": "HTTP/API Debugger",

@@ -141,11 +141,11 @@ export function formatResponseBody(
 export type CurlPlatform = "windows" | "macos";
 
 function quotePowerShell(value: string): string {
-  return `'${value.replaceAll("'", "''")}'`;
+  return `'${value.replace(/'/g, "''")}'`;
 }
 
 function quotePosix(value: string): string {
-  return `'${value.replaceAll("'", "'\\''")}'`;
+  return `'${value.replace(/'/g, "'\\''")}'`;
 }
 
 export function generateCurl(

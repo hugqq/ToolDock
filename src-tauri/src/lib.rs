@@ -66,6 +66,7 @@ use commands::renamer::{
     clear_rename_history, execute_batch_rename, get_rename_history, preview_batch_rename,
     revert_batch_rename, revert_single_rename,
 };
+use commands::search::{get_file_search_status, open_search_result, search_local_files};
 use commands::reveal_in_explorer;
 use commands::settings::{
     check_latest_release, export_config, get_developer_logs, get_global_shortcut,
@@ -107,12 +108,25 @@ fn greet(name: &str) -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_notification::init())
-        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_clipboard_manager::init());
+
+    #[cfg(target_os = "macos")]
+    let builder = builder.plugin(
+        tauri_plugin_global_shortcut::Builder::new()
+            .with_handler(|app, _shortcut, event| {
+                if event.state == tauri_plugin_global_shortcut::ShortcutState::Pressed {
+                    crate::core::hotkey::toggle_command_palette(app);
+                }
+            })
+            .build(),
+    );
+
+    builder
         .setup(|app| {
             let data_dir = app
                 .path()
@@ -136,7 +150,7 @@ pub fn run() {
             app.manage(hotkey_manager.clone());
 
             // 从注册表加载并注册快捷键
-            if let Ok(shortcut) = crate::core::settings::load_global_shortcut() {
+            if let Ok(shortcut) = crate::core::settings::load_global_shortcut(app.handle()) {
                 if !shortcut.is_empty() {
                     let _ = hotkey_manager.register(&shortcut);
                 }
@@ -343,6 +357,9 @@ pub fn run() {
             list_http_history,
             delete_http_history,
             clear_http_history,
+            get_file_search_status,
+            search_local_files,
+            open_search_result,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
