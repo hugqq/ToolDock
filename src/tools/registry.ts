@@ -29,6 +29,7 @@ import {
   Notebook,
   FileImage,
   MonitorX,
+  Webhook,
 } from "lucide-react";
 import { CATEGORY } from "../constants";
 import { ToolPlatform } from "../lib/toolVisibility";
@@ -46,6 +47,15 @@ export interface Tool {
 }
 
 export const TOOLS: Tool[] = [
+  {
+    id: "http_debugger",
+    nameKey: "tools.http_debugger.name",
+    icon: Webhook,
+    categoryKey: "categories.dev",
+    descriptionKey: "tools.http_debugger.description",
+    color: "#0ea5e9",
+    route: "/tools/http-debugger",
+  },
   {
     id: "notepad",
     nameKey: "tools.notepad.name",
