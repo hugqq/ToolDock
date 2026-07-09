@@ -8,6 +8,7 @@ pub mod dns;
 pub mod file;
 pub mod hash;
 pub mod hotkey;
+pub mod http_client;
 pub mod image_convert;
 pub mod ip_lookup;
 pub mod my_computer_namespace;
