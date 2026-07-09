@@ -18,6 +18,7 @@ pub enum HttpBodyMode {
     None,
     Json,
     Form,
+    Multipart,
     Text,
 }
 
@@ -30,6 +31,25 @@ pub struct HttpKeyValue {
     pub value: String,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum HttpMultipartFieldKind {
+    Text,
+    File,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct HttpMultipartField {
+    pub id: String,
+    pub enabled: bool,
+    pub key: String,
+    pub kind: HttpMultipartFieldKind,
+    pub value: String,
+    pub file_path: String,
+    pub file_name: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct HttpDebugRequest {
@@ -40,6 +60,8 @@ pub struct HttpDebugRequest {
     pub body_mode: HttpBodyMode,
     pub body_text: String,
     pub form_fields: Vec<HttpKeyValue>,
+    #[serde(default)]
+    pub multipart_fields: Vec<HttpMultipartField>,
     pub timeout_ms: u64,
 }
 

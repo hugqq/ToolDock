@@ -5,7 +5,8 @@ use tooldock_lib::core::http_client::{
     build_history_projection, execute_request, validate_request,
 };
 use tooldock_lib::models::http_client::{
-    HttpBodyMode, HttpDebugRequest, HttpKeyValue, HttpMethod,
+    HttpBodyMode, HttpDebugRequest, HttpKeyValue, HttpMethod, HttpMultipartField,
+    HttpMultipartFieldKind,
 };
 
 fn pair(key: &str, value: &str) -> HttpKeyValue {
@@ -14,6 +15,25 @@ fn pair(key: &str, value: &str) -> HttpKeyValue {
         enabled: true,
         key: key.to_string(),
         value: value.to_string(),
+    }
+}
+
+fn multipart_field(
+    id: &str,
+    key: &str,
+    kind: HttpMultipartFieldKind,
+    value: &str,
+    file_path: &str,
+    file_name: &str,
+) -> HttpMultipartField {
+    HttpMultipartField {
+        id: id.to_string(),
+        enabled: true,
+        key: key.to_string(),
+        kind,
+        value: value.to_string(),
+        file_path: file_path.to_string(),
+        file_name: file_name.to_string(),
     }
 }
 
@@ -26,6 +46,7 @@ fn request() -> HttpDebugRequest {
         body_mode: HttpBodyMode::None,
         body_text: String::new(),
         form_fields: vec![],
+        multipart_fields: vec![],
         timeout_ms: 30_000,
     }
 }
@@ -48,6 +69,54 @@ fn validates_scheme_timeout_json_and_content_type() {
     value.body_text = "{}".to_string();
     value.headers = vec![pair("Content-Type", "text/plain")];
     assert_eq!(validate_request(&value).unwrap_err().code(), "INCOMPATIBLE_CONTENT_TYPE");
+}
+
+#[test]
+fn accepts_old_serialized_requests_without_multipart_fields() {
+    let json = r#"{
+        "method":"POST","url":"https://example.test","query":[],"headers":[],
+        "bodyMode":"none","bodyText":"","formFields":[],"timeoutMs":30000
+    }"#;
+    let value: HttpDebugRequest = serde_json::from_str(json).unwrap();
+    assert!(value.multipart_fields.is_empty());
+}
+
+#[test]
+fn validates_multipart_rows_and_managed_content_type() {
+    let mut value = request();
+    value.body_mode = HttpBodyMode::Multipart;
+    value.multipart_fields = vec![multipart_field(
+        "missing-key",
+        "",
+        HttpMultipartFieldKind::Text,
+        "hello",
+        "",
+        "",
+    )];
+    assert_eq!(
+        validate_request(&value).unwrap_err().code(),
+        "INVALID_MULTIPART_FIELD"
+    );
+
+    value.multipart_fields = vec![multipart_field(
+        "missing-file",
+        "asset",
+        HttpMultipartFieldKind::File,
+        "",
+        "",
+        "",
+    )];
+    assert_eq!(
+        validate_request(&value).unwrap_err().code(),
+        "MISSING_MULTIPART_FILE"
+    );
+
+    value.multipart_fields.clear();
+    value.headers = vec![pair("Content-Type", "multipart/form-data")];
+    assert_eq!(
+        validate_request(&value).unwrap_err().code(),
+        "MULTIPART_CONTENT_TYPE_MANAGED"
+    );
 }
 
 #[test]
@@ -82,6 +151,35 @@ fn redacts_nested_json_and_form_secrets() {
     let safe = build_history_projection(&value);
     assert_eq!(safe.form_fields[0].value, "alice");
     assert_eq!(safe.form_fields[1].value, "<redacted>");
+}
+
+#[test]
+fn redacts_multipart_text_secrets_and_clears_file_metadata() {
+    let mut value = request();
+    value.body_mode = HttpBodyMode::Multipart;
+    value.multipart_fields = vec![
+        multipart_field(
+            "token",
+            "access_token",
+            HttpMultipartFieldKind::Text,
+            "secret",
+            "",
+            "",
+        ),
+        multipart_field(
+            "file",
+            "asset",
+            HttpMultipartFieldKind::File,
+            "",
+            r#"C:\private\a.txt"#,
+            "a.txt",
+        ),
+    ];
+
+    let safe = build_history_projection(&value);
+    assert_eq!(safe.multipart_fields[0].value, "<redacted>");
+    assert!(safe.multipart_fields[1].file_path.is_empty());
+    assert!(safe.multipart_fields[1].file_name.is_empty());
 }
 
 #[test]
@@ -164,4 +262,25 @@ async fn maps_request_timeout_without_fake_http_status() {
 
     let error = execute_request(value).await.unwrap_err();
     assert_eq!(error.code(), "REQUEST_TIMEOUT");
+}
+
+#[tokio::test]
+async fn reports_a_file_that_disappears_before_send() {
+    let missing = std::env::temp_dir().join(format!(
+        "tooldock-missing-upload-{}.bin",
+        uuid::Uuid::new_v4()
+    ));
+    let mut value = request();
+    value.body_mode = HttpBodyMode::Multipart;
+    value.multipart_fields = vec![multipart_field(
+        "missing",
+        "asset",
+        HttpMultipartFieldKind::File,
+        "",
+        missing.to_str().unwrap(),
+        "missing.bin",
+    )];
+
+    let error = execute_request(value).await.unwrap_err();
+    assert_eq!(error.code(), "FILE_READ_FAILED");
 }

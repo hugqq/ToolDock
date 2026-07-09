@@ -17,6 +17,7 @@ import type {
   HttpMethod,
 } from "../../types/httpDebugger";
 import { KeyValueEditor } from "./KeyValueEditor";
+import { MultipartEditor } from "./MultipartEditor";
 
 interface Props {
   request: HttpDebugRequest;
@@ -27,7 +28,7 @@ interface Props {
 }
 
 const METHODS: HttpMethod[] = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"];
-const BODY_MODES: HttpBodyMode[] = ["none", "json", "form", "text"];
+const BODY_MODES: HttpBodyMode[] = ["none", "json", "form", "multipart", "text"];
 
 export function RequestEditor({ request, errors, sending, onChange, onSend }: Props) {
   const { t } = useTranslation();
@@ -84,7 +85,16 @@ export function RequestEditor({ request, errors, sending, onChange, onSend }: Pr
                 <MenuItem key={mode} value={mode}>{t(`tools.http_debugger.body_modes.${mode}`)}</MenuItem>
               ))}
             </TextField>
-            {request.bodyMode === "form" ? (
+            {errors.body && (request.bodyMode === "form" || request.bodyMode === "multipart") && (
+              <Alert severity="error">{t(`tools.http_debugger.errors.${errors.body}`)}</Alert>
+            )}
+            {request.bodyMode === "multipart" ? (
+              <MultipartEditor
+                rows={request.multipartFields}
+                errors={errors.multipart}
+                onChange={(rows) => set("multipartFields", rows)}
+              />
+            ) : request.bodyMode === "form" ? (
               <KeyValueEditor rows={request.formFields} onChange={(rows) => set("formFields", rows)} />
             ) : request.bodyMode !== "none" ? (
               <TextField

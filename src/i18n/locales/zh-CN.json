@@ -105,7 +105,13 @@
       "value": "值",
       "add_row": "添加一行",
       "body_type": "请求体类型",
-      "body_modes": { "none": "无", "json": "JSON", "form": "表单", "text": "文本" },
+      "body_modes": { "none": "无", "json": "JSON", "form": "表单", "multipart": "Multipart（文件上传）", "text": "文本" },
+      "multipart": {
+        "text": "文本",
+        "file": "文件",
+        "choose_file": "选择文件",
+        "no_file": "未选择文件"
+      },
       "raw_body": "输入文本请求体",
       "timeout": "超时（毫秒）",
       "copy_curl": "复制为 cURL",
@@ -130,6 +136,10 @@
         "unsupported_scheme": "仅支持 HTTP 和 HTTPS 地址",
         "invalid_json": "JSON 请求体格式无效",
         "incompatible_content_type": "Content-Type 与请求体类型不匹配",
+        "multipart_content_type_managed": "文件上传的 Content-Type 和 boundary 由程序自动生成，请删除手动设置的 Content-Type",
+        "field_required": "请输入字段名",
+        "file_required": "请选择要上传的文件",
+        "file_read_failed": "文件不存在或无法读取，请重新选择",
         "out_of_range": "超时范围必须为 1000–120000 毫秒"
       }
     },

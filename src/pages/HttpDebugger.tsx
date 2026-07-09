@@ -5,7 +5,12 @@ import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import { invoke } from "@tauri-apps/api/core";
 import { ToolLayout } from "../components/layout/ToolLayout";
-import { generateCurl, validateHttpDraft } from "../lib/httpDebugger";
+import {
+  createMultipartField,
+  generateCurl,
+  normalizeHttpRequest,
+  validateHttpDraft,
+} from "../lib/httpDebugger";
 import type {
   HttpDebugRequest,
   HttpDebugResponse,
@@ -26,6 +31,7 @@ const initialRequest = (): HttpDebugRequest => ({
   bodyMode: "none",
   bodyText: "",
   formFields: [row()],
+  multipartFields: [createMultipartField()],
   timeoutMs: 30_000,
 });
 
@@ -58,7 +64,13 @@ export default function HttpDebugger() {
       if (!result.historySaved) toast.error(t("tools.http_debugger.history_save_failed"));
       await loadHistory();
     } catch (error) {
-      toast.error(t("tools.http_debugger.request_failed", { error: errorMessage(error) }));
+      const code = typeof error === "object" && error && "code" in error
+        ? String(error.code)
+        : "";
+      const detail = code === "FILE_READ_FAILED"
+        ? t("tools.http_debugger.errors.file_read_failed")
+        : errorMessage(error);
+      toast.error(t("tools.http_debugger.request_failed", { error: detail }));
     } finally {
       setSending(false);
     }
@@ -91,7 +103,7 @@ export default function HttpDebugger() {
       actions={<Button size="small" variant="outlined" startIcon={<Copy size={15} />} onClick={copyCurl}>{t("tools.http_debugger.copy_curl")}</Button>}
     >
       <div className="grid min-h-[680px] flex-1 grid-cols-1 gap-4 xl:grid-cols-[250px_minmax(420px,1fr)_minmax(360px,1fr)]">
-        <HistoryPanel entries={history} onRestore={(entry) => { setRequest(entry.request); setErrors({}); }} onDelete={deleteHistory} onClear={clearHistory} />
+        <HistoryPanel entries={history} onRestore={(entry) => { setRequest(normalizeHttpRequest(entry.request)); setErrors({}); }} onDelete={deleteHistory} onClear={clearHistory} />
         <RequestEditor request={request} errors={errors} sending={sending} onChange={setRequest} onSend={send} />
         <ResponseViewer response={response} />
       </div>
