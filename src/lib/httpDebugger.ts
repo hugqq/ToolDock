@@ -137,3 +137,44 @@ export function formatResponseBody(
     return { text: bodyText, jsonFormatted: false, parseWarning: true };
   }
 }
+
+export type CurlPlatform = "windows" | "macos";
+
+function quotePowerShell(value: string): string {
+  return `'${value.replaceAll("'", "''")}'`;
+}
+
+function quotePosix(value: string): string {
+  return `'${value.replaceAll("'", "'\\''")}'`;
+}
+
+export function generateCurl(
+  request: HttpDebugRequest,
+  platform: CurlPlatform,
+): string {
+  const quote = platform === "windows" ? quotePowerShell : quotePosix;
+  const executable = platform === "windows" ? "curl.exe" : "curl";
+  const url = buildRequestUrl(request.url, request.query);
+  const parts = [
+    executable,
+    "--request",
+    quote(request.method),
+    quote(url),
+    "--max-time",
+    String(Math.ceil(request.timeoutMs / 1000)),
+  ];
+
+  for (const { key, value } of activePairs(request.headers)) {
+    parts.push("--header", quote(`${key}: ${value}`));
+  }
+
+  if (request.bodyMode === "json" || request.bodyMode === "text") {
+    parts.push("--data-raw", quote(request.bodyText));
+  } else if (request.bodyMode === "form") {
+    for (const { key, value } of activePairs(request.formFields)) {
+      parts.push("--data-urlencode", quote(`${key}=${value}`));
+    }
+  }
+
+  return parts.join(" ");
+}
