@@ -5,10 +5,20 @@ import {
   buildRequestUrl,
   formatResponseBody,
   generateCurl,
+  normalizeHttpRequest,
   validateHttpDraft,
 } from "../src/lib/httpDebugger.ts";
 
 const row = (key, value, enabled = true) => ({ id: `${key}-${value}`, key, value, enabled });
+const multipartRow = ({
+  id,
+  key,
+  kind = "text",
+  value = "",
+  filePath = "",
+  fileName = "",
+  enabled = true,
+}) => ({ id, key, kind, value, filePath, fileName, enabled });
 
 test("encodes only enabled complete query rows", () => {
   const url = buildRequestUrl("https://example.test/api?existing=1", [row("q", "a b"), row("", "x"), row("off", "x", false)]);
@@ -78,6 +88,7 @@ test("generates PowerShell-safe curl.exe with current secrets", () => {
     bodyMode: "json",
     bodyText: '{"name":"O\'Brien"}',
     formFields: [],
+    multipartFields: [],
     timeoutMs: 30000,
   }, "windows");
 
@@ -96,6 +107,7 @@ test("generates POSIX-safe curl on macOS", () => {
     bodyMode: "none",
     bodyText: "",
     formFields: [],
+    multipartFields: [],
     timeoutMs: 30000,
   }, "macos");
 
@@ -112,9 +124,76 @@ test("generates URL-encoded form fields without disabled rows", () => {
     bodyMode: "form",
     bodyText: "",
     formFields: [row("name", "A B"), row("ignored", "x", false)],
+    multipartFields: [],
     timeoutMs: 30000,
   }, "windows");
 
   assert.match(command, /--data-urlencode 'name=A B'/);
+  assert.doesNotMatch(command, /ignored/);
+});
+
+test("validates multipart rows and managed content type", () => {
+  const draft = {
+    url: "https://example.test/upload",
+    bodyMode: "multipart",
+    bodyText: "",
+    timeoutMs: 30000,
+    headers: [],
+    multipartFields: [
+      multipartRow({ id: "blank-key", key: "", value: "hello" }),
+      multipartRow({ id: "blank-file", key: "avatar", kind: "file" }),
+    ],
+  };
+
+  assert.deepEqual(validateHttpDraft(draft).multipart, {
+    "blank-key": "field_required",
+    "blank-file": "file_required",
+  });
+  assert.equal(
+    validateHttpDraft({
+      ...draft,
+      multipartFields: [],
+      headers: [row("Content-Type", "multipart/form-data")],
+    }).body,
+    "multipart_content_type_managed",
+  );
+});
+
+test("normalizes old requests with one empty multipart row", () => {
+  const normalized = normalizeHttpRequest({
+    method: "GET",
+    url: "https://example.test",
+    query: [],
+    headers: [],
+    bodyMode: "none",
+    bodyText: "",
+    formFields: [],
+    timeoutMs: 30000,
+  });
+
+  assert.equal(normalized.multipartFields.length, 1);
+  assert.equal(normalized.multipartFields[0].kind, "text");
+});
+
+test("generates multipart cURL text and file forms in order", () => {
+  const command = generateCurl({
+    method: "POST",
+    url: "https://example.test/upload",
+    query: [],
+    headers: [],
+    bodyMode: "multipart",
+    bodyText: "",
+    formFields: [],
+    multipartFields: [
+      multipartRow({ id: "title", key: "title", value: "Summer photo" }),
+      multipartRow({ id: "file", key: "asset", kind: "file", filePath: "C:\\Media\\a b.png", fileName: "a b.png" }),
+      multipartRow({ id: "off", key: "ignored", value: "no", enabled: false }),
+    ],
+    timeoutMs: 30000,
+  }, "windows");
+
+  assert.match(command, /--form 'title=Summer photo'/);
+  assert.match(command, /--form 'asset=@C:\\Media\\a b\.png'/);
+  assert.ok(command.indexOf("title=Summer photo") < command.indexOf("asset=@"));
   assert.doesNotMatch(command, /ignored/);
 });

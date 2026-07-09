@@ -1,11 +1,22 @@
 export type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
-export type HttpBodyMode = "none" | "json" | "form" | "text";
+export type HttpBodyMode = "none" | "json" | "form" | "multipart" | "text";
+export type HttpMultipartFieldKind = "text" | "file";
 
 export interface HttpKeyValue {
   id: string;
   enabled: boolean;
   key: string;
   value: string;
+}
+
+export interface HttpMultipartField {
+  id: string;
+  enabled: boolean;
+  key: string;
+  kind: HttpMultipartFieldKind;
+  value: string;
+  filePath: string;
+  fileName: string;
 }
 
 export interface HttpDebugRequest {
@@ -16,6 +27,7 @@ export interface HttpDebugRequest {
   bodyMode: HttpBodyMode;
   bodyText: string;
   formFields: HttpKeyValue[];
+  multipartFields: HttpMultipartField[];
   timeoutMs: number;
 }
 
@@ -46,7 +58,8 @@ export interface HttpHistoryEntry {
 
 export interface HttpDraftErrors {
   url?: "required" | "invalid_url" | "unsupported_scheme";
-  body?: "invalid_json" | "incompatible_content_type";
+  body?: "invalid_json" | "incompatible_content_type" | "multipart_content_type_managed";
+  multipart?: Record<string, "field_required" | "file_required">;
   timeout?: "out_of_range";
 }
 

@@ -28,3 +28,17 @@ test("HTTP commands are managed and exposed by the Tauri application", async () 
     assert.match(source, new RegExp(`\\b${command}\\b`));
   }
 });
+
+test("HTTP debugger exposes multipart file selection", async () => {
+  const [requestEditor, multipartEditor, page] = await Promise.all([
+    read("../src/pages/http-debugger/RequestEditor.tsx"),
+    read("../src/pages/http-debugger/MultipartEditor.tsx"),
+    read("../src/pages/HttpDebugger.tsx"),
+  ]);
+
+  assert.match(requestEditor, /bodyMode === "multipart"/);
+  assert.match(requestEditor, /<MultipartEditor/);
+  assert.match(multipartEditor, /@tauri-apps\/plugin-dialog/);
+  assert.match(multipartEditor, /filePath/);
+  assert.match(page, /normalizeHttpRequest/);
+});

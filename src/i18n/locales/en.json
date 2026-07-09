@@ -104,7 +104,13 @@
       "value": "Value",
       "add_row": "Add row",
       "body_type": "Body type",
-      "body_modes": { "none": "None", "json": "JSON", "form": "Form", "text": "Text" },
+      "body_modes": { "none": "None", "json": "JSON", "form": "Form", "multipart": "Multipart (File Upload)", "text": "Text" },
+      "multipart": {
+        "text": "Text",
+        "file": "File",
+        "choose_file": "Choose file",
+        "no_file": "No file selected"
+      },
       "raw_body": "Enter a text body",
       "timeout": "Timeout (ms)",
       "copy_curl": "Copy as cURL",
@@ -129,6 +135,10 @@
         "unsupported_scheme": "Only HTTP and HTTPS URLs are supported",
         "invalid_json": "The JSON request body is invalid",
         "incompatible_content_type": "Content-Type does not match the selected body type",
+        "multipart_content_type_managed": "ToolDock generates the multipart Content-Type and boundary; remove the manual Content-Type header",
+        "field_required": "Enter a field name",
+        "file_required": "Choose a file to upload",
+        "file_read_failed": "The file is missing or unreadable; choose it again",
         "out_of_range": "Timeout must be between 1000 and 120000 milliseconds"
       }
     },

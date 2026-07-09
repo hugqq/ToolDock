@@ -1,9 +1,10 @@
 use crate::models::http_client::{
     HttpBodyMode, HttpDebugRequest, HttpDebugResponse, HttpKeyValue, HttpMethod,
-    HttpResponseHeader,
+    HttpMultipartField, HttpMultipartFieldKind, HttpResponseHeader,
 };
 use futures_util::StreamExt;
 use reqwest::header::{HeaderName, HeaderValue, CONTENT_TYPE};
+use reqwest::multipart::{Form, Part};
 use serde_json::Value;
 use std::time::{Duration, Instant};
 use thiserror::Error;
@@ -25,6 +26,14 @@ pub enum HttpClientError {
     InvalidJson,
     #[error("Content-Type is incompatible with the selected body mode")]
     IncompatibleContentType,
+    #[error("Multipart field {0} needs a name")]
+    InvalidMultipartField(String),
+    #[error("Multipart file field {0} needs a selected file")]
+    MissingMultipartFile(String),
+    #[error("ToolDock manages Content-Type for multipart requests")]
+    MultipartContentTypeManaged,
+    #[error("Unable to read upload file {path}: {message}")]
+    FileRead { path: String, message: String },
     #[error("Invalid request header: {0}")]
     InvalidHeader(String),
     #[error("Unable to create the HTTP client: {0}")]
@@ -49,6 +58,10 @@ impl HttpClientError {
             Self::TimeoutOutOfRange => "TIMEOUT_OUT_OF_RANGE",
             Self::InvalidJson => "INVALID_JSON",
             Self::IncompatibleContentType => "INCOMPATIBLE_CONTENT_TYPE",
+            Self::InvalidMultipartField(_) => "INVALID_MULTIPART_FIELD",
+            Self::MissingMultipartFile(_) => "MISSING_MULTIPART_FILE",
+            Self::MultipartContentTypeManaged => "MULTIPART_CONTENT_TYPE_MANAGED",
+            Self::FileRead { .. } => "FILE_READ_FAILED",
             Self::InvalidHeader(_) => "INVALID_HEADER",
             Self::ClientBuild(_) => "CLIENT_BUILD_FAILED",
             Self::RequestTimeout => "REQUEST_TIMEOUT",
@@ -83,6 +96,7 @@ fn content_type_matches(mode: &HttpBodyMode, value: &str) -> bool {
         HttpBodyMode::None => true,
         HttpBodyMode::Json => mime == "application/json" || mime.ends_with("+json"),
         HttpBodyMode::Form => mime == "application/x-www-form-urlencoded",
+        HttpBodyMode::Multipart => false,
         HttpBodyMode::Text => mime.starts_with("text/") && mime.len() > 5,
     }
 }
@@ -103,9 +117,31 @@ pub fn validate_request(request: &HttpDebugRequest) -> Result<(), HttpClientErro
         return Err(HttpClientError::InvalidJson);
     }
 
-    if let Some(value) = active_header(request, "content-type") {
-        if !content_type_matches(&request.body_mode, value) {
-            return Err(HttpClientError::IncompatibleContentType);
+    if request.body_mode == HttpBodyMode::Multipart {
+        if active_header(request, "content-type").is_some() {
+            return Err(HttpClientError::MultipartContentTypeManaged);
+        }
+
+        for field in request
+            .multipart_fields
+            .iter()
+            .filter(|field| field.enabled)
+        {
+            if field.key.trim().is_empty() {
+                return Err(HttpClientError::InvalidMultipartField(field.id.clone()));
+            }
+
+            if field.kind == HttpMultipartFieldKind::File && field.file_path.trim().is_empty() {
+                return Err(HttpClientError::MissingMultipartFile(field.id.clone()));
+            }
+        }
+    }
+
+    if request.body_mode != HttpBodyMode::Multipart {
+        if let Some(value) = active_header(request, "content-type") {
+            if !content_type_matches(&request.body_mode, value) {
+                return Err(HttpClientError::IncompatibleContentType);
+            }
         }
     }
 
@@ -159,10 +195,26 @@ fn redact_json(value: &mut Value) {
     }
 }
 
+fn redact_multipart_fields(fields: &mut [HttpMultipartField]) {
+    for field in fields {
+        match field.kind {
+            HttpMultipartFieldKind::Text if field.enabled && is_sensitive_name(&field.key) => {
+                field.value = REDACTED.to_string();
+            }
+            HttpMultipartFieldKind::File => {
+                field.file_path.clear();
+                field.file_name.clear();
+            }
+            HttpMultipartFieldKind::Text => {}
+        }
+    }
+}
+
 pub fn build_history_projection(request: &HttpDebugRequest) -> HttpDebugRequest {
     let mut safe = request.clone();
     redact_pairs(&mut safe.headers);
     redact_pairs(&mut safe.form_fields);
+    redact_multipart_fields(&mut safe.multipart_fields);
 
     match safe.body_mode {
         HttpBodyMode::Json => {
@@ -174,7 +226,7 @@ pub fn build_history_projection(request: &HttpDebugRequest) -> HttpDebugRequest 
             }
         }
         HttpBodyMode::Text => safe.body_text.clear(),
-        HttpBodyMode::None | HttpBodyMode::Form => {}
+        HttpBodyMode::None | HttpBodyMode::Form | HttpBodyMode::Multipart => {}
     }
 
     safe
@@ -221,6 +273,35 @@ fn is_text_content_type(content_type: Option<&str>) -> bool {
         || mime.contains("xml")
         || mime.contains("javascript")
         || mime.contains("html")
+}
+
+async fn build_multipart_form(
+    fields: &[HttpMultipartField],
+) -> Result<Form, HttpClientError> {
+    let mut form = Form::new();
+
+    for field in fields.iter().filter(|field| field.enabled) {
+        let key = field.key.trim().to_string();
+        form = match field.kind {
+            HttpMultipartFieldKind::Text => form.text(key, field.value.clone()),
+            HttpMultipartFieldKind::File => {
+                let part = Part::file(&field.file_path).await.map_err(|error| {
+                    HttpClientError::FileRead {
+                        path: field.file_path.clone(),
+                        message: error.to_string(),
+                    }
+                })?;
+                let part = if field.file_name.is_empty() {
+                    part
+                } else {
+                    part.file_name(field.file_name.clone())
+                };
+                form.part(key, part)
+            }
+        };
+    }
+
+    Ok(form)
 }
 
 pub async fn execute_request(
@@ -279,6 +360,9 @@ pub async fn execute_request(
                 .map(|field| (field.key.trim(), field.value.as_str()))
                 .collect();
             builder.form(&fields)
+        }
+        HttpBodyMode::Multipart => {
+            builder.multipart(build_multipart_form(&request.multipart_fields).await?)
         }
         HttpBodyMode::Text => {
             let builder = if has_content_type {

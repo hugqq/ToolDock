@@ -24,6 +24,7 @@ fn request(index: i64) -> HttpDebugRequest {
         body_mode: HttpBodyMode::Json,
         body_text: r#"{"name":"ToolDock","apiKey":"private"}"#.into(),
         form_fields: vec![],
+        multipart_fields: vec![],
         timeout_ms: 30_000,
     }
 }

@@ -4,6 +4,7 @@ import type {
   HttpDebugRequest,
   HttpDraftErrors,
   HttpKeyValue,
+  HttpMultipartField,
 } from "../types/httpDebugger.ts";
 
 type HttpDraft = Pick<
@@ -11,7 +12,29 @@ type HttpDraft = Pick<
   "url" | "bodyMode" | "bodyText" | "timeoutMs"
 > & {
   headers?: HttpKeyValue[];
+  multipartFields?: HttpMultipartField[];
 };
+
+export function createMultipartField(): HttpMultipartField {
+  return {
+    id: crypto.randomUUID(),
+    enabled: true,
+    key: "",
+    kind: "text",
+    value: "",
+    filePath: "",
+    fileName: "",
+  };
+}
+
+export function normalizeHttpRequest(request: HttpDebugRequest): HttpDebugRequest {
+  const multipartFields = request.multipartFields ?? [];
+
+  return {
+    ...request,
+    multipartFields: multipartFields.length ? multipartFields : [createMultipartField()],
+  };
+}
 
 export function activePairs(
   rows: HttpKeyValue[],
@@ -60,6 +83,8 @@ function acceptsContentType(
       return mimeType === "application/x-www-form-urlencoded";
     case "text":
       return /^text\/[^/\s]+$/.test(mimeType);
+    case "multipart":
+      return false;
     case "none":
       return true;
   }
@@ -104,7 +129,25 @@ export function validateHttpDraft(draft: HttpDraft): HttpDraftErrors {
     ({ key }) => key.toLowerCase() === "content-type",
   )?.value;
 
+  if (draft.bodyMode === "multipart") {
+    const multipart: Record<string, "field_required" | "file_required"> = {};
+
+    for (const field of draft.multipartFields ?? []) {
+      if (!field.enabled) continue;
+
+      if (!field.key.trim()) {
+        multipart[field.id] = "field_required";
+      } else if (field.kind === "file" && !field.filePath.trim()) {
+        multipart[field.id] = "file_required";
+      }
+    }
+
+    if (Object.keys(multipart).length) errors.multipart = multipart;
+    if (contentType !== undefined) errors.body = "multipart_content_type_managed";
+  }
+
   if (
+    draft.bodyMode !== "multipart" &&
     !errors.body &&
     contentType !== undefined &&
     !acceptsContentType(draft.bodyMode, contentType)
@@ -173,6 +216,17 @@ export function generateCurl(
   } else if (request.bodyMode === "form") {
     for (const { key, value } of activePairs(request.formFields)) {
       parts.push("--data-urlencode", quote(`${key}=${value}`));
+    }
+  } else if (request.bodyMode === "multipart") {
+    for (const field of request.multipartFields ?? []) {
+      const key = field.key.trim();
+      if (!field.enabled || !key) continue;
+
+      if (field.kind === "file") {
+        if (field.filePath) parts.push("--form", quote(`${key}=@${field.filePath}`));
+      } else {
+        parts.push("--form", quote(`${key}=${field.value}`));
+      }
     }
   }
 
