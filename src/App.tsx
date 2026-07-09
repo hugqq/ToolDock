@@ -45,6 +45,7 @@ const IpLookup = lazy(() => import("./pages/IpLookup"));
 const Clicker = lazy(() => import("./pages/Clicker"));
 const SimpleWebServer = lazy(() => import("./pages/SimpleWebServer"));
 const PortScanner = lazy(() => import("./pages/PortScanner"));
+const HttpDebugger = lazy(() => import("./pages/HttpDebugger"));
 const Othello = lazy(() => import("./pages/Othello"));
 const Game2048 = lazy(() => import("./pages/Game2048"));
 const NotePad = lazy(() => import("./pages/NotePad"));
@@ -195,6 +196,7 @@ function AppContent() {
                 element={<SimpleWebServer />}
               />
               <Route path="/tools/port-scanner" element={<PortScanner />} />
+              <Route path="/tools/http-debugger" element={<HttpDebugger />} />
               <Route path="/tools/2048" element={<Game2048 />} />
               <Route path="/tools/notepad" element={<NotePad />} />
               <Route path="/tools/pdf-to-image" element={<PdfToImage />} />
