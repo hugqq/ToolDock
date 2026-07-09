@@ -32,6 +32,7 @@ import {
   XCircle,
   Bug,
   FileText,
+  Trash2,
 } from "lucide-react";
 import { getVersion } from "@tauri-apps/api/app";
 import { openPath, openUrl } from "@tauri-apps/plugin-opener";
@@ -257,6 +258,7 @@ const Settings: React.FC = () => {
   const [developerLogs, setDeveloperLogs] =
     React.useState<DeveloperLogs | null>(null);
   const [isRefreshingLogs, setIsRefreshingLogs] = React.useState(false);
+  const [isClearingLogs, setIsClearingLogs] = React.useState(false);
   const [activeCategory, setActiveCategory] =
     React.useState<SettingsCategory>("general");
   // 导出导入相关状态
@@ -291,6 +293,30 @@ const Settings: React.FC = () => {
     }
     toast.success(t("tools.settings.developer_log_level_saved"));
     await refreshDeveloperLogs();
+  };
+
+  const handleClearDeveloperLogs = async () => {
+    const confirmed = await confirm({
+      title: t("tools.settings.developer_logs_clear"),
+      message: t("tools.settings.developer_logs_clear_confirm"),
+      type: "warning",
+    });
+    if (!confirmed) return;
+
+    setIsClearingLogs(true);
+    try {
+      const res = await invokeWrapper<void>("clear_developer_logs");
+      if (!res.ok) {
+        toast.error(res.message || t("common.error"));
+        return;
+      }
+      await refreshDeveloperLogs();
+      toast.success(t("tools.settings.developer_logs_clear_success"));
+    } catch {
+      toast.error(t("common.error"));
+    } finally {
+      setIsClearingLogs(false);
+    }
   };
 
   const handleToggleDeveloperSettings = async (checked: boolean) => {
@@ -1385,7 +1411,7 @@ const Settings: React.FC = () => {
               <Button
                 variant="outlined"
                 onClick={refreshDeveloperLogs}
-                disabled={isRefreshingLogs}
+                disabled={isRefreshingLogs || isClearingLogs}
                 className="flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm"
               >
                 <RefreshCw
@@ -1396,13 +1422,27 @@ const Settings: React.FC = () => {
               </Button>
               <Button
                 variant="outlined"
+                color="error"
+                onClick={handleClearDeveloperLogs}
+                disabled={isClearingLogs || isRefreshingLogs}
+                className="flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm"
+              >
+                {isClearingLogs ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Trash2 size={16} />
+                )}
+                {t("tools.settings.developer_logs_clear")}
+              </Button>
+              <Button
+                variant="outlined"
                 onClick={() =>
                   developerLogs?.logDir &&
                   openPath(developerLogs.logDir).catch(() =>
                     toast.error(t("common.error"))
                   )
                 }
-                disabled={!developerLogs?.logDir}
+                disabled={!developerLogs?.logDir || isClearingLogs}
                 className="flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm"
               >
                 <FolderInput size={16} />

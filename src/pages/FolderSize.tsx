@@ -4,6 +4,7 @@
  */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import IconButton from "@mui/material/IconButton";
 import {
   deleteItem,
   FolderInfo,
@@ -555,25 +556,25 @@ const FolderSize: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button
-                            variant="text"
+                        <div className="flex items-center justify-center gap-1">
+                          <IconButton
+                            color="primary"
                             size="small"
                             onClick={() => openFolder(item.path)}
-                            className="p-1.5 text-(--text-muted) hover:text-primary hover:bg-primary/10 rounded-lg transition-all h-auto"
+                            sx={{ width: 28, height: 28, borderRadius: "8px" }}
                             title={t("tools.folder_size.open_in_explorer")}
                           >
                             <ExternalLink size={14} />
-                          </Button>
-                          <Button
-                            variant="text"
+                          </IconButton>
+                          <IconButton
+                            color="primary"
                             size="small"
                             onClick={() => copyPath(item.path)}
-                            className="p-1.5 text-(--text-muted) hover:text-primary hover:bg-primary/10 rounded-lg transition-all h-auto"
+                            sx={{ width: 28, height: 28, borderRadius: "8px" }}
                             title={t("tools.folder_size.copy_path")}
                           >
                             <Copy size={14} />
-                          </Button>
+                          </IconButton>
                         </div>
                       </td>
                     </tr>

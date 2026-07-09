@@ -1,6 +1,6 @@
 use crate::errors::AppError;
 use serde::Serialize;
-use std::fs;
+use std::fs::{self, OpenOptions};
 use std::io::{Read, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
@@ -129,6 +129,33 @@ pub fn read_developer_logs(fallback_log_dir: PathBuf) -> Result<DeveloperLogs, A
         run_log,
         error_log,
     })
+}
+
+pub fn clear_developer_logs(fallback_log_dir: PathBuf) -> Result<(), AppError> {
+    let log_dir = LOG_DIR.get().cloned().unwrap_or(fallback_log_dir);
+    fs::create_dir_all(&log_dir).map_err(AppError::Io)?;
+
+    for entry in fs::read_dir(&log_dir).map_err(AppError::Io)? {
+        let entry = entry.map_err(AppError::Io)?;
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+            continue;
+        };
+        if !name.starts_with(RUN_LOG_PREFIX) && !name.starts_with(ERROR_LOG_PREFIX) {
+            continue;
+        }
+
+        OpenOptions::new()
+            .write(true)
+            .truncate(true)
+            .open(path)
+            .map_err(AppError::Io)?;
+    }
+
+    Ok(())
 }
 
 fn find_latest_log(log_dir: &Path, prefix: &str) -> Result<Option<PathBuf>, AppError> {

@@ -120,6 +120,18 @@ pub async fn get_developer_logs(app: tauri::AppHandle) -> ApiResponse<DeveloperL
 }
 
 #[tauri::command]
+pub async fn clear_developer_logs(app: tauri::AppHandle) -> ApiResponse<()> {
+    let data_dir = app
+        .path()
+        .app_data_dir()
+        .unwrap_or_else(|_| std::path::PathBuf::from("data"));
+    match crate::core::logging::clear_developer_logs(data_dir.join("logs")) {
+        Ok(()) => ApiResponse::ok(()),
+        Err(e) => ApiResponse::error("CLEAR_LOGS_FAILED", e.to_string()),
+    }
+}
+
+#[tauri::command]
 pub async fn set_global_shortcut(
     app: tauri::AppHandle,
     manager: State<'_, HotkeyManager>,

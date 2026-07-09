@@ -239,7 +239,7 @@ export default function MyComputerNamespaceCleaner() {
             <div>
               <h3 className="font-bold text-(--text-main)">注册表项目</h3>
               <p className="text-xs text-(--text-muted) mt-1">
-                已自动勾选 {suspiciousCount} 个疑似第三方网盘项目
+                已自动勾选 {suspiciousCount} 个疑似第三方应用项目
               </p>
             </div>
             <div className="flex items-center gap-2">

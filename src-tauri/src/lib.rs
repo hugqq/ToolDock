@@ -129,10 +129,10 @@ use commands::renamer::{
 use commands::search::{get_file_search_status, open_search_result, search_local_files};
 use commands::reveal_in_explorer;
 use commands::settings::{
-    check_latest_release, export_config, get_developer_logs, get_global_shortcut,
-    get_silent_start, import_config, is_auto_start_enabled, is_run_as_admin, set_auto_start,
-    set_developer_log_level, set_global_shortcut, set_run_as_admin, set_silent_start,
-    test_ai_connection,
+    check_latest_release, clear_developer_logs, export_config, get_developer_logs,
+    get_global_shortcut, get_silent_start, import_config, is_auto_start_enabled, is_run_as_admin,
+    set_auto_start, set_developer_log_level, set_global_shortcut, set_run_as_admin,
+    set_silent_start, test_ai_connection,
 };
 use commands::timestamp::{
     batch_convert_timestamps, convert_timestamp, get_current_datetime, get_current_timestamp,
@@ -386,6 +386,7 @@ pub fn run() {
             is_auto_start_enabled,
             set_developer_log_level,
             get_developer_logs,
+            clear_developer_logs,
             test_ai_connection,
             get_global_shortcut,
             set_global_shortcut,
