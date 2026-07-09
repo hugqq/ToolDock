@@ -600,7 +600,7 @@ const FolderSize: React.FC = () => {
 
         {contextMenu && (
           <div
-            className="fixed bg-(--card-bg) border border-(--border-color) rounded-xl shadow-xl p-1.5 z-[1000] min-w-[180px] animate-in fade-in zoom-in duration-150"
+            className="fixed w-[240px] bg-(--card-bg) border border-(--border-color) rounded-xl shadow-xl p-1.5 z-[1000] animate-in fade-in zoom-in duration-150"
             style={{
               top: contextMenu.y,
               left: contextMenu.x,
@@ -639,7 +639,8 @@ const FolderSize: React.FC = () => {
             <div className="h-px bg-(--border-color) my-1.5 mx-1" />
             <Button
               variant="text"
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50 rounded-lg transition-colors justify-start h-auto"
+              color="error"
+              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-medium hover:bg-red-500/10 rounded-lg transition-colors justify-start h-auto"
               onClick={() => {
                 if (contextMenu.item) {
                   handleDelete(contextMenu.item);
