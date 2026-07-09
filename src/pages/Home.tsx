@@ -6,6 +6,7 @@ import { Button, Tooltip } from "../components/mui";
 import { CATEGORIES, TOOLS, Tool } from "../tools/registry";
 import { useSettingsStore } from "../stores/useSettingsStore";
 import { CATEGORY, CategoryType } from "../constants";
+import { getVisibleTools } from "../lib/toolVisibility";
 
 interface HomeProps {
   activeCategory: CategoryType;
@@ -25,9 +26,10 @@ export function Home({ activeCategory, setActiveCategory, searchText, setSearchT
   const setHomeViewMode = useSettingsStore((state) => state.setHomeViewMode);
 
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+  const visibleTools = useMemo(() => getVisibleTools(TOOLS), []);
 
   const filteredTools = useMemo(() => {
-    let filtered = TOOLS.filter((tool) => {
+    let filtered = visibleTools.filter((tool) => {
       const name = t(tool.nameKey);
       const desc = t(tool.descriptionKey);
       const matchesSearch =
@@ -55,13 +57,13 @@ export function Home({ activeCategory, setActiveCategory, searchText, setSearchT
       if (aIsPinned && !bIsPinned) return -1;
       if (!aIsPinned && bIsPinned) return 1;
 
-      const aIndex = TOOLS.findIndex((t) => t.id === a.id);
-      const bIndex = TOOLS.findIndex((t) => t.id === b.id);
+      const aIndex = visibleTools.findIndex((t) => t.id === a.id);
+      const bIndex = visibleTools.findIndex((t) => t.id === b.id);
       return aIndex - bIndex;
     });
 
     return filtered;
-  }, [searchText, activeCategory, t, favoriteTools, pinnedTools]);
+  }, [searchText, activeCategory, t, favoriteTools, pinnedTools, visibleTools]);
 
   // 按分类分组工具
   const groupedTools = useMemo(() => {

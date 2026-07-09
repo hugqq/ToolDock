@@ -1,12 +1,12 @@
 /**
- * TabLayout 组件 - 带标签页和使用说明的通用布局
+ * TabLayout 组件 - 带标签页和说明的通用布局
  *
- * 用途：为工具页面提供统一的标签页导航和使用说明展示
+ * 用途：为工具页面提供统一的标签页导航和说明展示
  *
  * 属性说明：
  * - tabs: TabItem[] 标签页配置数组
- * - instructions?: Step[] 使用说明步骤数组（可选）
- * - instructionsTitle?: string 使用说明标题（可选）
+ * - instructions?: Step[] 说明步骤数组（可选）
+ * - instructionsTitle?: string 说明标题（可选）
  * - instructionsColor?: 兼容旧配置，弹窗入口统一使用默认样式
  * - activeTab: number 当前激活的标签页索引
  * - onTabChange: (index: number) => void 标签页切换回调
@@ -21,7 +21,7 @@
  *   instructions={[
  *     { title: "步骤1", description: "描述内容" },
  *   ]}
- *   instructionsTitle="使用说明"
+ *   instructionsTitle="说明"
  *   instructionsColor="blue"
  *   activeTab={0}
  *   onTabChange={(index) => setActiveTab(index)}
@@ -109,7 +109,7 @@ export const TabLayout: React.FC<TabLayoutProps> = ({
             {hasInstructions && (
               <Box sx={{ px: 2, flexShrink: 0 }}>
                 <InstructionsDialog
-                  title={currentTab.instructionsTitle || "使用说明"}
+                  title={currentTab.instructionsTitle || "说明"}
                   triggerIcon={Lightbulb}
                   steps={currentTab.instructions!}
                 />

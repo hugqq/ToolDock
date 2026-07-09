@@ -151,6 +151,10 @@
       "no_history": "No history yet",
       "pomodoro_settings": "Pomodoro Settings"
     },
+    "my_computer_namespace": {
+      "name": "This PC Icon Cleaner",
+      "description": "Remove third-party cloud drive icons that cannot be deleted from This PC"
+    },
     "env_manager": {
       "name": "Environment Variables",
       "description": "Manage system and user environment variables with path validation",
@@ -1341,8 +1345,8 @@
       }
     },
     "port_scanner": {
-      "name": "Port Scanner",
-      "description": "Quickly scan open ports on a target host with custom port ranges and concurrency settings",
+      "name": "Port Manager",
+      "description": "Scan open ports, inspect local port occupancy, and end occupying processes",
       "target_host": "Target Host",
       "target_host_placeholder": "Enter IP or domain (e.g., 192.168.1.1 or google.com)",
       "scan_mode": "Scan Mode",
@@ -1384,6 +1388,24 @@
       "resolve_failed": "Failed to resolve host",
       "show_all": "Show All",
       "show_open_only": "Show Open Only",
+      "scan_title": "Open Port Scan",
+      "occupancy_title": "Port Occupancy",
+      "occupancy_description": "Enter a local port to see which listening process is using it, then end the occupying process if needed.",
+      "inspect_port": "Port to Inspect",
+      "inspect_occupancy": "Inspect Occupancy",
+      "no_port_occupancy": "No process is occupying this port",
+      "inspect_failed": "Failed to inspect port occupancy",
+      "inspect_failed_with_error": "Failed to inspect port occupancy: {error}",
+      "protocol": "Protocol",
+      "local_address": "Local Address",
+      "process_name": "Process Name",
+      "actions": "Actions",
+      "kill_process": "End Process",
+      "kill_confirm": "End process {process} (PID: {pid})? This may interrupt a running service.",
+      "kill_warning": "Ending a process will close the program occupying the port. Make sure it is not a system service or important task before continuing.",
+      "kill_success": "Process ended",
+      "kill_failed": "Failed to end process",
+      "kill_failed_with_error": "Failed to end process: {error}",
       "instructions": {
         "title": "Instructions",
         "step1_title": "Enter Target Host",

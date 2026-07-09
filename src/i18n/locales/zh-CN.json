@@ -34,7 +34,7 @@
     "swap": "交换",
     "engine": "引擎",
     "required": "必填",
-    "instructions": "使用说明",
+    "instructions": "说明",
     "optional": "可选",
     "items": "个项目",
     "input": "输入",
@@ -152,6 +152,10 @@
       "no_history": "暂无历史记录",
       "pomodoro_settings": "番茄钟设置"
     },
+    "my_computer_namespace": {
+      "name": "此电脑图标清理",
+      "description": "删除此电脑中右键无法移除的第三方网盘图标"
+    },
     "env_manager": {
       "name": "环境变量",
       "description": "管理系统和用户环境变量，支持路径有效性检测",
@@ -177,7 +181,7 @@
       "name": "文件夹大小",
       "description": "扫描并分析文件夹大小，找出占用空间最大的目录",
       "instructions": {
-        "title": "使用说明",
+        "title": "说明",
         "step1_title": "1. 选择文件夹",
         "step1_desc": "点击\"浏览\"按钮或手动输入要分析的文件夹路径。支持磁盘根目录和子目录。",
         "step2_title": "2. 开始扫描",
@@ -570,7 +574,7 @@
         "method": "方法命名"
       },
       "instructions": {
-        "title": "使用说明",
+        "title": "说明",
         "step1_title": "1. 配置 AI 模型",
         "step1_desc": "在设置中配置您的 AI API Key 和模型，支持 DeepSeek、豆包、OpenAI 等多个服务商",
         "step2_title": "2. 选择编程语言",
@@ -652,7 +656,7 @@
       "tab_vite": "创建 Vite 项目",
       "instructions": {
         "deps": {
-          "title": "依赖管理使用说明",
+          "title": "依赖管理说明",
           "step1_title": "1. 选择扫描目录",
           "step1_desc": "点击路径输入框，选择包含多个 Node.js 项目的根目录",
           "step2_title": "2. 开始扫描",
@@ -663,7 +667,7 @@
           "step4_desc": "点击删除后，可选择包管理工具（npm/pnpm/yarn）重新安装依赖"
         },
         "nvm": {
-          "title": "版本管理使用说明",
+          "title": "版本管理说明",
           "step1_title": "1. 检查安装",
           "step1_desc": "确保已安装 NVM-Windows，用于管理多个 Node.js 版本",
           "step2_title": "2. 查看版本",
@@ -809,7 +813,7 @@
       "copies": "份副本",
       "file_size": "单个大小",
       "instructions": {
-        "title": "使用说明",
+        "title": "说明",
         "step1_title": "1. 选择文件夹",
         "step1_desc": "点击\"选择文件夹\"按钮，选择需要扫描的目录",
         "step2_title": "2. 自动扫描",
@@ -824,7 +828,7 @@
       "name": "批量重命名",
       "description": "强大的批量文件/文件夹重命名工具，支持正则、序号等",
       "instructions": {
-        "title": "使用说明",
+        "title": "说明",
         "step1_title": "1. 添加文件",
         "step1_desc": "点击\"添加文件\"或\"添加文件夹\"按钮，选择需要重命名的文件或文件夹。支持批量选择。",
         "step2_title": "2. 配置规则",
@@ -919,7 +923,7 @@
           "enumerate": "枚举项目",
           "random": "随机字符串",
           "datetime": "日期时间",
-          "hint_title": "变量使用说明：",
+          "hint_title": "变量说明：",
           "hint_enumerate": "在「替换为」中使用 ${start=1;increment=1;padding=4} 插入计数器",
           "hint_random": "使用 ${rstringalnum=8} 生成随机字符串，${ruuidv4} 生成UUID",
           "hint_datetime": "使用 $YYYY$MM$DD 插入文件创建日期，$hh$mm$ss 插入时间"
@@ -1325,7 +1329,7 @@
       "auto_start_tooltip": "程序启动时自动启动服务器",
       "current_ip": "当前 IP 地址",
       "instructions": {
-        "title": "使用说明",
+        "title": "说明",
         "step1_title": "1.选择服务目录",
         "step1_desc": "点击'浏览'按钮选择要共享的文件夹，该文件夹中的所有文件都将被共享",
         "step2_title": "2.配置端口号",
@@ -1349,8 +1353,8 @@
       }
     },
     "port_scanner": {
-      "name": "端口扫描器",
-      "description": "快速扫描指定主机的开放端口，支持自定义端口范围和并发设置",
+      "name": "端口管理",
+      "description": "扫描开放端口，排查本机端口占用，并结束占用进程",
       "target_host": "目标主机",
       "target_host_placeholder": "输入 IP 地址或域名 (如: 192.168.1.1 或 google.com)",
       "scan_mode": "扫描模式",
@@ -1392,8 +1396,26 @@
       "resolve_failed": "主机解析失败",
       "show_all": "显示全部",
       "show_open_only": "仅显示开放端口",
+      "scan_title": "开放端口扫描",
+      "occupancy_title": "端口占用排查",
+      "occupancy_description": "输入本机端口号，查看正在监听该端口的进程，并可结束占用进程。",
+      "inspect_port": "排查端口",
+      "inspect_occupancy": "排查占用",
+      "no_port_occupancy": "未发现该端口被占用",
+      "inspect_failed": "端口占用排查失败",
+      "inspect_failed_with_error": "端口占用排查失败: {error}",
+      "protocol": "协议",
+      "local_address": "本地地址",
+      "process_name": "进程名",
+      "actions": "操作",
+      "kill_process": "结束进程",
+      "kill_confirm": "确定要结束进程 {process} (PID: {pid}) 吗？这可能会中断正在运行的服务。",
+      "kill_warning": "结束进程会直接关闭占用该端口的程序，请确认不是系统服务或重要任务后再操作。",
+      "kill_success": "进程已结束",
+      "kill_failed": "结束进程失败",
+      "kill_failed_with_error": "结束进程失败: {error}",
       "instructions": {
-        "title": "使用说明",
+        "title": "说明",
         "step1_title": "输入目标主机",
         "step1_desc": "输入要扫描的目标主机，可以是 IP 地址（如 192.168.1.1）或域名（如 google.com）",
         "step2_title": "选择扫描模式",

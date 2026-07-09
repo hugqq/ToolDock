@@ -43,6 +43,10 @@ use commands::ip_lookup::{
     batch_query_ips, check_ip_is_private, get_ip_special_info, parse_ip_range, query_ip_info,
     validate_ip_address,
 };
+use commands::my_computer_namespace::{
+    delete_my_computer_namespace_icons, list_my_computer_namespace_backups,
+    restore_my_computer_namespace_backup, scan_my_computer_namespace_icons,
+};
 use commands::network::{start_network_task, stop_network_task};
 use commands::nginx::{
     create_nginx_backup, delete_nginx_backup, is_nginx_running, list_nginx_backups,
@@ -51,7 +55,9 @@ use commands::nginx::{
 };
 use commands::notepad::{load_notepad_data, save_notepad_data, save_notepad_image, NotepadDbState};
 use commands::ocr::{run_ocr, run_ocr_detailed};
-use commands::port_scanner::{start_port_scan, stop_port_scan};
+use commands::port_scanner::{
+    find_port_occupancy, kill_port_process, start_port_scan, stop_port_scan,
+};
 use commands::renamer::{
     clear_rename_history, execute_batch_rename, get_rename_history, preview_batch_rename,
     revert_batch_rename, revert_single_rename,
@@ -303,6 +309,10 @@ pub fn run() {
             query_ip_info,
             batch_query_ips,
             parse_ip_range,
+            scan_my_computer_namespace_icons,
+            delete_my_computer_namespace_icons,
+            list_my_computer_namespace_backups,
+            restore_my_computer_namespace_backup,
             start_mouse_clicker,
             stop_mouse_clicker,
             is_mouse_clicker_running,
@@ -317,6 +327,8 @@ pub fn run() {
             get_web_server_status,
             start_port_scan,
             stop_port_scan,
+            find_port_occupancy,
+            kill_port_process,
             register_global_hotkey,
             load_notepad_data,
             save_notepad_data,

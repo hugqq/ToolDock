@@ -28,8 +28,10 @@ import {
   Gamepad2,
   Notebook,
   FileImage,
+  MonitorX,
 } from "lucide-react";
 import { CATEGORY } from "../constants";
+import { ToolPlatform } from "../lib/toolVisibility";
 
 export interface Tool {
   id: string;
@@ -40,6 +42,7 @@ export interface Tool {
   color: string;
   route: string;
   requiredPermissions?: string[];
+  supportedPlatforms?: ToolPlatform[];
 }
 
 export const TOOLS: Tool[] = [
@@ -204,6 +207,16 @@ export const TOOLS: Tool[] = [
     descriptionKey: "tools.clipboard_manager.description",
     color: "#10b981",
     route: "/tools/clipboard-manager",
+  },
+  {
+    id: "my_computer_namespace",
+    nameKey: "tools.my_computer_namespace.name",
+    icon: MonitorX,
+    categoryKey: "categories.system",
+    descriptionKey: "tools.my_computer_namespace.description",
+    color: "#ef4444",
+    route: "/tools/my-computer-namespace",
+    supportedPlatforms: ["windows"],
   },
   {
     id: "dns_tool",

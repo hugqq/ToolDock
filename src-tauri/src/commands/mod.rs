@@ -10,6 +10,7 @@ pub mod hash;
 pub mod hotkey;
 pub mod image_convert;
 pub mod ip_lookup;
+pub mod my_computer_namespace;
 pub mod network;
 pub mod nginx;
 pub mod notepad;

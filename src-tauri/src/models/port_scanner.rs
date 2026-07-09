@@ -14,3 +14,12 @@ pub struct ScanProgress {
     pub scanned_count: usize,
     pub result: Option<ScanResult>,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct PortOccupancy {
+    pub protocol: String,
+    pub local_address: String,
+    pub port: u16,
+    pub pid: u32,
+    pub process_name: String,
+}

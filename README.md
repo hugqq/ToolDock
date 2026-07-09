@@ -123,7 +123,7 @@ src-tauri/target/release/bundle/
 
 - DNS Helper: run DNS queries and related diagnostics.
 - Nginx Editor: edit, validate, template, and manage local Nginx configs.
-- Port Scanner: scan open ports by common ports, ranges, or custom lists.
+- Port Manager: scan open ports, inspect local port occupancy, and end occupying processes.
 - IP Lookup: query IP location and network information.
 - Simple Web Server: serve a local folder over HTTP for quick LAN sharing or static page testing.
 

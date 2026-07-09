@@ -49,6 +49,9 @@ const Othello = lazy(() => import("./pages/Othello"));
 const Game2048 = lazy(() => import("./pages/Game2048"));
 const NotePad = lazy(() => import("./pages/NotePad"));
 const PdfToImage = lazy(() => import("./pages/PdfToImage"));
+const MyComputerNamespaceCleaner = lazy(
+  () => import("./pages/MyComputerNamespaceCleaner")
+);
 
 // Loading fallback component
 function PageLoader() {
@@ -195,6 +198,10 @@ function AppContent() {
               <Route path="/tools/2048" element={<Game2048 />} />
               <Route path="/tools/notepad" element={<NotePad />} />
               <Route path="/tools/pdf-to-image" element={<PdfToImage />} />
+              <Route
+                path="/tools/my-computer-namespace"
+                element={<MyComputerNamespaceCleaner />}
+              />
               <Route path="/othello" element={<Othello />} />
               <Route path="/settings" element={<Settings />} />
             </Routes>

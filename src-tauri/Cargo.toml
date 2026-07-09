@@ -1,6 +1,6 @@
 [package]
 name = "tooldock"
-version = "1.0.3"
+version = "1.0.4"
 description = "ToolDock - A Windows-first utility toolbox"
 authors = ["Glow"]
 edition = "2021"

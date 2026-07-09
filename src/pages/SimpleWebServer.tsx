@@ -1,11 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import { openPath } from "@tauri-apps/plugin-opener";
 import { ToolLayout } from "../components/layout/ToolLayout";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
-import { Copy, ExternalLink, Lightbulb } from "lucide-react";
+import {
+  Copy,
+  ExternalLink,
+  FolderOpen,
+  Monitor,
+  Play,
+  Server,
+  Square,
+  Wifi,
+} from "lucide-react";
 import { InstructionsDialog } from "../components/shared/InstructionsDialog";
 
 interface ServerStatus {
@@ -127,11 +136,48 @@ export default function SimpleWebServer() {
   };
 
   return (
-    <ToolLayout title={t("tools.simple_web_server.name")}>
-      <div className="space-y-6">
-        {/* 设计思路 */}
-        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
-          <div className="flex justify-end mb-3">
+    <ToolLayout
+      title={t("tools.simple_web_server.name")}
+      status={
+        isRunning
+          ? t("tools.simple_web_server.server_running")
+          : t("tools.simple_web_server.server_stopped")
+      }
+    >
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 pb-6">
+        <section className="rounded-2xl border border-(--border-color) bg-(--card-bg) p-6 shadow-sm">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="rounded-xl bg-primary/10 p-3 text-primary">
+                <Server className="h-6 w-6" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h3 className="text-lg font-bold text-(--text-main)">
+                    {t("tools.simple_web_server.name")}
+                  </h3>
+                  <span
+                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold ${
+                      isRunning
+                        ? "bg-green-500/10 text-green-500"
+                        : "bg-slate-500/10 text-(--text-muted)"
+                    }`}
+                  >
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        isRunning ? "bg-green-500" : "bg-slate-400"
+                      }`}
+                    />
+                    {isRunning
+                      ? t("tools.simple_web_server.server_running")
+                      : t("tools.simple_web_server.server_stopped")}
+                  </span>
+                </div>
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-(--text-muted)">
+                  {t("tools.simple_web_server.design_philosophy.content")}
+                </p>
+              </div>
+            </div>
             <InstructionsDialog
               title={t("tools.simple_web_server.instructions.title")}
               steps={[
@@ -162,153 +208,192 @@ export default function SimpleWebServer() {
               ]}
             />
           </div>
-          <div className="flex items-start gap-3">
-            <Lightbulb className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 shrink-0" />
-            <div>
-              <h3 className="text-base font-semibold text-orange-800 dark:text-orange-300 mb-1">
-                {t("tools.simple_web_server.design_philosophy.title")}
+        </section>
+
+        <section className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="rounded-2xl border border-(--border-color) bg-(--card-bg) p-6 shadow-sm">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                <FolderOpen className="h-5 w-5" />
+              </div>
+              <h3 className="text-base font-bold text-(--text-main)">
+                {t("tools.simple_web_server.folder_path")}
               </h3>
-              <p className="text-sm text-orange-700 dark:text-orange-400 leading-relaxed">
-                {t("tools.simple_web_server.design_philosophy.content")}
-              </p>
+            </div>
+
+            <div className="space-y-5">
+              <div className="flex min-w-0 flex-col gap-3 sm:flex-row">
+                <div className="relative min-w-0 flex-1">
+                  <FolderOpen className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--text-muted)" />
+                  <input
+                    type="text"
+                    value={folderPath}
+                    readOnly
+                    title={
+                      folderPath || t("tools.simple_web_server.select_folder")
+                    }
+                    placeholder={t("tools.simple_web_server.select_folder")}
+                    className="h-11 w-full rounded-xl border border-(--border-color) bg-(--bg-main) pl-10 pr-3 text-sm text-(--text-main) outline-none placeholder:text-(--text-muted) focus:border-primary focus:ring-4 focus:ring-primary/10"
+                  />
+                </div>
+                <button
+                  onClick={handleSelectFolder}
+                  disabled={isRunning}
+                  className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-bold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none"
+                >
+                  <FolderOpen className="h-4 w-4" />
+                  {t("common.browse")}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-[220px_minmax(0,1fr)] sm:items-end">
+                <div>
+                  <label className="mb-2 block text-sm font-bold text-(--text-main)">
+                    {t("tools.simple_web_server.port")}
+                  </label>
+                  <input
+                    type="number"
+                    value={port}
+                    onChange={(e) => setPort(parseInt(e.target.value) || 8080)}
+                    disabled={isRunning}
+                    min={1024}
+                    max={65535}
+                    className="h-11 w-full rounded-xl border border-(--border-color) bg-(--bg-main) px-3 font-mono text-sm text-(--text-main) outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  />
+                </div>
+
+                {!isRunning ? (
+                  <button
+                    onClick={handleStartServer}
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-bold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-hover"
+                  >
+                    <Play className="h-4 w-4" />
+                    {t("tools.simple_web_server.start_server")}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleStopServer}
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-red-500 px-5 text-sm font-bold text-white shadow-sm shadow-red-500/20 transition-colors hover:bg-red-600"
+                  >
+                    <Square className="h-4 w-4" />
+                    {t("tools.simple_web_server.stop_server")}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* 配置区域 */}
-        <div className="bg-(--bg-secondary) rounded-lg p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-(--text-main) mb-2">
-              {t("tools.simple_web_server.folder_path")}
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={folderPath}
-                readOnly
-                placeholder={t("tools.simple_web_server.select_folder")}
-                className="flex-1 px-3 py-2 bg-(--bg-main) border border-(--border-main) rounded-lg text-(--text-main) focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <div className="rounded-2xl border border-(--border-color) bg-(--card-bg) p-6 shadow-sm">
+            <div className="mb-6 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`rounded-lg p-2 ${
+                    isRunning
+                      ? "bg-green-500/10 text-green-500"
+                      : "bg-slate-500/10 text-(--text-muted)"
+                  }`}
+                >
+                  <Server className="h-5 w-5" />
+                </div>
+                <h3 className="text-base font-bold text-(--text-main)">
+                  {isRunning
+                    ? t("tools.simple_web_server.server_running")
+                    : t("tools.simple_web_server.server_stopped")}
+                </h3>
+              </div>
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${
+                  isRunning ? "bg-green-500" : "bg-slate-400"
+                }`}
               />
-              <button
-                onClick={handleSelectFolder}
-                disabled={isRunning}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-              >
-                {t("common.browse")}
-              </button>
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-(--text-main) mb-2">
-              {t("tools.simple_web_server.port")}
-            </label>
-            <input
-              type="number"
-              value={port}
-              onChange={(e) => setPort(parseInt(e.target.value) || 8080)}
-              disabled={isRunning}
-              min={1024}
-              max={65535}
-              className="w-full px-3 py-2 bg-(--bg-main) border border-(--border-main) rounded-lg text-(--text-main) focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-            />
-          </div>
-
-          <div className="flex gap-2">
-            {!isRunning ? (
-              <button
-                onClick={handleStartServer}
-                className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium"
-              >
-                {t("tools.simple_web_server.start_server")}
-              </button>
+            {!isRunning || !localAddress ? (
+              <div className="flex min-h-40 flex-col items-center justify-center rounded-xl border border-dashed border-(--border-color) bg-(--bg-main) px-4 text-center">
+                <Server className="mb-3 h-9 w-9 text-(--text-muted) opacity-40" />
+                <p className="text-sm font-bold text-(--text-main)">
+                  {t("tools.simple_web_server.server_stopped")}
+                </p>
+                <p className="mt-1 text-xs text-(--text-muted)">
+                  {t("tools.simple_web_server.select_folder")}
+                </p>
+              </div>
             ) : (
-              <button
-                onClick={handleStopServer}
-                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
-              >
-                {t("tools.simple_web_server.stop_server")}
-              </button>
+              <div className="space-y-4">
+                <AddressRow
+                  icon={<Monitor className="h-4 w-4" />}
+                  label={t("tools.simple_web_server.local_address")}
+                  value={localAddress}
+                  onCopy={() => handleCopyAddress(localAddress)}
+                  onOpen={() => handleOpenBrowser(localAddress)}
+                  copyTitle={t("tools.simple_web_server.copy_address")}
+                  openTitle={t("tools.simple_web_server.open_browser")}
+                />
+                <AddressRow
+                  icon={<Wifi className="h-4 w-4" />}
+                  label={t("tools.simple_web_server.network_address")}
+                  value={networkAddress}
+                  onCopy={() => handleCopyAddress(networkAddress)}
+                  onOpen={() => handleOpenBrowser(networkAddress)}
+                  copyTitle={t("tools.simple_web_server.copy_address")}
+                  openTitle={t("tools.simple_web_server.open_browser")}
+                />
+              </div>
             )}
           </div>
-        </div>
-
-        {/* 服务器状态 */}
-        <div className="bg-(--bg-secondary) rounded-lg p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <div
-              className={`w-3 h-3 rounded-full ${
-                isRunning ? "bg-green-500" : "bg-gray-400"
-              }`}
-            />
-            <span className="text-lg font-medium text-(--text-main)">
-              {isRunning
-                ? t("tools.simple_web_server.server_running")
-                : t("tools.simple_web_server.server_stopped")}
-            </span>
-          </div>
-
-          {isRunning && localAddress && (
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-(--text-secondary) mb-1">
-                  {t("tools.simple_web_server.local_address")}
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={localAddress}
-                    readOnly
-                    className="flex-1 px-3 py-2 bg-(--bg-main) border border-(--border-main) rounded-lg text-(--text-main) font-mono text-sm"
-                  />
-                  <button
-                    onClick={() => handleCopyAddress(localAddress)}
-                    className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center"
-                    title={t("tools.simple_web_server.copy_address")}
-                  >
-                    <Copy size={20} />
-                  </button>
-                  <button
-                    onClick={() => handleOpenBrowser(localAddress)}
-                    className="p-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center"
-                    title={t("tools.simple_web_server.open_browser")}
-                  >
-                    <ExternalLink size={20} />
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-(--text-secondary) mb-1">
-                  {t("tools.simple_web_server.network_address")}
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={networkAddress}
-                    readOnly
-                    className="flex-1 px-3 py-2 bg-(--bg-main) border border-(--border-main) rounded-lg text-(--text-main) font-mono text-sm"
-                  />
-                  <button
-                    onClick={() => handleCopyAddress(networkAddress)}
-                    className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center"
-                    title={t("tools.simple_web_server.copy_address")}
-                  >
-                    <Copy size={20} />
-                  </button>
-                  <button
-                    onClick={() => handleOpenBrowser(networkAddress)}
-                    className="p-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors flex items-center justify-center"
-                    title={t("tools.simple_web_server.open_browser")}
-                  >
-                    <ExternalLink size={20} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        </section>
       </div>
     </ToolLayout>
+  );
+}
+
+interface AddressRowProps {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  onCopy: () => void;
+  onOpen: () => void;
+  copyTitle: string;
+  openTitle: string;
+}
+
+function AddressRow({
+  icon,
+  label,
+  value,
+  onCopy,
+  onOpen,
+  copyTitle,
+  openTitle,
+}: AddressRowProps) {
+  return (
+    <div className="rounded-xl border border-(--border-color) bg-(--bg-main) p-3">
+      <div className="mb-2 flex items-center gap-2 text-xs font-bold text-(--text-muted)">
+        <span className="text-primary">{icon}</span>
+        {label}
+      </div>
+      <div className="flex min-w-0 items-center gap-2">
+        <input
+          type="text"
+          value={value}
+          readOnly
+          className="h-9 min-w-0 flex-1 rounded-lg border border-(--border-color) bg-(--card-bg) px-3 font-mono text-xs text-(--text-main) outline-none"
+        />
+        <button
+          onClick={onCopy}
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors hover:bg-primary hover:text-white"
+          title={copyTitle}
+        >
+          <Copy className="h-4 w-4" />
+        </button>
+        <button
+          onClick={onOpen}
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors hover:bg-primary hover:text-white"
+          title={openTitle}
+        >
+          <ExternalLink className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
   );
 }

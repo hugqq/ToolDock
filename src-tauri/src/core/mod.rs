@@ -11,6 +11,7 @@ pub mod hosts;
 pub mod hotkey;
 pub mod ip_lookup;
 pub mod logging;
+pub mod my_computer_namespace;
 pub mod network;
 pub mod nginx;
 pub mod notepad_db;

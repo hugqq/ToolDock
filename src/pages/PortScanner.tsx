@@ -13,8 +13,18 @@ import {
   Tooltip,
   ToggleButtonGroup,
   ToggleButton,
+  Divider,
+  Alert,
 } from "@mui/material";
-import { PlayArrow, Stop, CopyAll, Timer, Dns } from "@mui/icons-material";
+import {
+  PlayArrow,
+  Stop,
+  CopyAll,
+  Timer,
+  Dns,
+  Search,
+  DeleteForever,
+} from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -43,6 +53,20 @@ interface PortScannerPayload {
   status: string;
 }
 
+interface ApiResponse<T> {
+  ok: boolean;
+  data: T | null;
+  error: { code: string; message: string } | null;
+}
+
+interface PortOccupancy {
+  protocol: string;
+  local_address: string;
+  port: number;
+  pid: number;
+  process_name: string;
+}
+
 const COMMON_PORTS = [
   21, 22, 23, 25, 53, 80, 110, 143, 443, 445, 1433, 1521, 3306, 3389, 5432,
   6379, 8080, 27017,
@@ -63,6 +87,10 @@ export default function PortScanner() {
   const [scannedCount, setScannedCount] = useState(0);
   const [totalPorts, setTotalPorts] = useState(0);
   const [showOpenOnly, setShowOpenOnly] = useState(true);
+  const [inspectPort, setInspectPort] = useState(8080);
+  const [isInspecting, setIsInspecting] = useState(false);
+  const [isKillingPid, setIsKillingPid] = useState<number | null>(null);
+  const [occupancyResults, setOccupancyResults] = useState<PortOccupancy[]>([]);
 
   const taskId = "port-scanner-task";
 
@@ -157,6 +185,59 @@ export default function PortScanner() {
     await invoke("stop_port_scan", { taskId });
   };
 
+  const inspectOccupancy = async () => {
+    if (!Number.isInteger(inspectPort) || inspectPort < 1 || inspectPort > 65535) {
+      toast.error(t("tools.port_scanner.invalid_port_range"));
+      return;
+    }
+
+    setIsInspecting(true);
+    try {
+      const response = await invoke<ApiResponse<PortOccupancy[]>>(
+        "find_port_occupancy",
+        { port: inspectPort }
+      );
+      if (!response.ok) {
+        throw new Error(response.error?.message || t("tools.port_scanner.inspect_failed"));
+      }
+      const data = response.data || [];
+      setOccupancyResults(data);
+      if (data.length === 0) {
+        toast.success(t("tools.port_scanner.no_port_occupancy"));
+      }
+    } catch (error) {
+      toast.error(t("tools.port_scanner.inspect_failed_with_error", { error }));
+    } finally {
+      setIsInspecting(false);
+    }
+  };
+
+  const killProcess = async (row: PortOccupancy) => {
+    const confirmed = window.confirm(
+      t("tools.port_scanner.kill_confirm", {
+        pid: row.pid,
+        process: row.process_name,
+      })
+    );
+    if (!confirmed) return;
+
+    setIsKillingPid(row.pid);
+    try {
+      const response = await invoke<ApiResponse<void>>("kill_port_process", {
+        pid: row.pid,
+      });
+      if (!response.ok) {
+        throw new Error(response.error?.message || t("tools.port_scanner.kill_failed"));
+      }
+      toast.success(t("tools.port_scanner.kill_success"));
+      await inspectOccupancy();
+    } catch (error) {
+      toast.error(t("tools.port_scanner.kill_failed_with_error", { error }));
+    } finally {
+      setIsKillingPid(null);
+    }
+  };
+
   const columns: GridColDef[] = [
     { field: "port", headerName: t("tools.port_scanner.port"), width: 100 },
     {
@@ -181,6 +262,54 @@ export default function PortScanner() {
     { field: "service", headerName: t("tools.port_scanner.service"), flex: 1 },
   ];
 
+  const occupancyColumns: GridColDef[] = [
+    {
+      field: "port",
+      headerName: t("tools.port_scanner.port"),
+      width: 90,
+    },
+    {
+      field: "protocol",
+      headerName: t("tools.port_scanner.protocol"),
+      width: 100,
+    },
+    {
+      field: "local_address",
+      headerName: t("tools.port_scanner.local_address"),
+      flex: 1,
+      minWidth: 180,
+    },
+    {
+      field: "pid",
+      headerName: "PID",
+      width: 100,
+    },
+    {
+      field: "process_name",
+      headerName: t("tools.port_scanner.process_name"),
+      flex: 1,
+      minWidth: 160,
+    },
+    {
+      field: "actions",
+      headerName: t("tools.port_scanner.actions"),
+      width: 140,
+      sortable: false,
+      renderCell: (params) => (
+        <Button
+          size="small"
+          color="error"
+          variant="outlined"
+          startIcon={<DeleteForever />}
+          disabled={isKillingPid === params.row.pid}
+          onClick={() => killProcess(params.row as PortOccupancy)}
+        >
+          {t("tools.port_scanner.kill_process")}
+        </Button>
+      ),
+    },
+  ];
+
   const filteredResults = showOpenOnly
     ? results.filter((r) => r.status === "open")
     : results;
@@ -189,6 +318,54 @@ export default function PortScanner() {
     <ToolLayout title={t("tools.port_scanner.name")}>
       <Box sx={{ p: 3 }}>
         <Paper sx={{ p: 3, my: 3 }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            {t("tools.port_scanner.occupancy_title")}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            {t("tools.port_scanner.occupancy_description")}
+          </Typography>
+          <Grid container spacing={2} alignItems="center">
+            <Grid size={{ xs: 12, md: 4 }}>
+              <TextField
+                fullWidth
+                type="number"
+                label={t("tools.port_scanner.inspect_port")}
+                value={inspectPort}
+                onChange={(e) => setInspectPort(Number(e.target.value))}
+                inputProps={{ min: 1, max: 65535 }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 8 }}>
+              <Button
+                variant="contained"
+                startIcon={<Search />}
+                onClick={inspectOccupancy}
+                disabled={isInspecting}
+                size="large"
+              >
+                {t("tools.port_scanner.inspect_occupancy")}
+              </Button>
+            </Grid>
+          </Grid>
+
+          <Alert severity="warning" sx={{ my: 3 }}>
+            {t("tools.port_scanner.kill_warning")}
+          </Alert>
+
+          <DataTable
+            rows={occupancyResults}
+            columns={occupancyColumns}
+            getRowId={(row) => `${row.pid}-${row.local_address}`}
+            autoHeight
+          />
+        </Paper>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Paper sx={{ p: 3, my: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            {t("tools.port_scanner.scan_title")}
+          </Typography>
           <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
             <InstructionsDialog
               title={t("tools.port_scanner.instructions.title")}

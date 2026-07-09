@@ -1,5 +1,5 @@
 ﻿use crate::core::port_scanner;
-use crate::models::port_scanner::ScanProgress;
+use crate::models::port_scanner::{PortOccupancy, ScanProgress};
 use crate::models::ApiResponse;
 use crate::AppState;
 use serde::Serialize;
@@ -92,4 +92,18 @@ pub async fn stop_port_scan(
         cancel_token.store(true, Ordering::SeqCst);
     }
     Ok(ApiResponse::ok(()))
+}
+
+#[tauri::command]
+pub async fn find_port_occupancy(port: u16) -> Result<ApiResponse<Vec<PortOccupancy>>, String> {
+    port_scanner::find_port_occupancy(port)
+        .map(ApiResponse::ok)
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn kill_port_process(pid: u32) -> Result<ApiResponse<()>, String> {
+    port_scanner::kill_port_process(pid)
+        .map(ApiResponse::ok)
+        .map_err(|e| e.to_string())
 }
