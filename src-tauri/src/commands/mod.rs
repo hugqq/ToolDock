@@ -18,6 +18,7 @@ pub mod notepad;
 pub mod ocr;
 pub mod port_scanner;
 pub mod renamer;
+pub mod search;
 pub mod settings;
 pub mod timestamp;
 pub mod translator;

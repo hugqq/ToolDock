@@ -6,6 +6,7 @@ pub mod cron;
 pub mod diff;
 pub mod dns;
 pub mod file;
+pub mod file_search;
 pub mod hash;
 pub mod hosts;
 pub mod http_client;
