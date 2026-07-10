@@ -295,13 +295,21 @@ pub fn run() {
         .manage(NotepadDbState(Mutex::new(None)))
         .manage(HttpHistoryState(Mutex::new(None)))
         .on_window_event(|window, event| {
-            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                if window.label() == "command-palette" {
-                    let _ = window.hide();
-                    api.prevent_close();
-                    return;
+            if window.label() == "command-palette" {
+                match event {
+                    tauri::WindowEvent::Focused(false) => {
+                        let _ = window.hide();
+                    }
+                    tauri::WindowEvent::CloseRequested { api, .. } => {
+                        let _ = window.hide();
+                        api.prevent_close();
+                    }
+                    _ => {}
                 }
+                return;
+            }
 
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 if window.label() == "main" {
                     let app_handle = window.app_handle();
                     let state = app_handle.state::<AppSettings>();

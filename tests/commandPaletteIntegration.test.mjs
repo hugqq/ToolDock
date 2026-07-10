@@ -51,24 +51,23 @@ test("routes shortcuts and palette UI events", async () => {
     lib,
     /window\.label\(\)\s*==\s*"command-palette"[\s\S]*?window\.hide\(\)[\s\S]*?api\.prevent_close\(\)/,
   );
+  assert.match(
+    lib,
+    /window\.label\(\)\s*==\s*"command-palette"[\s\S]*?WindowEvent::Focused\(false\)[\s\S]*?window\.hide\(\)/,
+  );
 });
 
 test("palette searches files and supports full keyboard control", async () => {
   const page = await read("../src/pages/CommandPalette.tsx");
   assert.match(page, /command-palette-focus/);
   assert.match(page, /search_local_files/);
+  assert.doesNotMatch(page, /onFocusChanged/);
   assert.match(page, /LogicalSize/);
   assert.match(page, /PALETTE_COLLAPSED_HEIGHT\s*=\s*64/);
   assert.match(page, /PALETTE_EXPANDED_HEIGHT\s*=\s*520/);
   assert.match(page, /const expanded = Boolean\(query\.trim\(\)\)/);
   assert.match(page, /setSize\(new LogicalSize/);
   assert.match(page, /expanded\s*&&/);
-  assert.match(page, /onFocusChanged/);
-  assert.match(
-    page,
-    /onFocusChanged\([\s\S]*?focused[\s\S]*?if \(!focused\)[\s\S]*?\.hide\(\)/,
-  );
-  assert.match(page, /focusUnlisten\.then\(\(dispose\) => dispose\(\)\)/);
   for (const key of ["ArrowUp", "ArrowDown", "Enter", "Escape"]) {
     assert.match(page, new RegExp(key));
   }
