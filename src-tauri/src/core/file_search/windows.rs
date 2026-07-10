@@ -26,6 +26,7 @@ fn normalize_item(
         path: path.to_string_lossy().into_owned(),
         modified_at,
         size: if is_directory { None } else { size },
+        icon_data_url: None,
     }
 }
 

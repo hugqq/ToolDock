@@ -6,6 +6,7 @@ export interface FileSearchResult {
   path: string;
   modifiedAt?: number;
   size?: number;
+  iconDataUrl?: string;
 }
 
 export interface FileSearchResponse {

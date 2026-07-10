@@ -38,6 +38,7 @@ fn normalize_metadata(path: &Path) -> FileSearchResult {
             .as_ref()
             .filter(|_| !is_directory)
             .map(|value| value.len()),
+        icon_data_url: None,
     }
 }
 
