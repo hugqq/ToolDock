@@ -14,7 +14,7 @@ use winapi::um::winuser::{
 
 #[cfg(target_os = "windows")]
 const HOTKEY_ID: i32 = 1;
-const PALETTE_UPWARD_OFFSET_LOGICAL: f64 = 80.0;
+const PALETTE_UPWARD_OFFSET_LOGICAL: f64 = 160.0;
 
 fn shifted_palette_y(centered_y: i32, monitor_top: i32, scale_factor: f64) -> i32 {
     let physical_offset = (PALETTE_UPWARD_OFFSET_LOGICAL * scale_factor).round() as i32;
@@ -320,8 +320,8 @@ mod tests {
 
     #[test]
     fn shifts_palette_up_using_scale_factor() {
-        assert_eq!(shifted_palette_y(400, 0, 1.0), 320);
-        assert_eq!(shifted_palette_y(400, 0, 1.5), 280);
+        assert_eq!(shifted_palette_y(400, 0, 1.0), 240);
+        assert_eq!(shifted_palette_y(400, 0, 1.5), 160);
     }
 
     #[test]
