@@ -52,6 +52,12 @@ test("palette searches files and supports full keyboard control", async () => {
   const page = await read("../src/pages/CommandPalette.tsx");
   assert.match(page, /command-palette-focus/);
   assert.match(page, /search_local_files/);
+  assert.match(page, /onFocusChanged/);
+  assert.match(
+    page,
+    /onFocusChanged\([\s\S]*?focused[\s\S]*?if \(!focused\)[\s\S]*?\.hide\(\)/,
+  );
+  assert.match(page, /focusUnlisten\.then\(\(dispose\) => dispose\(\)\)/);
   for (const key of ["ArrowUp", "ArrowDown", "Enter", "Escape"]) {
     assert.match(page, new RegExp(key));
   }

@@ -59,6 +59,10 @@ export default function CommandPalette() {
 
   useEffect(() => {
     void refreshStatus();
+    const paletteWindow = getCurrentWindow();
+    const focusUnlisten = paletteWindow.onFocusChanged(({ payload: focused }) => {
+      if (!focused) void paletteWindow.hide();
+    });
     const unlisten = listen("command-palette-focus", () => {
       setQuery("");
       setFiles([]);
@@ -68,7 +72,10 @@ export default function CommandPalette() {
       void refreshStatus();
     });
     queueMicrotask(() => inputRef.current?.focus());
-    return () => { unlisten.then((dispose) => dispose()); };
+    return () => {
+      unlisten.then((dispose) => dispose());
+      focusUnlisten.then((dispose) => dispose());
+    };
   }, []);
 
   useEffect(() => {
