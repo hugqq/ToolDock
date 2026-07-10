@@ -14,6 +14,27 @@ use winapi::um::winuser::{
 
 #[cfg(target_os = "windows")]
 const HOTKEY_ID: i32 = 1;
+const PALETTE_UPWARD_OFFSET_LOGICAL: f64 = 80.0;
+
+fn shifted_palette_y(centered_y: i32, monitor_top: i32, scale_factor: f64) -> i32 {
+    let physical_offset = (PALETTE_UPWARD_OFFSET_LOGICAL * scale_factor).round() as i32;
+    centered_y
+        .saturating_sub(physical_offset)
+        .max(monitor_top)
+}
+
+fn move_palette_up<R: tauri::Runtime>(window: &tauri::WebviewWindow<R>) {
+    let (Ok(position), Ok(scale_factor), Ok(Some(monitor))) = (
+        window.outer_position(),
+        window.scale_factor(),
+        window.current_monitor(),
+    ) else {
+        return;
+    };
+
+    let y = shifted_palette_y(position.y, monitor.position().y, scale_factor);
+    let _ = window.set_position(tauri::PhysicalPosition::new(position.x, y));
+}
 
 #[allow(dead_code)]
 enum HotkeyCommand {
@@ -42,6 +63,7 @@ pub fn toggle_command_palette(app_handle: &AppHandle) {
 
     let _ = window.set_size(tauri::LogicalSize::new(720.0, 64.0));
     let _ = window.center();
+    move_palette_up(&window);
     let _ = window.unminimize();
     let _ = window.show();
     let _ = window.set_focus();
@@ -289,5 +311,22 @@ impl HotkeyManager {
                 break;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::shifted_palette_y;
+
+    #[test]
+    fn shifts_palette_up_using_scale_factor() {
+        assert_eq!(shifted_palette_y(400, 0, 1.0), 320);
+        assert_eq!(shifted_palette_y(400, 0, 1.5), 280);
+    }
+
+    #[test]
+    fn keeps_palette_inside_current_monitor_top() {
+        assert_eq!(shifted_palette_y(50, 0, 1.0), 0);
+        assert_eq!(shifted_palette_y(-900, -1000, 1.5), -1000);
     }
 }

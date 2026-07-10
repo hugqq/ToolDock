@@ -40,6 +40,11 @@ test("routes shortcuts and palette UI events", async () => {
   ]);
   assert.match(hotkey, /toggle_command_palette/);
   assert.match(hotkey, /command-palette-focus/);
+  assert.match(hotkey, /PALETTE_UPWARD_OFFSET_LOGICAL:\s*f64\s*=\s*80\.0/);
+  assert.match(
+    hotkey,
+    /window\.center\(\)[\s\S]*?move_palette_up\(&window\)[\s\S]*?window\.unminimize\(\)/,
+  );
   assert.match(
     hotkey,
     /set_size\([\s\S]*?LogicalSize::new\(720\.0, 64\.0\)[\s\S]*?window\.center\(\)/,
