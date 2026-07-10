@@ -6,7 +6,7 @@ export function rankToolMatches(
   limit = 5,
 ): ToolSearchCandidate[] {
   const needle = query.trim().toLocaleLowerCase();
-  if (!needle) return candidates.slice(0, limit);
+  if (!needle) return [];
 
   return candidates
     .map((candidate, index) => {

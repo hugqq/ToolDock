@@ -12,6 +12,11 @@ test("ranks exact and prefix tool names ahead of description matches", () => {
   assert.deepEqual(rankToolMatches(tools, "json", 5).map((tool) => tool.id), ["json", "naming"]);
 });
 
+test("returns no tools for empty and whitespace-only queries", () => {
+  assert.deepEqual(rankToolMatches(tools, "", 5), []);
+  assert.deepEqual(rankToolMatches(tools, "   ", 5), []);
+});
+
 test("wraps keyboard selection in both directions", () => {
   assert.equal(moveSelection(2, 1, 3), 0);
   assert.equal(moveSelection(0, -1, 3), 2);
