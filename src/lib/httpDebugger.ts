@@ -27,15 +27,6 @@ export function createMultipartField(): HttpMultipartField {
   };
 }
 
-export function normalizeHttpRequest(request: HttpDebugRequest): HttpDebugRequest {
-  const multipartFields = request.multipartFields ?? [];
-
-  return {
-    ...request,
-    multipartFields: multipartFields.length ? multipartFields : [createMultipartField()],
-  };
-}
-
 export function activePairs(
   rows: HttpKeyValue[],
 ): Array<{ key: string; value: string }> {

@@ -1,9 +1,7 @@
 use std::time::Duration;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
-use tooldock_lib::core::http_client::{
-    build_history_projection, execute_request, validate_request,
-};
+use tooldock_lib::core::http_client::{execute_request, validate_request};
 use tooldock_lib::models::http_client::{
     HttpBodyMode, HttpDebugRequest, HttpKeyValue, HttpMethod, HttpMultipartField,
     HttpMultipartFieldKind,
@@ -117,79 +115,6 @@ fn validates_multipart_rows_and_managed_content_type() {
         validate_request(&value).unwrap_err().code(),
         "MULTIPART_CONTENT_TYPE_MANAGED"
     );
-}
-
-#[test]
-fn redacts_sensitive_headers_case_insensitively() {
-    let mut value = request();
-    value.headers = vec![
-        pair("authorization", "Bearer secret"),
-        pair("X-API-Key", "api-secret"),
-        pair("Accept", "application/json"),
-    ];
-
-    let safe = build_history_projection(&value);
-    assert_eq!(safe.headers[0].value, "<redacted>");
-    assert_eq!(safe.headers[1].value, "<redacted>");
-    assert_eq!(safe.headers[2].value, "application/json");
-}
-
-#[test]
-fn redacts_nested_json_and_form_secrets() {
-    let mut value = request();
-    value.body_mode = HttpBodyMode::Json;
-    value.body_text = r#"{"user":"alice","nested":{"access_token":"secret"},"items":[{"password":"pw"}]}"#.to_string();
-
-    let safe = build_history_projection(&value);
-    assert!(safe.body_text.contains("alice"));
-    assert!(!safe.body_text.contains("secret"));
-    assert!(!safe.body_text.contains("pw"));
-    assert!(safe.body_text.matches("<redacted>").count() >= 2);
-
-    value.body_mode = HttpBodyMode::Form;
-    value.form_fields = vec![pair("username", "alice"), pair("api_key", "secret")];
-    let safe = build_history_projection(&value);
-    assert_eq!(safe.form_fields[0].value, "alice");
-    assert_eq!(safe.form_fields[1].value, "<redacted>");
-}
-
-#[test]
-fn redacts_multipart_text_secrets_and_clears_file_metadata() {
-    let mut value = request();
-    value.body_mode = HttpBodyMode::Multipart;
-    value.multipart_fields = vec![
-        multipart_field(
-            "token",
-            "access_token",
-            HttpMultipartFieldKind::Text,
-            "secret",
-            "",
-            "",
-        ),
-        multipart_field(
-            "file",
-            "asset",
-            HttpMultipartFieldKind::File,
-            "",
-            r#"C:\private\a.txt"#,
-            "a.txt",
-        ),
-    ];
-
-    let safe = build_history_projection(&value);
-    assert_eq!(safe.multipart_fields[0].value, "<redacted>");
-    assert!(safe.multipart_fields[1].file_path.is_empty());
-    assert!(safe.multipart_fields[1].file_name.is_empty());
-}
-
-#[test]
-fn never_persists_raw_text_body() {
-    let mut value = request();
-    value.body_mode = HttpBodyMode::Text;
-    value.body_text = "unstructured secret".to_string();
-
-    let safe = build_history_projection(&value);
-    assert!(safe.body_text.is_empty());
 }
 
 async fn serve_once(response: Vec<u8>, delay: Duration) -> String {

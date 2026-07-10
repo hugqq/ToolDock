@@ -311,18 +311,10 @@ const FolderSize: React.FC = () => {
                 <input
                   type="text"
                   placeholder={t("tools.folder_size.path_placeholder")}
-                  className="w-full !pl-4 !pr-10 py-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  className="w-full !pl-4 !pr-4 py-2.5 bg-(--bg-main) border border-(--border-color) rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   value={path}
                   onChange={(e) => setPath(e.target.value)}
                 />
-                {scanning && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <RefreshCw
-                      size={16}
-                      className="animate-spin text-primary"
-                    />
-                  </div>
-                )}
               </div>
               <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:gap-3">
                 <Button

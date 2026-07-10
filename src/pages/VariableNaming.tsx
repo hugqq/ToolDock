@@ -191,9 +191,10 @@ const VariableNaming: React.FC = () => {
                 {t("tools.variable_naming.model_label")}
               </label>
               <Select
-                value={selectedProvider}
+                value={availableProviders.length > 0 ? selectedProvider : ""}
                 onChange={setSelectedProvider}
                 options={availableProviders}
+                placeholder={t("tools.variable_naming.no_model")}
               />
             </div>
 

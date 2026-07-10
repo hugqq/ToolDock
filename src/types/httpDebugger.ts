@@ -43,19 +43,6 @@ export interface HttpDebugResponse {
   binary: boolean;
 }
 
-export interface SendHttpResult {
-  response: HttpDebugResponse;
-  historySaved: boolean;
-}
-
-export interface HttpHistoryEntry {
-  id: string;
-  request: HttpDebugRequest;
-  responseStatus: number;
-  durationMs: number;
-  createdAt: number;
-}
-
 export interface HttpDraftErrors {
   url?: "required" | "invalid_url" | "unsupported_scheme";
   body?: "invalid_json" | "incompatible_content_type" | "multipart_content_type_managed";

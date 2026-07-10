@@ -85,20 +85,3 @@ pub struct HttpDebugResponse {
     pub truncated: bool,
     pub binary: bool,
 }
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
-pub struct SendHttpResult {
-    pub response: HttpDebugResponse,
-    pub history_saved: bool,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
-pub struct HttpHistoryEntry {
-    pub id: String,
-    pub request: HttpDebugRequest,
-    pub response_status: u16,
-    pub duration_ms: u64,
-    pub created_at: i64,
-}

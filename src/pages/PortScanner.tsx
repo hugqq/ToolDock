@@ -316,8 +316,8 @@ export default function PortScanner() {
 
   return (
     <ToolLayout title={t("tools.port_scanner.name")}>
-      <Box sx={{ p: 3 }}>
-        <Paper sx={{ p: 3, my: 3 }}>
+      <Box sx={{ px: 3, pb: 3 }}>
+        <Paper sx={{ p: 3, mt: 0, mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 1 }}>
             {t("tools.port_scanner.occupancy_title")}
           </Typography>

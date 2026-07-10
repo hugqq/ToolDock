@@ -5,7 +5,6 @@ import {
   buildRequestUrl,
   formatResponseBody,
   generateCurl,
-  normalizeHttpRequest,
   validateHttpDraft,
 } from "../src/lib/httpDebugger.ts";
 
@@ -157,22 +156,6 @@ test("validates multipart rows and managed content type", () => {
     }).body,
     "multipart_content_type_managed",
   );
-});
-
-test("normalizes old requests with one empty multipart row", () => {
-  const normalized = normalizeHttpRequest({
-    method: "GET",
-    url: "https://example.test",
-    query: [],
-    headers: [],
-    bodyMode: "none",
-    bodyText: "",
-    formFields: [],
-    timeoutMs: 30000,
-  });
-
-  assert.equal(normalized.multipartFields.length, 1);
-  assert.equal(normalized.multipartFields[0].kind, "text");
 });
 
 test("generates multipart cURL text and file forms in order", () => {

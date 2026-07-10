@@ -1,6 +1,6 @@
 use crate::models::http_client::{
-    HttpBodyMode, HttpDebugRequest, HttpDebugResponse, HttpKeyValue, HttpMethod,
-    HttpMultipartField, HttpMultipartFieldKind, HttpResponseHeader,
+    HttpBodyMode, HttpDebugRequest, HttpDebugResponse, HttpMethod, HttpMultipartField,
+    HttpMultipartFieldKind, HttpResponseHeader,
 };
 use futures_util::StreamExt;
 use reqwest::header::{HeaderName, HeaderValue, CONTENT_TYPE};
@@ -9,7 +9,6 @@ use serde_json::Value;
 use std::time::{Duration, Instant};
 use thiserror::Error;
 
-const REDACTED: &str = "<redacted>";
 const MIN_TIMEOUT_MS: u64 = 1_000;
 const MAX_TIMEOUT_MS: u64 = 120_000;
 const MAX_RESPONSE_BYTES: usize = 5 * 1024 * 1024;
@@ -146,90 +145,6 @@ pub fn validate_request(request: &HttpDebugRequest) -> Result<(), HttpClientErro
     }
 
     Ok(())
-}
-
-pub fn is_sensitive_name(name: &str) -> bool {
-    let normalized: String = name
-        .chars()
-        .filter(|ch| ch.is_ascii_alphanumeric())
-        .flat_map(char::to_lowercase)
-        .collect();
-    [
-        "password",
-        "passwd",
-        "token",
-        "secret",
-        "apikey",
-        "authorization",
-        "cookie",
-    ]
-    .iter()
-    .any(|fragment| normalized.contains(fragment))
-}
-
-fn redact_pairs(values: &mut [HttpKeyValue]) {
-    for value in values.iter_mut().filter(|value| value.enabled) {
-        if is_sensitive_name(&value.key) {
-            value.value = REDACTED.to_string();
-        }
-    }
-}
-
-fn redact_json(value: &mut Value) {
-    match value {
-        Value::Object(map) => {
-            for (key, value) in map.iter_mut() {
-                if is_sensitive_name(key) {
-                    *value = Value::String(REDACTED.to_string());
-                } else {
-                    redact_json(value);
-                }
-            }
-        }
-        Value::Array(values) => {
-            for value in values {
-                redact_json(value);
-            }
-        }
-        _ => {}
-    }
-}
-
-fn redact_multipart_fields(fields: &mut [HttpMultipartField]) {
-    for field in fields {
-        match field.kind {
-            HttpMultipartFieldKind::Text if field.enabled && is_sensitive_name(&field.key) => {
-                field.value = REDACTED.to_string();
-            }
-            HttpMultipartFieldKind::File => {
-                field.file_path.clear();
-                field.file_name.clear();
-            }
-            HttpMultipartFieldKind::Text => {}
-        }
-    }
-}
-
-pub fn build_history_projection(request: &HttpDebugRequest) -> HttpDebugRequest {
-    let mut safe = request.clone();
-    redact_pairs(&mut safe.headers);
-    redact_pairs(&mut safe.form_fields);
-    redact_multipart_fields(&mut safe.multipart_fields);
-
-    match safe.body_mode {
-        HttpBodyMode::Json => {
-            if let Ok(mut json) = serde_json::from_str::<Value>(&safe.body_text) {
-                redact_json(&mut json);
-                safe.body_text = serde_json::to_string(&json).unwrap_or_default();
-            } else {
-                safe.body_text.clear();
-            }
-        }
-        HttpBodyMode::Text => safe.body_text.clear(),
-        HttpBodyMode::None | HttpBodyMode::Form | HttpBodyMode::Multipart => {}
-    }
-
-    safe
 }
 
 fn method(method: &HttpMethod) -> reqwest::Method {

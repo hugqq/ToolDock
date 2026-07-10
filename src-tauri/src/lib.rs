@@ -98,10 +98,7 @@ use commands::file::{
 };
 use commands::hash::find_duplicate_files;
 use commands::hotkey::{register_global_hotkey, unregister_global_hotkey};
-use commands::http_client::{
-    clear_http_history, delete_http_history, list_http_history, send_http_request,
-    HttpHistoryState,
-};
+use commands::http_client::send_http_request;
 use commands::image_convert::convert_images;
 use commands::ip_lookup::{
     batch_query_ips, check_ip_is_private, get_ip_special_info, parse_ip_range, query_ip_info,
@@ -293,7 +290,6 @@ pub fn run() {
             close_behavior: Mutex::new("minimize".to_string()),
         })
         .manage(NotepadDbState(Mutex::new(None)))
-        .manage(HttpHistoryState(Mutex::new(None)))
         .on_window_event(|window, event| {
             if window.label() == "command-palette" {
                 match event {
@@ -439,9 +435,6 @@ pub fn run() {
             save_notepad_image,
             unregister_global_hotkey,
             send_http_request,
-            list_http_history,
-            delete_http_history,
-            clear_http_history,
             get_file_search_status,
             search_local_files,
             open_search_result,

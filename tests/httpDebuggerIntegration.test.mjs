@@ -15,18 +15,11 @@ test("HTTP debugger is registered in the tool catalog and router", async () => {
   assert.match(app, /path="\/tools\/http-debugger"/);
 });
 
-test("HTTP commands are managed and exposed by the Tauri application", async () => {
+test("HTTP request command is exposed without history state", async () => {
   const source = await read("../src-tauri/src/lib.rs");
 
-  assert.match(source, /manage\(HttpHistoryState\(Mutex::new\(None\)\)\)/);
-  for (const command of [
-    "send_http_request",
-    "list_http_history",
-    "delete_http_history",
-    "clear_http_history",
-  ]) {
-    assert.match(source, new RegExp(`\\b${command}\\b`));
-  }
+  assert.match(source, /\bsend_http_request\b/);
+  assert.doesNotMatch(source, /HttpHistoryState|_http_history/);
 });
 
 test("HTTP debugger exposes multipart file selection", async () => {
@@ -40,5 +33,5 @@ test("HTTP debugger exposes multipart file selection", async () => {
   assert.match(requestEditor, /<MultipartEditor/);
   assert.match(multipartEditor, /@tauri-apps\/plugin-dialog/);
   assert.match(multipartEditor, /filePath/);
-  assert.match(page, /normalizeHttpRequest/);
+  assert.doesNotMatch(page, /HistoryPanel|_http_history/);
 });

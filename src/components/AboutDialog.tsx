@@ -2,6 +2,7 @@ import React from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { X, Github, ExternalLink } from "lucide-react";
+import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import logo from "../assets/logo.svg";
 
@@ -15,6 +16,25 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
   onClose,
 }) => {
   const { t } = useTranslation();
+  const [version, setVersion] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    let isActive = true;
+
+    getVersion()
+      .then((appVersion) => {
+        if (isActive) setVersion(appVersion);
+      })
+      .catch(() => {
+        if (isActive) setVersion(null);
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -92,7 +112,9 @@ export const AboutDialog: React.FC<AboutDialogProps> = ({
               <h2 className="text-xl font-bold text-(--text-main)">
                 {t("about.title")}
               </h2>
-              <p className="text-sm text-(--text-muted)">v1.0.0</p>
+              <p className="text-sm text-(--text-muted)">
+                v{version ?? "--"}
+              </p>
             </div>
           </div>
           <button
