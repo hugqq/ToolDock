@@ -23,11 +23,12 @@ test("configures the standalone command palette window and permissions", async (
   assert.equal(palette.url, "#/command-palette");
   assert.equal(palette.visible, false);
   assert.equal(palette.width, 720);
-  assert.equal(palette.height, 520);
+  assert.equal(palette.height, 64);
   assert.equal(palette.decorations, false);
   assert.equal(palette.alwaysOnTop, true);
   assert.equal(palette.skipTaskbar, true);
   assert.ok(capability.windows.includes("command-palette"));
+  assert.ok(capability.permissions.includes("core:window:allow-set-size"));
   assert.match(JSON.stringify(capability), /https:\/\/www\.voidtools\.com\/downloads\//);
 });
 
@@ -39,6 +40,10 @@ test("routes shortcuts and palette UI events", async () => {
   ]);
   assert.match(hotkey, /toggle_command_palette/);
   assert.match(hotkey, /command-palette-focus/);
+  assert.match(
+    hotkey,
+    /set_size\([\s\S]*?LogicalSize::new\(720\.0, 64\.0\)[\s\S]*?window\.center\(\)/,
+  );
   assert.match(app, /"\/command-palette"/);
   assert.match(app, /getCurrentWindow\(\)\.label\s*===\s*"command-palette"/);
   assert.match(app, /navigate-to-tool/);
@@ -52,6 +57,12 @@ test("palette searches files and supports full keyboard control", async () => {
   const page = await read("../src/pages/CommandPalette.tsx");
   assert.match(page, /command-palette-focus/);
   assert.match(page, /search_local_files/);
+  assert.match(page, /LogicalSize/);
+  assert.match(page, /PALETTE_COLLAPSED_HEIGHT\s*=\s*64/);
+  assert.match(page, /PALETTE_EXPANDED_HEIGHT\s*=\s*520/);
+  assert.match(page, /const expanded = Boolean\(query\.trim\(\)\)/);
+  assert.match(page, /setSize\(new LogicalSize/);
+  assert.match(page, /expanded\s*&&/);
   assert.match(page, /onFocusChanged/);
   assert.match(
     page,

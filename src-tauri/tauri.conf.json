@@ -26,7 +26,7 @@
         "title": "ToolDock Search",
         "url": "#/command-palette",
         "width": 720,
-        "height": 520,
+        "height": 64,
         "center": true,
         "decorations": false,
         "alwaysOnTop": true,

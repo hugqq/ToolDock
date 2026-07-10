@@ -40,6 +40,7 @@ pub fn toggle_command_palette(app_handle: &AppHandle) {
         return;
     }
 
+    let _ = window.set_size(tauri::LogicalSize::new(720.0, 64.0));
     let _ = window.center();
     let _ = window.unminimize();
     let _ = window.show();

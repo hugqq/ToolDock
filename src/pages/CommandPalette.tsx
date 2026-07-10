@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { LogicalSize } from "@tauri-apps/api/dpi";
 import { emitTo, listen } from "@tauri-apps/api/event";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -11,6 +12,9 @@ import { TOOLS } from "../tools/registry";
 import type { FileSearchResponse, FileSearchResult, ToolSearchCandidate } from "../types/search";
 
 const EVERYTHING_DOWNLOAD_URL = "https://www.voidtools.com/downloads/";
+const PALETTE_WIDTH = 720;
+const PALETTE_COLLAPSED_HEIGHT = 64;
+const PALETTE_EXPANDED_HEIGHT = 520;
 type PaletteItem =
   | { type: "tool"; value: ToolSearchCandidate }
   | { type: "file"; value: FileSearchResult };
@@ -26,6 +30,7 @@ export default function CommandPalette() {
   const [selected, setSelected] = useState(0);
   const [openError, setOpenError] = useState("");
   const [retryToken, setRetryToken] = useState(0);
+  const expanded = Boolean(query.trim());
 
   const candidates = useMemo<ToolSearchCandidate[]>(
     () => TOOLS.map((tool) => ({
@@ -77,6 +82,13 @@ export default function CommandPalette() {
       focusUnlisten.then((dispose) => dispose());
     };
   }, []);
+
+  useEffect(() => {
+    const height = expanded
+      ? PALETTE_EXPANDED_HEIGHT
+      : PALETTE_COLLAPSED_HEIGHT;
+    void getCurrentWindow().setSize(new LogicalSize(PALETTE_WIDTH, height));
+  }, [expanded]);
 
   useEffect(() => {
     setSelected(0);
@@ -162,7 +174,9 @@ export default function CommandPalette() {
         <kbd className="rounded border border-(--border-color) px-2 py-1 text-xs text-(--text-muted)">Esc</kbd>
       </div>
 
-      <div className="flex-1 overflow-auto py-2">
+      {expanded && (
+        <>
+          <div className="flex-1 overflow-auto py-2">
         {tools.length > 0 && (
           <ResultGroup title={t("command_palette.tools")}>
             {tools.map((tool, index) => (
@@ -193,12 +207,13 @@ export default function CommandPalette() {
             )}
           </ResultGroup>
         )}
-        {!query.trim() && <Message>{t("command_palette.hint")}</Message>}
-        {openError && <div className="mx-4 mt-2 text-sm text-red-500">{openError}</div>}
-      </div>
-      <div className="flex justify-between border-t border-(--border-color) px-5 py-2 text-xs text-(--text-muted)">
-        <span>↑↓ {t("command_palette.navigate")}</span><span>Enter {t("command_palette.open")}</span>
-      </div>
+            {openError && <div className="mx-4 mt-2 text-sm text-red-500">{openError}</div>}
+          </div>
+          <div className="flex justify-between border-t border-(--border-color) px-5 py-2 text-xs text-(--text-muted)">
+            <span>↑↓ {t("command_palette.navigate")}</span><span>Enter {t("command_palette.open")}</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }
