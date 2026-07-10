@@ -77,4 +77,8 @@ test("palette searches files and supports full keyboard control", async () => {
     assert.match(page, new RegExp(key));
   }
   assert.match(page, /https:\/\/www\.voidtools\.com\/downloads\//);
+  assert.match(page, /file\.iconDataUrl/);
+  assert.match(page, /<img/);
+  assert.match(page, /onError/);
+  assert.match(page, /<File\s+size=\{18\}/);
 });

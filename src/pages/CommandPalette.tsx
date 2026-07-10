@@ -182,7 +182,7 @@ export default function CommandPalette() {
         {query.trim() && (
           <ResultGroup title={t("command_palette.files")} loading={loading}>
             {files.map((file, index) => (
-              <ResultRow key={file.path} selected={selected === fileOffset + index} icon={file.kind === "directory" ? <Folder size={18} /> : <File size={18} />} title={file.name} subtitle={file.path} onClick={() => void choose({ type: "file", value: file })} />
+              <ResultRow key={file.path} selected={selected === fileOffset + index} icon={<FileResultIcon file={file} />} title={file.name} subtitle={file.path} onClick={() => void choose({ type: "file", value: file })} />
             ))}
             {!loading && provider?.available && !provider.errorCode && files.length === 0 && <Message>{t("command_palette.no_files")}</Message>}
             {!loading && provider?.errorCode === "query_failed" && (
@@ -215,6 +215,28 @@ export default function CommandPalette() {
 
 function ResultGroup({ title, loading, children }: { title: string; loading?: boolean; children: React.ReactNode }) {
   return <section className="mb-2"><h2 className="flex items-center gap-2 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-(--text-muted)">{title}{loading && <span className="h-3 w-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />}</h2>{children}</section>;
+}
+
+function FileResultIcon({ file }: { file: FileSearchResult }) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [file.iconDataUrl]);
+
+  if (file.kind === "directory") return <Folder size={18} />;
+  if (!file.iconDataUrl || imageFailed) return <File size={18} />;
+
+  return (
+    <img
+      src={file.iconDataUrl}
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+      className="h-[18px] w-[18px] object-contain"
+      onError={() => setImageFailed(true)}
+    />
+  );
 }
 
 function ResultRow({ selected, icon, title, subtitle, onClick }: { selected: boolean; icon: React.ReactNode; title: string; subtitle: string; onClick: () => void }) {
