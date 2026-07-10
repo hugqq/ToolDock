@@ -600,6 +600,8 @@
       "shortcut_clear": "清除快捷键",
       "shortcut_recording": "请按下快捷键组合...",
       "shortcut_example": "例如: Ctrl+Shift+D 或 Alt+F1",
+      "shortcut_preset_alt_space": "Alt+空格",
+      "shortcut_preset_ctrl_space": "Ctrl+空格",
       "developer_settings": "开发者设置",
       "developer_settings_desc": "开启后可以调整日志级别，并查看应用运行日志和错误日志。",
       "developer_log_level": "日志级别",

@@ -592,6 +592,8 @@
       "shortcut_clear": "Clear Shortcut",
       "shortcut_recording": "Press shortcut combination...",
       "shortcut_example": "e.g.: Ctrl+Shift+D or Alt+F1",
+      "shortcut_preset_alt_space": "Alt+Space",
+      "shortcut_preset_ctrl_space": "Ctrl+Space",
       "developer_settings": "Developer Settings",
       "developer_settings_desc": "Enable developer controls to adjust log level and inspect runtime and error logs.",
       "developer_log_level": "Log Level",

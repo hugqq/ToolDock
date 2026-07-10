@@ -43,6 +43,7 @@ import { invokeWrapper } from "../api";
 import { useModal } from "../components/ModalContext";
 import { Input } from "../components/mui";
 import { Button } from "../components/mui";
+import { buildShortcutFromKey } from "../lib/shortcut";
 
 // 设置分类定义
 type SettingsCategory =
@@ -87,6 +88,16 @@ const LOG_LEVELS: DeveloperLogLevel[] = [
   "debug",
   "trace",
 ];
+const SHORTCUT_PRESETS = [
+  {
+    value: "Alt+Space",
+    labelKey: "tools.settings.shortcut_preset_alt_space",
+  },
+  {
+    value: "Ctrl+Space",
+    labelKey: "tools.settings.shortcut_preset_ctrl_space",
+  },
+] as const;
 
 const normalizeVersion = (version: string) =>
   version
@@ -394,18 +405,15 @@ const Settings: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
 
-    const modifiers: string[] = [];
-    if (e.ctrlKey) modifiers.push("Ctrl");
-    if (e.shiftKey) modifiers.push("Shift");
-    if (e.altKey) modifiers.push("Alt");
-    if (e.metaKey) modifiers.push("Meta");
-
-    if (["Control", "Shift", "Alt", "Meta"].includes(e.key)) {
-      return;
-    }
-
-    const key = e.key.length === 1 ? e.key.toUpperCase() : e.key;
-    const shortcut = [...modifiers, key].join("+");
+    const shortcut = buildShortcutFromKey({
+      key: e.key,
+      code: e.code,
+      ctrlKey: e.ctrlKey,
+      shiftKey: e.shiftKey,
+      altKey: e.altKey,
+      metaKey: e.metaKey,
+    });
+    if (!shortcut) return;
 
     setTempShortcut(shortcut);
     setRecording(false);
@@ -920,6 +928,24 @@ const Settings: React.FC = () => {
         <p className="text-xs text-(--text-muted) mt-2">
           {t("tools.settings.shortcut_example")}
         </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {SHORTCUT_PRESETS.map((preset) => (
+            <Button
+              key={preset.value}
+              size="small"
+              variant={
+                tempShortcut === preset.value ? "contained" : "outlined"
+              }
+              aria-pressed={tempShortcut === preset.value}
+              onClick={() => {
+                setTempShortcut(preset.value);
+                setRecording(false);
+              }}
+            >
+              {t(preset.labelKey)}
+            </Button>
+          ))}
+        </div>
       </div>
     </div>
   );
