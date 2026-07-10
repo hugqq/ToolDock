@@ -228,7 +228,7 @@ impl HotkeyManager {
             let shortcut = self.current_shortcut.lock().unwrap().clone();
             self.app_handle
                 .global_shortcut()
-                .unregister(shortcut)
+                .unregister(shortcut.as_str())
                 .map_err(|error| AppError::Internal(error.to_string()))?;
         }
 

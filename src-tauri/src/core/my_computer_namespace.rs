@@ -1,6 +1,7 @@
 use crate::errors::AppError;
 use serde::Serialize;
 use std::path::{Path, PathBuf};
+#[cfg(target_os = "windows")]
 use std::process::Command;
 
 const NAMESPACE_KEY: &str =
